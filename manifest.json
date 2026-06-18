@@ -1,6 +1,7 @@
 {
   "name": "Juego AIP IE 5022",
   "short_name": "Juego AIP",
+  "description": "Aplicacion de juegos interactivos para el Aula de Innovacion Pedagogica",
   "start_url": "/juego-aip/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -9,6 +10,11 @@
     {
       "src": "icono.png",
       "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icono512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
