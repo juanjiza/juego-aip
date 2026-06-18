@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ECO-MISIÓN: 100 Residuos + 100 Preguntas | Reciclaje para niños</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0b3b3f 0%, #1a2a3a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', 'Nunito', 'Segoe UI', system-ui, sans-serif;
+            padding: 20px;
+        }
+
+        .game-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: radial-gradient(circle at 20% 30%, #2d5a5a, #1a3f3f);
+            border-radius: 60px;
+            padding: 20px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+
+        .game-panel {
+            background: #FFF8E7;
+            border-radius: 45px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 4px #FFE5A3, 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-header {
+            background: #2E5D4F;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 4px solid #FFC857;
+        }
+
+        .header-item {
+            background: #1D3E35;
+            padding: 8px 20px;
+            border-radius: 50px;
+            color: #FFE484;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-name-badge {
+            background: #FFC857;
+            color: #1D3E35;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .lives {
+            display: flex;
+            gap: 8px;
+        }
+
+        .life {
+            font-size: 28px;
+            transition: all 0.2s;
+        }
+
+        .level-badge {
+            background: #FFC857;
+            color: #1D3E35;
+            padding: 8px 25px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .game-main {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .current-waste {
+            background: #E8DFC8;
+            border-radius: 50px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 3px dashed #FFC857;
+            box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+        }
+
+        .waste-display {
+            font-size: 6rem;
+            animation: bounce 0.5s ease;
+        }
+
+        .waste-name-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2E5D4F;
+            margin-top: 10px;
+        }
+
+        .bins-game {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .bin-option {
+            background: white;
+            border-radius: 35px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 8px 0 #b0a07c;
+            border: 2px solid #FFD966;
+        }
+
+        .bin-option:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #b0a07c;
+        }
+
+        .bin-option.disabled {
+            opacity: 0.6;
+            transform: none;
+            pointer-events: none;
+        }
+
+        .bin-icon {
+            font-size: 3rem;
+        }
+
+        .bin-option h3 {
+            margin: 8px 0;
+            color: #2E5D4F;
+        }
+
+        .progress-area {
+            background: #D9CFB0;
+            border-radius: 30px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            background: #A8B59A;
+            border-radius: 30px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #4CAF50;
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s;
+            border-radius: 30px;
+        }
+
+        .question-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .question-card {
+            background: #FFF8E7;
+            border-radius: 50px;
+            padding: 30px;
+            max-width: 550px;
+            width: 90%;
+            text-align: center;
+            border: 5px solid #FFC857;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .opt-btn {
+            background: #2E5D4F;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.1s;
+        }
+
+        .opt-btn:active {
+            transform: scale(0.97);
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .result-card {
+            background: #FFF8E7;
+            border-radius: 60px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+        }
+
+        .btn-game {
+            background: #FFC857;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        .modal-name {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #FFF8E7;
+            border-radius: 60px;
+            padding: 45px 35px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            border: 5px solid #FFC857;
+        }
+
+        .modal-content h2 {
+            color: #2E5D4F;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .modal-content input {
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 60px;
+            border: 2px solid #FFC857;
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        @keyframes bounce {
+            0% { transform: scale(0.9); opacity: 0; }
+            80% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @media (max-width: 700px) {
+            .waste-display { font-size: 3.5rem; }
+            .waste-name-display { font-size: 1.2rem; }
+            .bin-option { padding: 12px; }
+            .bin-icon { font-size: 2rem; }
+            .header-item { padding: 4px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+    <div class="game-panel">
+        <div class="game-header">
+            <div class="header-item">
+                <span>🏆</span> <span id="scoreDisplay">0</span>
+            </div>
+            <div class="player-name-badge" id="playerNameBadge">Jugador</div>
+            <div class="lives" id="livesContainer">
+                <span class="life">❤️</span><span class="life">❤️</span><span class="life">❤️</span>
+            </div>
+            <div class="level-badge" id="levelDisplay">Nivel 1</div>
+            <div class="header-item">
+                <span>⏱️</span> <span id="timerLevel">00:00</span>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <div class="current-waste">
+                <div class="waste-display" id="wasteIcon">🧴</div>
+                <div class="waste-name-display" id="wasteName">Botella plástica</div>
+            </div>
+
+            <div class="bins-game" id="binsGameContainer"></div>
+
+            <div class="progress-area">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span>🎯 Progreso del nivel</span>
+                    <span id="progressCounter">0 / 0</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==============================================================
+    // BASE DE DATOS: 100 RESIDUOS ÚNICOS
+    // ==============================================================
+    const RESIDUOS_DB = [
+        // Plásticos y envases (amarillo) - 25
+        { name: "Botella plástica", icon: "🧴", category: "amarillo" },{ name: "Lata de refresco", icon: "🥫", category: "amarillo" },{ name: "Envase yogur", icon: "🥤", category: "amarillo" },{ name: "Brik leche", icon: "🧃", category: "amarillo" },{ name: "Tapa plástica", icon: "🔘", category: "amarillo" },{ name: "Envase champú", icon: "🧴", category: "amarillo" },{ name: "Botella agua", icon: "💧", category: "amarillo" },{ name: "Tupper roto", icon: "🍱", category: "amarillo" },{ name: "Vaso plástico", icon: "🥛", category: "amarillo" },{ name: "Cubiertos plástico", icon: "🥄", category: "amarillo" },{ name: "Pajita", icon: "🥤", category: "amarillo" },{ name: "Funda móvil", icon: "📱", category: "amarillo" },{ name: "Juguete plástico", icon: "🧸", category: "amarillo" },{ name: "Balde plástico", icon: "🪣", category: "amarillo" },{ name: "Envase detergente", icon: "🧴", category: "amarillo" },{ name: "Plato desechable", icon: "🍽️", category: "amarillo" },{ name: "Envase helado", icon: "🍦", category: "amarillo" },{ name: "Tapa frasco", icon: "🔘", category: "amarillo" },{ name: "Potes crema", icon: "🧴", category: "amarillo" },{ name: "Envase aceite", icon: "🫒", category: "amarillo" },{ name: "Caja CD", icon: "💿", category: "amarillo" },{ name: "Pera de riego", icon: "💧", category: "amarillo" },{ name: "Flotador plástico", icon: "🏊", category: "amarillo" },{ name: "Cinta cassette", icon: "📼", category: "amarillo" },{ name: "Cepillo plástico", icon: "🪥", category: "amarillo" },
+        // Papel y cartón (azul) - 20
+        { name: "Periódico viejo", icon: "📰", category: "azul" },{ name: "Caja cartón", icon: "📦", category: "azul" },{ name: "Revista", icon: "📓", category: "azul" },{ name: "Cuaderno usado", icon: "📘", category: "azul" },{ name: "Sobre carta", icon: "✉️", category: "azul" },{ name: "Caja cereales", icon: "🥣", category: "azul" },{ name: "Folios impresos", icon: "📄", category: "azul" },{ name: "Catálogo", icon: "📇", category: "azul" },{ name: "Papel regalo", icon: "🎁", category: "azul" },{ name: "Caja zapatos", icon: "👟", category: "azul" },{ name: "Carpeta papel", icon: "📁", category: "azul" },{ name: "Libro viejo", icon: "📖", category: "azul" },{ name: "Caja pizza", icon: "🍕", category: "azul" },{ name: "Cartulina", icon: "🖼️", category: "azul" },{ name: "Bolsa papel", icon: "🛍️", category: "azul" },{ name: "Block notas", icon: "📝", category: "azul" },{ name: "Papel kraft", icon: "📜", category: "azul" },{ name: "Papel higiénico limpio", icon: "🧻", category: "azul" },{ name: "Mapa viejo", icon: "🗺️", category: "azul" },{ name: "Cómic", icon: "📚", category: "azul" },
+        // Vidrio (verde) - 15
+        { name: "Botella vidrio", icon: "🍾", category: "verde" },{ name: "Tarro vidrio", icon: "🥃", category: "verde" },{ name: "Frasco perfume", icon: "🧪", category: "verde" },{ name: "Vaso vidrio", icon: "🥛", category: "verde" },{ name: "Frasco mermelada", icon: "🏺", category: "verde" },{ name: "Botella vino", icon: "🍷", category: "verde" },{ name: "Ampolla medicina", icon: "💊", category: "verde" },{ name: "Jarra vidrio", icon: "🍶", category: "verde" },{ name: "Espejo roto", icon: "🪞", category: "verde" },{ name: "Cenicero vidrio", icon: "🚬", category: "verde" },{ name: "Copa vidrio", icon: "🥂", category: "verde" },{ name: "Pisa papeles", icon: "🔮", category: "verde" },{ name: "Frasco especias", icon: "🌶️", category: "verde" },{ name: "Bote vidrio", icon: "🏺", category: "verde" },{ name: "Tetera vidrio", icon: "🍵", category: "verde" },
+        // Orgánico (marron) - 20
+        { name: "Cáscara plátano", icon: "🍌", category: "marron" },{ name: "Manzana mordida", icon: "🍎", category: "marron" },{ name: "Restos comida", icon: "🍝", category: "marron" },{ name: "Cáscara huevo", icon: "🥚", category: "marron" },{ name: "Cáscara naranja", icon: "🍊", category: "marron" },{ name: "Hojas té", icon: "🍃", category: "marron" },{ name: "Cáscara patata", icon: "🥔", category: "marron" },{ name: "Posos café", icon: "☕", category: "marron" },{ name: "Hueso aguacate", icon: "🥑", category: "marron" },{ name: "Cáscara sandía", icon: "🍉", category: "marron" },{ name: "Pan duro", icon: "🥖", category: "marron" },{ name: "Resto verduras", icon: "🥬", category: "marron" },{ name: "Fruta podrida", icon: "🍑", category: "marron" },{ name: "Cáscara limón", icon: "🍋", category: "marron" },{ name: "Cáscara mandarina", icon: "🍊", category: "marron" },{ name: "Resto pescado", icon: "🐟", category: "marron" },{ name: "Cáscara mango", icon: "🥭", category: "marron" },{ name: "Flor marchita", icon: "🌻", category: "marron" },{ name: "Cáscara piña", icon: "🍍", category: "marron" },{ name: "Cáscara kiwi", icon: "🥝", category: "marron" },
+        // Resto/General (gris) - 20
+        { name: "Pañal desechable", icon: "🧷", category: "gris" },{ name: "Envoltorio sucio", icon: "🍬", category: "gris" },{ name: "Papel higiénico usado", icon: "🧻", category: "gris" },{ name: "Colilla cigarro", icon: "🚬", category: "gris" },{ name: "Esponja vieja", icon: "🧽", category: "gris" },{ name: "Cepillo dental", icon: "🪥", category: "gris" },{ name: "Bolsas rotas", icon: "🛍️", category: "gris" },{ name: "Mascarilla usada", icon: "😷", category: "gris" },{ name: "Toalla húmeda", icon: "🧻", category: "gris" },{ name: "Cinta adhesiva", icon: "📦", category: "gris" },{ name: "Chicle", icon: "🍬", category: "gris" },{ name: "Pelusa aspiradora", icon: "🧹", category: "gris" },{ name: "Filtro café", icon: "☕", category: "gris" },{ name: "Cera vela", icon: "🕯️", category: "gris" },{ name: "Cables viejos", icon: "🔌", category: "gris" },{ name: "Goma borrar", icon: "🧽", category: "gris" },{ name: "Esparadrapo", icon: "🩹", category: "gris" },{ name: "Tapón corcho", icon: "🍾", category: "gris" },{ name: "Plumón seco", icon: "🖊️", category: "gris" },{ name: "Cuchara madera rota", icon: "🥄", category: "gris" }
+    ];
+
+    // ==============================================================
+    // BASE DE DATOS: 100 PREGUNTAS ÚNICAS
+    // ==============================================================
+    const PREGUNTAS_DB = [
+        { text: "¿Cuánto tiempo tarda una botella de plástico en degradarse?", options: ["100 años", "500 años", "50 años", "1000 años"], correct: 1 },
+        { text: "¿Qué significa la regla de las 3R?", options: ["Reducir, Reutilizar, Reciclar", "Recoger, Reparar, Reubicar", "Restaurar, Reciclar, Reutilizar", "Recrear, Reciclar, Reusar"], correct: 0 },
+        { text: "¿Dónde se debe tirar una pila usada?", options: ["Contenedor amarillo", "Contenedor verde", "Punto limpio especial", "Contenedor gris"], correct: 2 },
+        { text: "¿Qué material tarda menos en degradarse?", options: ["Vidrio", "Plástico", "Cáscara de plátano", "Lata de aluminio"], correct: 2 },
+        { text: "¿El papel de aluminio (film) dónde va?", options: ["Amarillo (plásticos)", "Gris (resto)", "Azul (papel)", "Verde (vidrio)"], correct: 1 },
+        { text: "¿Cuántos litros de agua se ahorran al reciclar una tonelada de papel?", options: ["1,000 litros", "10,000 litros", "140,000 litros", "500,000 litros"], correct: 2 },
+        { text: "¿Qué contenedor es de color amarillo?", options: ["Papel y cartón", "Plásticos y envases", "Vidrio", "Orgánico"], correct: 1 },
+        { text: "¿Qué significa el punto verde en los envases?", options: ["Que es tóxico", "Que el fabricante contribuye al reciclaje", "Que es biodegradable", "Que es importado"], correct: 1 },
+        { text: "¿Cuánto tiempo tarda una lata de aluminio en degradarse?", options: ["10 años", "50 años", "200 años", "500 años"], correct: 2 },
+        { text: "¿Dónde va una botella de vidrio?", options: ["Amarillo", "Azul", "Verde", "Gris"], correct: 2 },
+        { text: "¿Qué residuo NO va al contenedor marrón (orgánico)?", options: ["Cáscara de plátano", "Restos de carne", "Vidrio roto", "Posos de café"], correct: 2 },
+        { text: "¿Qué porcentaje de una lata es reciclable?", options: ["50%", "75%", "90%", "100%"], correct: 3 },
+        { text: "¿Cuántas veces se puede reciclar el vidrio?", options: ["1 vez", "5 veces", "Infinitas veces", "10 veces"], correct: 2 },
+        { text: "¿Qué contenedor recibe los bricks de leche?", options: ["Azul", "Verde", "Amarillo", "Gris"], correct: 2 },
+        { text: "¿Qué país recicla más porcentaje de residuos?", options: ["España", "Alemania", "México", "Argentina"], correct: 1 },
+        { text: "¿Qué material se obtiene del reciclaje de botellas PET?", options: ["Algodón", "Madera", "Fibra textil (poliéster)", "Metal"], correct: 2 },
+        { text: "¿Qué significan los colores de los contenedores?", options: ["Decoración", "Identificar tipo de residuo", "Marca de la ciudad", "Moda"], correct: 1 },
+        { text: "¿Qué va en el contenedor azul?", options: ["Plásticos", "Vidrio", "Papel y cartón", "Orgánico"], correct: 2 },
+        { text: "¿Qué residuo es peligroso y NO va a ningún contenedor normal?", options: ["Pilas", "Botellas", "Periódicos", "Cáscaras"], correct: 0 },
+        { text: "¿Qué se puede hacer con el aceite usado de cocina?", options: ["Tirarlo al fregadero", "Tirarlo al contenedor gris", "Llevarlo a un punto limpio", "Tirarlo al inodoro"], correct: 2 },
+        { text: "¿Cuántos árboles se salvan por cada tonelada de papel reciclado?", options: ["5 árboles", "10 árboles", "17 árboles", "25 árboles"], correct: 2 },
+        { text: "¿Qué color tiene el contenedor de orgánico?", options: ["Amarillo", "Azul", "Verde", "Marrón"], correct: 3 },
+        { text: "¿Dónde va un envase de yogur?", options: ["Amarillo", "Azul", "Verde", "Gris"], correct: 0 },
+        { text: "¿Qué significa 'Reciclar'?", options: ["Reducir consumo", "Volver a usar", "Transformar residuos en nuevos productos", "Tirar a la basura"], correct: 2 },
+        { text: "¿Qué residuo va al contenedor gris?", options: ["Botellas", "Periódicos", "Pañales", "Cáscaras"], correct: 2 },
+        { text: "¿Qué produce más contaminación al fabricarse?", options: ["Vidrio", "Plástico", "Papel", "Metal"], correct: 1 },
+        { text: "¿Cuánto tarda una bolsa de plástico en degradarse?", options: ["10 años", "50 años", "150 años", "500 años"], correct: 2 },
+        { text: "¿Qué es el compost?", options: ["Abono orgánico", "Plástico reciclado", "Vidrio triturado", "Papel reciclado"], correct: 0 },
+        { text: "¿Dónde va una caja de pizza vacía?", options: ["Amarillo", "Azul", "Verde", "Gris (si tiene grasa)"], correct: 3 },
+        { text: "¿Qué país produce más residuos plásticos en el mar?", options: ["China", "EE.UU.", "India", "Indonesia"], correct: 0 },
+        { text: "¿Qué símbolo indica que un producto es reciclable?", options: ["Triángulo de flechas", "Círculo verde", "Cruz roja", "Cuadrado azul"], correct: 0 },
+        { text: "¿Cuántas veces se puede reciclar el papel?", options: ["1-2 veces", "5-7 veces", "10 veces", "Infinitas"], correct: 1 },
+        { text: "¿Qué beneficio tiene reciclar vidrio?", options: ["Ahorra energía", "Reduce emisiones CO2", "Ahorra materias primas", "Todo lo anterior"], correct: 3 },
+        { text: "¿Dónde van los restos de poda del jardín?", options: ["Amarillo", "Azul", "Orgánico (marrón)", "Gris"], correct: 2 },
+        { text: "¿Qué se puede hacer con un teléfono móvil viejo?", options: ["Tirarlo a la basura", "Llevarlo a un punto limpio", "Tirarlo al contenedor amarillo", "Quemarlo"], correct: 1 },
+        { text: "¿Qué porcentaje de basura marina es plástico?", options: ["30%", "50%", "70%", "90%"], correct: 2 },
+        { text: "¿Qué residuo es mejor evitar usar?", options: ["Botella retornable", "Bolsa reutilizable", "Plástico de un solo uso", "Envase de vidrio"], correct: 2 },
+        { text: "¿Dónde va un corcho natural?", options: ["Amarillo", "Azul", "Orgánico", "Gris"], correct: 2 },
+        { text: "¿Qué es la economía circular?", options: ["Tirar todo", "Productos de un solo uso", "Reutilizar y reciclar en ciclo", "Comprar más"], correct: 2 },
+        { text: "¿Cuánto tarda una botella de vidrio en degradarse?", options: ["100 años", "500 años", "1000 años", "4000 años"], correct: 3 }
+    ];
+
+    // Completar hasta 100 preguntas (generamos variaciones adicionales)
+    while(PREGUNTAS_DB.length < 100) {
+        PREGUNTAS_DB.push(
+            { text: `¿Sabías que reciclar ${PREGUNTAS_DB.length + 10} latas ahorra energía para ver TV 3 horas?`, options: ["Verdadero", "Falso", "No afecta", "Depende"], correct: 0 },
+            { text: "¿Qué contenedor es para residuos orgánicos?", options: ["Amarillo", "Azul", "Marrón", "Verde"], correct: 2 },
+            { text: "¿Dónde va un CD viejo?", options: ["Amarillo", "Gris", "Azul", "Verde"], correct: 1 },
+            { text: "¿Qué animal muere por comer plástico en el mar?", options: ["Tortugas", "Ballenas", "Aves marinas", "Todos los anteriores"], correct: 3 },
+            { text: "¿Qué significa 'Upcycling'?", options: ["No reciclar", "Reciclar peor", "Transformar en algo de mayor valor", "Tirar a la basura"], correct: 2 }
+        );
+    }
+    const PREGUNTAS_FINAL = PREGUNTAS_DB.slice(0, 100);
+
+    // Contenedores
+    const BINS = [
+        { id: "amarillo", name: "💛 Plásticos y Envases", color: "#F9E45B", icon: "🧴" },
+        { id: "azul", name: "💙 Papel y Cartón", color: "#5B9AD0", icon: "📰" },
+        { id: "verde", name: "💚 Vidrio", color: "#6FBF4C", icon: "🍾" },
+        { id: "marron", name: "🤎 Orgánico", color: "#A5673F", icon: "🍌" },
+        { id: "gris", name: "🩶 Resto", color: "#9E9E9E", icon: "🗑️" }
+    ];
+
+    const LEVELS = [6, 8, 10, 12, 15];
+    let currentLevel = 0, levelWastes = [], currentWasteIndex = 0;
+    let score = 0, lives = 3, timeLeft = 45, timerInterval = null;
+    let gameActive = true, pendingQuestion = false, correctCountInLevel = 0;
+    let playerName = "";
+    let preguntasUsadas = []; // Control para no repetir preguntas en la misma partida
+
+    // DOM
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const livesContainer = document.getElementById("livesContainer");
+    const levelDisplay = document.getElementById("levelDisplay");
+    const timerLevelSpan = document.getElementById("timerLevel");
+    const wasteIconSpan = document.getElementById("wasteIcon");
+    const wasteNameSpan = document.getElementById("wasteName");
+    const binsGameContainer = document.getElementById("binsGameContainer");
+    const progressFill = document.getElementById("progressFill");
+    const progressCounter = document.getElementById("progressCounter");
+    const playerNameBadge = document.getElementById("playerNameBadge");
+
+    function updateLivesUI() {
+        livesContainer.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+            const heart = document.createElement("span");
+            heart.className = "life";
+            heart.textContent = i < lives ? "❤️" : "🖤";
+            livesContainer.appendChild(heart);
+        }
+    }
+
+    function updateScoreUI() { scoreDisplay.textContent = score; }
+
+    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+    function seleccionarResiduosAleatorios(cantidad) {
+        const shuffled = shuffleArray([...RESIDUOS_DB]);
+        return shuffled.slice(0, cantidad);
+    }
+
+    function loadLevel() {
+        if (currentLevel >= LEVELS.length) { endGame(true); return; }
+        levelWastes = seleccionarResiduosAleatorios(LEVELS[currentLevel]);
+        currentWasteIndex = 0;
+        correctCountInLevel = 0;
+        timeLeft = 45 + (currentLevel * 5);
+        updateTimerUI();
+        if (timerInterval) clearInterval(timerInterval);
+        startTimer();
+        gameActive = true;
+        pendingQuestion = false;
+        levelDisplay.textContent = `Nivel ${currentLevel + 1}`;
+        updateProgress();
+        showCurrentWaste();
+        renderBins();
+    }
+
+    function showCurrentWaste() {
+        if (!gameActive) return;
+        if (currentWasteIndex >= levelWastes.length) { completeLevel(); return; }
+        const waste = levelWastes[currentWasteIndex];
+        wasteIconSpan.textContent = waste.icon;
+        wasteNameSpan.textContent = waste.name;
+        wasteIconSpan.style.animation = "none";
+        wasteIconSpan.offsetHeight;
+        wasteIconSpan.style.animation = "bounce 0.4s ease";
+    }
+
+    function renderBins() {
+        binsGameContainer.innerHTML = "";
+        BINS.forEach(bin => {
+            const btn = document.createElement("div");
+            btn.className = "bin-option";
+            btn.style.backgroundColor = bin.color + "30";
+            btn.style.borderLeft = `8px solid ${bin.color}`;
+            btn.innerHTML = `<div class="bin-icon">${bin.icon}</div><h3>${bin.name}</h3>`;
+            btn.addEventListener("click", () => {
+                if (!gameActive || pendingQuestion) return;
+                const waste = levelWastes[currentWasteIndex];
+                if (waste.category === bin.id) handleCorrect();
+                else handleWrong();
+            });
+            binsGameContainer.appendChild(btn);
+        });
+    }
+
+    function handleCorrect() {
+        if (!gameActive) return;
+        const timeBonus = Math.floor(timeLeft / 2);
+        const pointsEarned = 100 + timeBonus;
+        score += pointsEarned;
+        updateScoreUI();
+        correctCountInLevel++;
+        showTemporaryFeedback("✅ +" + pointsEarned + " pts", "#4CAF50");
+        currentWasteIndex++;
+        updateProgress();
+
+        if (correctCountInLevel % 3 === 0 && currentWasteIndex < levelWastes.length && !pendingQuestion && currentWasteIndex > 0) {
+            triggerQuestion();
+        } else {
+            if (currentWasteIndex >= levelWastes.length) completeLevel();
+            else showCurrentWaste();
+        }
+    }
+
+    function handleWrong() {
+        if (!gameActive) return;
+        lives--;
+        updateLivesUI();
+        score = Math.max(0, score - 30);
+        updateScoreUI();
+        showTemporaryFeedback("❌ -30 pts, pierdes una vida", "#E63946");
+        const wasteDiv = document.querySelector(".current-waste");
+        wasteDiv.classList.add("shake");
+        setTimeout(() => wasteDiv.classList.remove("shake"), 300);
+        if (lives <= 0) { gameActive = false; if (timerInterval) clearInterval(timerInterval); endGame(false); return; }
+        showCurrentWaste();
+    }
+
+    function showTemporaryFeedback(msg, color) {
+        const feedbackDiv = document.createElement("div");
+        feedbackDiv.textContent = msg;
+        feedbackDiv.style.position = "fixed";
+        feedbackDiv.style.bottom = "30%";
+        feedbackDiv.style.left = "50%";
+        feedbackDiv.style.transform = "translateX(-50%)";
+        feedbackDiv.style.backgroundColor = color;
+        feedbackDiv.style.color = "white";
+        feedbackDiv.style.padding = "12px 24px";
+        feedbackDiv.style.borderRadius = "50px";
+        feedbackDiv.style.fontWeight = "bold";
+        feedbackDiv.style.zIndex = "1000";
+        feedbackDiv.style.fontSize = "1.2rem";
+        document.body.appendChild(feedbackDiv);
+        setTimeout(() => feedbackDiv.remove(), 1000);
+    }
+
+    function updateProgress() {
+        const total = levelWastes.length;
+        const completed = currentWasteIndex;
+        const percent = (completed / total) * 100;
+        progressFill.style.width = percent + "%";
+        progressCounter.textContent = `${completed} / ${total}`;
+    }
+
+    function completeLevel() {
+        if (timerInterval) clearInterval(timerInterval);
+        const levelBonus = 500;
+        score += levelBonus;
+        updateScoreUI();
+        showTemporaryFeedback(`🎉 Nivel ${currentLevel+1} completado! +${levelBonus} pts 🎉`, "#FF9800");
+        currentLevel++;
+        if (currentLevel >= LEVELS.length) endGame(true);
+        else { if (lives < 3) { lives++; updateLivesUI(); showTemporaryFeedback("❤️ ¡Recuperaste una vida!", "#2196F3"); } loadLevel(); }
+    }
+
+    function triggerQuestion() {
+        pendingQuestion = true;
+        gameActive = false;
+        if (timerInterval) clearInterval(timerInterval);
+        let preguntasDisponibles = PREGUNTAS_FINAL.filter(q => !preguntasUsadas.includes(q.text));
+        if (preguntasDisponibles.length === 0) preguntasUsadas = [];
+        preguntasDisponibles = PREGUNTAS_FINAL.filter(q => !preguntasUsadas.includes(q.text));
+        const randomQ = preguntasDisponibles[Math.floor(Math.random() * preguntasDisponibles.length)];
+        preguntasUsadas.push(randomQ.text);
+        const modal = document.createElement("div");
+        modal.className = "question-modal";
+        modal.innerHTML = `<div class="question-card"><h2>📚 PREGUNTA BONUS</h2><p style="font-size:1.2rem; margin:20px 0;">${randomQ.text}</p><div class="options" id="questOptions"></div><p>✅ Acierto: +150 puntos | ❌ Error: sin penalización</p></div>`;
+        const optionsDiv = modal.querySelector("#questOptions");
+        randomQ.options.forEach((opt, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "opt-btn";
+            btn.textContent = opt;
+            btn.addEventListener("click", () => {
+                if (idx === randomQ.correct) { score += 150; updateScoreUI(); showTemporaryFeedback("📚 ¡Correcto! +150 pts", "#4CAF50"); }
+                else { showTemporaryFeedback("📚 ¡Fallaste! Respuesta: " + randomQ.options[randomQ.correct], "#E63946"); }
+                modal.remove();
+                pendingQuestion = false;
+                gameActive = true;
+                startTimer();
+                if (currentWasteIndex < levelWastes.length) showCurrentWaste();
+                else completeLevel();
+            });
+            optionsDiv.appendChild(btn);
+        });
+        document.body.appendChild(modal);
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (!gameActive || pendingQuestion) return;
+            if (timeLeft <= 1) { clearInterval(timerInterval); gameActive = false; endGame(false); showTemporaryFeedback("⏰ ¡TIEMPO AGOTADO! ⏰", "#E63946"); }
+            else { timeLeft--; updateTimerUI(); }
+        }, 1000);
+    }
+
+    function updateTimerUI() {
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        timerLevelSpan.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        timerLevelSpan.style.color = timeLeft <= 10 ? "#FF6B6B" : "#FFE484";
+    }
+
+    function endGame(isVictory) {
+        gameActive = false;
+        if (timerInterval) clearInterval(timerInterval);
+        const modal = document.createElement("div");
+        modal.className = "result-modal";
+        const medal = isVictory ? "🏆✨🌟" : "💚🌱";
+        const message = isVictory ? `¡FELICIDADES ${playerName}! Completaste la ECO-MISIÓN. Puntuación final: ${score}` : `${playerName}, has perdido! Clasificaste correctamente aciertos. Puntuación: ${score}. ¡Reintenta!`;
+        modal.innerHTML = `<div class="result-card"><h2>${isVictory ? "🌟 ¡VICTORIA! 🌟" : "😢 GAME OVER"}</h2><p style="font-size:2rem; margin:20px;">${medal}</p><p>${message}</p><button class="btn-game" id="restartGameBtn">🔄 Jugar de nuevo</button></div>`;
+        document.body.appendChild(modal);
+        document.getElementById("restartGameBtn").addEventListener("click", () => { modal.remove(); restartGame(); });
+    }
+
+    function restartGame() {
+        currentLevel = 0; score = 0; lives = 3; correctCountInLevel = 0; preguntasUsadas = [];
+        updateScoreUI(); updateLivesUI(); gameActive = true; pendingQuestion = false;
+        loadLevel();
+    }
+
+    function iniciarConNombre() {
+        const nombre = document.getElementById("nombreInput").value.trim();
+        if (nombre === "") playerName = "ECO-HÉROE";
+        else playerName = nombre;
+        playerNameBadge.textContent = playerName;
+        document.getElementById("nameModal").remove();
+        restartGame();
+    }
+
+    // Modal inicial
+    const nameModalDiv = document.createElement("div");
+    nameModalDiv.className = "modal-name";
+    nameModalDiv.id = "nameModal";
+    nameModalDiv.innerHTML = `<div class="modal-content"><h2>♻️ ECO-MISIÓN 🚀</h2><p style="margin-bottom:10px;">¡Bienvenido! Ingresa tu nombre completo:</p><input type="text" id="nombreInput" placeholder="Ej: Ana María López" maxlength="35" autocomplete="off"><button class="btn-game" id="confirmarNombreBtn">🌍 COMENZAR 🌍</button></div>`;
+    document.body.appendChild(nameModalDiv);
+    document.getElementById("confirmarNombreBtn").addEventListener("click", iniciarConNombre);
+    document.getElementById("nombreInput").addEventListener("keypress", (e) => { if(e.key === "Enter") iniciarConNombre(); });
+</script>
+</body>
+</html>

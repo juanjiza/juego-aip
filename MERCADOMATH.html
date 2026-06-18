@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MERCADO "LA ESPIGA" - SISTEMA DE PAGO PARA NIÑOS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1e5631 0%, #0f3b1f 100%);
+            font-family: 'Segoe UI', 'Comic Neue', 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .welcome-card {
+            background: #fef3da;
+            border-radius: 80px;
+            padding: 40px 50px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-bottom: 8px solid #b46f3a;
+        }
+        .welcome-card h1 {
+            font-size: 2.5rem;
+            color: #3c2a1a;
+            margin: 0 0 10px;
+        }
+        .welcome-card input {
+            font-size: 1.5rem;
+            padding: 12px 20px;
+            border-radius: 60px;
+            border: 2px solid #d9b382;
+            text-align: center;
+            width: 80%;
+            margin: 20px 0;
+            font-family: inherit;
+        }
+        .welcome-card button {
+            background: #6f9e3f;
+            color: white;
+            font-size: 1.3rem;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #3c5e1f;
+        }
+        .welcome-card button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #3c5e1f;
+        }
+
+        .market-stall {
+            max-width: 1600px;
+            width: 100%;
+            background: #fef3da;
+            border-radius: 70px 70px 50px 50px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5), inset 0 1px 5px #fff6cf;
+            padding: 20px 25px 30px;
+            border-bottom: 14px solid #b46f3a;
+            display: none;
+        }
+
+        .stall-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #e7cfaa;
+            padding: 10px 25px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            gap: 15px;
+            box-shadow: inset 0 1px 5px #fff5e0, 0 6px 0 #9b6a3c;
+        }
+
+        .stall-title h1 {
+            margin: 0;
+            font-size: 1.7rem;
+            color: #3c2a1a;
+        }
+        .stall-title p {
+            margin: 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .kid-panel {
+            background: #f5e2b0;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 5px 20px 5px 12px;
+            box-shadow: inset 0 0 0 2px #fff2cf, 0 5px 0 #b57a42;
+        }
+        .kid-avatar {
+            font-size: 3rem;
+            filter: drop-shadow(2px 5px 0 rgba(0,0,0,0.2));
+            background: #ffdead;
+            border-radius: 100px;
+            padding: 5px;
+        }
+        .kid-money {
+            background: #2e2b25;
+            padding: 5px 18px;
+            border-radius: 50px;
+            text-align: center;
+        }
+        .kid-money span:first-child {
+            color: #ffdd99;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .dinero-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: monospace;
+            background: #00000088;
+            padding: 0 12px;
+            border-radius: 40px;
+            color: #f9e45b;
+            margin-left: 8px;
+        }
+        .student-name {
+            background: #b87a44;
+            padding: 5px 15px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .market-content {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .products-section {
+            flex: 2;
+            min-width: 280px;
+        }
+        .cart-section {
+            flex: 1.2;
+            min-width: 300px;
+            background: #ecdcaa;
+            border-radius: 50px;
+            padding: 15px;
+            box-shadow: inset 0 1px 5px #fff0cf, 0 6px 0 #a5713e;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            max-height: 550px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .product-card {
+            background: #fff8ed;
+            border-radius: 35px;
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow: 0 8px 0 #bb8553;
+            border: 1px solid #ffefcf;
+        }
+        .product-emoji {
+            font-size: 2.8rem;
+        }
+        .product-name {
+            font-weight: bold;
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+        .price-tag {
+            background: #d9b382;
+            border-radius: 40px;
+            padding: 2px 8px;
+            display: inline-block;
+            margin: 5px 0;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .peso-control {
+            background: #eeddbb;
+            border-radius: 50px;
+            padding: 5px;
+            margin: 8px 0;
+        }
+        .peso-control input {
+            width: 65%;
+            accent-color: #5f8b4c;
+        }
+        .btn-agregar {
+            background: #6f9e3f;
+            border: none;
+            padding: 7px;
+            width: 95%;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin: 5px 0;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 3px 0 #3c5e1f;
+        }
+        .btn-agregar:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #3c5e1f;
+        }
+        .btn-agregar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .cart-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 12px;
+            color: #3c2a1a;
+        }
+        .cart-items {
+            max-height: 280px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .cart-item {
+            background: #fff5e0;
+            border-radius: 30px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        .cart-item-remove {
+            background: #c27e4a;
+            border: none;
+            border-radius: 50px;
+            padding: 3px 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .cart-total {
+            background: #2e2b25;
+            color: #ffd966;
+            padding: 8px;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 10px 0;
+        }
+        .payment-zone {
+            background: #e2ce9e;
+            border-radius: 50px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .monedas-billetes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+        .denom-card {
+            background: #f7e5c2;
+            border-radius: 35px;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #aa7948;
+            min-width: 70px;
+            transition: 0.05s linear;
+        }
+        .denom-card:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #aa7948;
+        }
+        .denom-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            pointer-events: none;
+        }
+        .denom-valor {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .pago-info {
+            background: #faf0cf;
+            border-radius: 40px;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-pagar {
+            background: #4f8b2c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #2d571b;
+        }
+        .btn-pagar:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #2d571b;
+        }
+        .reset-btn {
+            background: #c27e4a;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 1rem;
+        }
+        .mensaje-info {
+            background: #4f3a28;
+            color: #ffefb0;
+            padding: 8px 10px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #7a6233;
+            font-weight: bold;
+        }
+        @media (max-width: 900px) {
+            .market-content { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-card">
+        <h1>🥬 MERCADO "LA ESPIGA" 🍎</h1>
+        <p style="font-size:1.2rem;">¡Bienvenido al puesto más divertido!</p>
+        <input type="text" id="studentNameInput" placeholder="Escribe tu nombre" maxlength="20" autocomplete="off">
+        <br>
+        <button id="startGameBtn">🎮 COMENZAR A COMPRAR</button>
+        <p style="margin-top:15px; font-size:0.9rem;">💰 Comenzarás con 100 Soles para comprar frutas y verduras</p>
+        <p style="font-size:0.8rem; color:#b46f3a;">⭐ ¡Precios en números enteros, sin decimales! ⭐</p>
+    </div>
+</div>
+
+<div class="market-stall" id="gameContainer">
+    <div class="stall-header">
+        <div class="stall-title">
+            <h1>🥬 MERCADO "LA ESPIGA" 🍎</h1>
+            <p>✅ Más de 30 frutas y verduras frescas - Precio por kilo (Soles enteros)</p>
+        </div>
+        <div class="kid-panel">
+            <div class="kid-avatar">🧒👦</div>
+            <div class="kid-money">
+                <span>💵 Dinero:</span>
+                <span class="dinero-num" id="dineroActualSpan">100</span>
+                <span> S/.</span>
+            </div>
+            <div class="student-name" id="studentNameDisplay">Alumno</div>
+        </div>
+    </div>
+
+    <div class="market-content">
+        <div class="products-section">
+            <div class="products-grid" id="productosGrid"></div>
+        </div>
+
+        <div class="cart-section">
+            <div class="cart-title">🛒 MI CARRITO</div>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-total" id="cartTotal">Total: S/ 0</div>
+            
+            <div class="payment-zone">
+                <div style="font-weight: bold; text-align:center; font-size:1.1rem;">💰 PAGA AQUÍ</div>
+                <div class="monedas-billetes" id="denominacionesContainer"></div>
+                <div class="pago-info">
+                    <div style="background:#2d2b26; padding:6px 15px; border-radius:40px; color:#ffd966; font-size:1rem; font-weight:bold;">
+                        💸 Pagado: <strong id="montoPagadoDisplay">0</strong> S/.
+                    </div>
+                    <button class="btn-pagar" id="btnConfirmarPago">✅ PAGAR</button>
+                </div>
+                <div class="mensaje-info" id="mensajePago">✨ Agrega productos al carrito ✨</div>
+            </div>
+            <button class="reset-btn" id="resetJuegoBtn">🔄 REINICIAR JUEGO</button>
+        </div>
+    </div>
+    <footer>💰 MONEDAS: 1, 2, 5 soles | BILLETES: 10, 20, 50, 100 soles</footer>
+</div>
+
+<script>
+    // 30 productos con precios ENTEROS (sin decimales)
+    const productos = [
+        { id: 0, nombre: "🍅 Tomate", emoji: "🍅", precioKg: 3 },
+        { id: 1, nombre: "🍎 Manzana", emoji: "🍎", precioKg: 3 },
+        { id: 2, nombre: "🥬 Lechuga", emoji: "🥬", precioKg: 2 },
+        { id: 3, nombre: "🍊 Naranja", emoji: "🍊", precioKg: 3 },
+        { id: 4, nombre: "🥕 Zanahoria", emoji: "🥕", precioKg: 2 },
+        { id: 5, nombre: "🍓 Fresa", emoji: "🍓", precioKg: 6 },
+        { id: 6, nombre: "🍌 Plátano", emoji: "🍌", precioKg: 2 },
+        { id: 7, nombre: "🍇 Uva", emoji: "🍇", precioKg: 7 },
+        { id: 8, nombre: "🥦 Brócoli", emoji: "🥦", precioKg: 2 },
+        { id: 9, nombre: "🥔 Papa", emoji: "🥔", precioKg: 2 },
+        { id: 10, nombre: "🧅 Cebolla", emoji: "🧅", precioKg: 2 },
+        { id: 11, nombre: "🫑 Pimiento", emoji: "🫑", precioKg: 4 },
+        { id: 12, nombre: "🥝 Kiwi", emoji: "🥝", precioKg: 4 },
+        { id: 13, nombre: "🍑 Durazno", emoji: "🍑", precioKg: 5 },
+        { id: 14, nombre: "🍒 Cereza", emoji: "🍒", precioKg: 12 },
+        { id: 15, nombre: "🥭 Mango", emoji: "🥭", precioKg: 5 },
+        { id: 16, nombre: "🍍 Piña", emoji: "🍍", precioKg: 4 },
+        { id: 17, nombre: "🥑 Aguacate", emoji: "🥑", precioKg: 8 },
+        { id: 18, nombre: "🍆 Berenjena", emoji: "🍆", precioKg: 3 },
+        { id: 19, nombre: "🌽 Elote", emoji: "🌽", precioKg: 2 },
+        { id: 20, nombre: "🥒 Pepino", emoji: "🥒", precioKg: 2 },
+        { id: 21, nombre: "🫒 Aceituna", emoji: "🫒", precioKg: 8 },
+        { id: 22, nombre: "🧄 Ajo", emoji: "🧄", precioKg: 7 },
+        { id: 23, nombre: "🫚 Jengibre", emoji: "🫚", precioKg: 6 },
+        { id: 24, nombre: "🌶️ Ají", emoji: "🌶️", precioKg: 5 },
+        { id: 25, nombre: "🍈 Melón", emoji: "🍈", precioKg: 3 },
+        { id: 26, nombre: "🍉 Sandía", emoji: "🍉", precioKg: 3 },
+        { id: 27, nombre: "🍋 Limón", emoji: "🍋", precioKg: 2 },
+        { id: 28, nombre: "🍐 Pera", emoji: "🍐", precioKg: 4 },
+        { id: 29, nombre: "🥬 Espinaca", emoji: "🥬", precioKg: 2 }
+    ];
+
+    // Denominaciones SIN decimales (solo enteros)
+    const denominaciones = [
+        { valor: 1, tipo: "moneda" }, { valor: 2, tipo: "moneda" }, { valor: 5, tipo: "moneda" },
+        { valor: 10, tipo: "billete" }, { valor: 20, tipo: "billete" }, 
+        { valor: 50, tipo: "billete" }, { valor: 100, tipo: "billete" }
+    ];
+
+    let dineroDisponible = 100;
+    let carrito = [];
+    let montoEntregadoEnEfectivo = 0;
+    let estudianteNombre = "";
+
+    // DOM
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const gameContainer = document.getElementById("gameContainer");
+    const startBtn = document.getElementById("startGameBtn");
+    const nameInput = document.getElementById("studentNameInput");
+    const studentNameDisplay = document.getElementById("studentNameDisplay");
+    const dineroSpan = document.getElementById("dineroActualSpan");
+    const productosGrid = document.getElementById("productosGrid");
+    const cartItemsDiv = document.getElementById("cartItems");
+    const cartTotalSpan = document.getElementById("cartTotal");
+    const denominacionesContainer = document.getElementById("denominacionesContainer");
+    const montoPagadoDisplay = document.getElementById("montoPagadoDisplay");
+    const mensajePagoDiv = document.getElementById("mensajePago");
+    const btnPagar = document.getElementById("btnConfirmarPago");
+    const resetBtn = document.getElementById("resetJuegoBtn");
+
+    function actualizarDineroUI() {
+        dineroSpan.innerText = dineroDisponible;
+        actualizarBotonesDenominaciones();
+    }
+
+    function mostrarMensaje(texto, esError = false) {
+        mensajePagoDiv.innerHTML = texto;
+        mensajePagoDiv.style.background = esError ? "#8b3c2c" : "#4f3a28";
+        setTimeout(() => {
+            if (mensajePagoDiv.innerHTML === texto) {
+                if (carrito.length === 0) mensajePagoDiv.innerHTML = "✨ Agrega productos al carrito ✨";
+                else mensajePagoDiv.innerHTML = `💰 Total a pagar: S/ ${calcularTotalCarrito()} | Entregado: S/ ${montoEntregadoEnEfectivo}`;
+            }
+        }, 3000);
+    }
+
+    function calcularTotalCarrito() {
+        return carrito.reduce((sum, item) => sum + item.costo, 0);
+    }
+
+    function actualizarCarritoUI() {
+        cartItemsDiv.innerHTML = "";
+        carrito.forEach((item, index) => {
+            const div = document.createElement("div");
+            div.className = "cart-item";
+            div.innerHTML = `
+                <div class="cart-item-info">
+                    ${item.emoji} ${item.nombre}<br>
+                    <small>${item.pesoKg} kg - S/ ${item.costo}</small>
+                </div>
+                <button class="cart-item-remove" data-index="${index}">❌</button>
+            `;
+            cartItemsDiv.appendChild(div);
+        });
+        document.querySelectorAll(".cart-item-remove").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                const idx = parseInt(btn.dataset.index);
+                carrito.splice(idx, 1);
+                actualizarCarritoUI();
+                actualizarTotalYPago();
+                mostrarMensaje("🗑️ Producto eliminado del carrito");
+            });
+        });
+        actualizarTotalYPago();
+    }
+
+    function actualizarTotalYPago() {
+        const total = calcularTotalCarrito();
+        cartTotalSpan.innerText = `Total: S/ ${total}`;
+        montoPagadoDisplay.innerText = montoEntregadoEnEfectivo;
+    }
+
+    function agregarAlCarrito(producto, pesoKg, costo) {
+        if (costo > dineroDisponible) {
+            mostrarMensaje(`❌ No tienes suficiente dinero para comprar ${producto.nombre}. Te faltan S/ ${costo - dineroDisponible}`, true);
+            return;
+        }
+        
+        carrito.push({
+            nombre: producto.nombre,
+            emoji: producto.emoji,
+            pesoKg: pesoKg,
+            costo: costo
+        });
+        
+        actualizarCarritoUI();
+        mostrarMensaje(`✅ ${producto.nombre} (${pesoKg} kg) agregado. Total: S/ ${calcularTotalCarrito()}`);
+    }
+
+    function entregarDinero(valor) {
+        const totalAPagar = calcularTotalCarrito();
+        if (totalAPagar === 0) {
+            mostrarMensaje("❌ El carrito está vacío. Agrega productos primero", true);
+            return;
+        }
+        
+        if (dineroDisponible < valor) {
+            mostrarMensaje(`❌ No tienes S/ ${valor}. Tu dinero actual es S/ ${dineroDisponible}`, true);
+            return;
+        }
+        
+        let nuevoEntregado = montoEntregadoEnEfectivo + valor;
+        if (nuevoEntregado > totalAPagar + 5) {
+            mostrarMensaje(`❌ No puedes pagar más de S/ ${totalAPagar + 5}. El vuelto máximo es S/ 5.`, true);
+            return;
+        }
+        
+        dineroDisponible -= valor;
+        montoEntregadoEnEfectivo = nuevoEntregado;
+        
+        actualizarDineroUI();
+        montoPagadoDisplay.innerText = montoEntregadoEnEfectivo;
+        
+        let faltante = totalAPagar - montoEntregadoEnEfectivo;
+        if (faltante <= 0) {
+            mostrarMensaje(`🎯 Has entregado S/ ${montoEntregadoEnEfectivo} (vuelto: S/ ${Math.abs(faltante)}). Presiona "PAGAR" para completar la compra.`);
+        } else {
+            mostrarMensaje(`💰 Has entregado: S/ ${montoEntregadoEnEfectivo} | Te falta: S/ ${faltante}`);
+        }
+    }
+    
+    function finalizarPago() {
+        const total = calcularTotalCarrito();
+        if (total === 0) {
+            mostrarMensaje("❌ El carrito está vacío. Agrega productos para comprar", true);
+            return;
+        }
+        
+        // Verificar que el total no sea mayor que el dinero total que tiene el niño
+        const dineroTotalOriginal = dineroDisponible + montoEntregadoEnEfectivo;
+        
+        if (total > dineroTotalOriginal) {
+            const falta = total - dineroTotalOriginal;
+            mostrarMensaje(`❌ NO PUEDES PAGAR. Te faltan S/ ${falta}. El total (S/ ${total}) es mayor que tu dinero (S/ ${dineroTotalOriginal}). Elimina productos del carrito.`, true);
+            return;
+        }
+        
+        if (montoEntregadoEnEfectivo < total) {
+            let falta = total - montoEntregadoEnEfectivo;
+            mostrarMensaje(`❌ Te faltan S/ ${falta}. Entrega más dinero con las monedas o billetes`, true);
+            return;
+        }
+        
+        let vuelto = montoEntregadoEnEfectivo - total;
+        
+        if (vuelto > 0) {
+            dineroDisponible += vuelto;
+            mostrarMensaje(`🎉 ¡COMPRA EXITOSA! Pagaste S/ ${montoEntregadoEnEfectivo}. Te devuelven S/ ${vuelto} de vuelto. ¡Gracias ${estudianteNombre}!`);
+        } else {
+            mostrarMensaje(`🎉 ¡COMPRA EXITOSA! Pagaste exactamente S/ ${total}. ¡Gracias ${estudianteNombre}!`);
+        }
+        
+        actualizarDineroUI();
+        
+        carrito = [];
+        montoEntregadoEnEfectivo = 0;
+        actualizarCarritoUI();
+        montoPagadoDisplay.innerText = "0";
+        
+        if (dineroDisponible <= 0) {
+            mostrarMensaje("🎊 ¡Gastaste todo tu dinero! Reinicia el juego para seguir comprando.", false);
+            bloquearBotonesAgregar(true);
+        } else {
+            bloquearBotonesAgregar(false);
+            mostrarMensaje(`✨ ¡Sigue comprando! Te quedan S/ ${dineroDisponible} ✨`);
+        }
+    }
+
+    function bloquearBotonesAgregar(bloquear) {
+        document.querySelectorAll(".btn-agregar").forEach(btn => {
+            btn.disabled = bloquear;
+        });
+    }
+    
+    function actualizarBotonesDenominaciones() {
+        const botones = document.querySelectorAll(".denom-card");
+        botones.forEach((btn, idx) => {
+            const valor = denominaciones[idx].valor;
+            if (dineroDisponible < valor) {
+                btn.classList.add("disabled");
+            } else {
+                btn.classList.remove("disabled");
+            }
+        });
+    }
+
+    function construirProductos() {
+        productosGrid.innerHTML = "";
+        productos.forEach(prod => {
+            const card = document.createElement("div");
+            card.className = "product-card";
+            card.innerHTML = `
+                <div class="product-emoji">${prod.emoji}</div>
+                <div class="product-name">${prod.nombre}</div>
+                <div class="price-tag">💵 S/ ${prod.precioKg}/kg</div>
+                <div class="peso-control">
+                    <input type="range" min="1" max="5" step="1" value="2" class="weight-slider">
+                    <span class="weight-value">2 kg</span>
+                </div>
+                <div class="costo-producto" style="font-size:1rem; font-weight:bold;">💰 S/ ${prod.precioKg * 2}</div>
+                <button class="btn-agregar">🛒 Quiero esto</button>
+            `;
+            const slider = card.querySelector(".weight-slider");
+            const weightSpan = card.querySelector(".weight-value");
+            const costoSpan = card.querySelector(".costo-producto");
+            const boton = card.querySelector(".btn-agregar");
+            
+            function actualizarPreview() {
+                let pesoKg = parseInt(slider.value);
+                const costo = prod.precioKg * pesoKg;
+                weightSpan.innerText = pesoKg + " kg";
+                costoSpan.innerHTML = `💰 S/ ${costo}`;
+                return { pesoKg, costo };
+            }
+            slider.addEventListener("input", () => actualizarPreview());
+            boton.addEventListener("click", () => {
+                const { pesoKg, costo } = actualizarPreview();
+                agregarAlCarrito(prod, pesoKg, costo);
+            });
+            productosGrid.appendChild(card);
+        });
+    }
+
+    function construirDenominaciones() {
+        denominacionesContainer.innerHTML = "";
+        denominaciones.forEach(den => {
+            const btn = document.createElement("div");
+            btn.className = "denom-card";
+            btn.innerHTML = `<div class="denom-valor">S/ ${den.valor}</div><div style="font-size:0.8rem;">${den.tipo === "moneda" ? "🪙 MONEDA" : "💵 BILLETE"}</div>`;
+            btn.addEventListener("click", () => entregarDinero(den.valor));
+            denominacionesContainer.appendChild(btn);
+        });
+        actualizarBotonesDenominaciones();
+    }
+
+    function reiniciarJuego() {
+        dineroDisponible = 100;
+        carrito = [];
+        montoEntregadoEnEfectivo = 0;
+        actualizarDineroUI();
+        actualizarCarritoUI();
+        montoPagadoDisplay.innerText = "0";
+        mostrarMensaje(`🔄 Juego reiniciado ${estudianteNombre}. Tienes S/ 100`);
+        bloquearBotonesAgregar(false);
+        document.querySelectorAll(".weight-slider").forEach(slider => {
+            if (slider) {
+                slider.value = "2";
+                slider.dispatchEvent(new Event('input'));
+            }
+        });
+        actualizarBotonesDenominaciones();
+    }
+
+    startBtn.addEventListener("click", () => {
+        let nombre = nameInput.value.trim();
+        if (nombre === "") nombre = "Estudiante";
+        estudianteNombre = nombre;
+        studentNameDisplay.innerText = estudianteNombre;
+        welcomeScreen.style.display = "none";
+        gameContainer.style.display = "block";
+        dineroDisponible = 100;
+        carrito = [];
+        montoEntregadoEnEfectivo = 0;
+        actualizarDineroUI();
+        actualizarCarritoUI();
+        montoPagadoDisplay.innerText = "0";
+        mostrarMensaje(`✨ ¡Bienvenido ${estudianteNombre}! Tienes S/ 100 para comprar ✨`);
+        bloquearBotonesAgregar(false);
+        actualizarBotonesDenominaciones();
+    });
+
+    btnPagar.addEventListener("click", finalizarPago);
+    resetBtn.addEventListener("click", reiniciarJuego);
+    
+    function init() {
+        construirProductos();
+        construirDenominaciones();
+        actualizarDineroUI();
+    }
+    init();
+</script>
+</body>
+</html>

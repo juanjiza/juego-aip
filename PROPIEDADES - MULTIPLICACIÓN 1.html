@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⭐ Multi-Propiedades · 4º grado</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f9f3e6 0%, #ffe9ce 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Fredoka One', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+      padding: 16px;
+      margin: 0;
+    }
+
+    .game-container {
+      max-width: 820px;
+      width: 100%;
+      background: rgba(255, 242, 224, 0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 72px 72px 48px 48px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 8px 16px rgba(0, 0, 0, 0.1);
+      padding: 24px 28px 40px;
+      border: 4px solid #fbd38d;
+      transition: 0.3s;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #4f2d1a;
+      letter-spacing: 2px;
+      text-shadow: 4px 4px 0 #f1c792;
+      margin-top: -8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 span {
+      background: #ffb882;
+      padding: 0 18px;
+      border-radius: 60px;
+      font-size: 1.8rem;
+      color: #2f1a0e;
+      box-shadow: inset 0 -4px 0 #b46f3f;
+    }
+
+    .property-badge {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 16px;
+      margin: 18px 0 22px;
+    }
+
+    .badge {
+      background: #fbe9d2;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #3d2b1a;
+      box-shadow: 0 4px 0 #d4a373;
+      border: 2px solid #e7c29b;
+      transition: 0.2s;
+      cursor: default;
+    }
+
+    .badge.active {
+      background: #f8d5a8;
+      box-shadow: 0 0 0 3px #ffb25a, 0 4px 0 #b46f3f;
+      transform: scale(1.02);
+      border-color: #b46f3f;
+    }
+
+    /* Registro inicial */
+    .register-box {
+      background: #fef7ed;
+      border-radius: 60px;
+      padding: 24px 28px;
+      margin: 12px 0 24px;
+      border: 3px solid #cc9f73;
+      box-shadow: inset 0 0 0 4px #fbe4cd;
+      text-align: center;
+    }
+
+    .register-box label {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #3d2415;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .register-box input {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px 18px;
+      font-size: 1.2rem;
+      border-radius: 60px;
+      border: 3px solid #dbb48b;
+      background: white;
+      font-family: inherit;
+      margin: 6px auto 12px;
+      display: block;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .register-box input:focus {
+      border-color: #b46f3f;
+      box-shadow: 0 0 0 4px #f8d5a8;
+    }
+
+    .register-box .btn-register {
+      background: #fccc8b;
+      border: none;
+      border-radius: 80px;
+      padding: 14px 40px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2f1a0d;
+      box-shadow: 0 6px 0 #b47a46;
+      transition: 0.08s linear;
+      cursor: pointer;
+      border: 3px solid #fad6a8;
+      margin-top: 6px;
+    }
+
+    .register-box .btn-register:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #b47a46;
+    }
+
+    .register-box .btn-register:disabled {
+      opacity: 0.5;
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #b47a46;
+      pointer-events: none;
+    }
+
+    .card-question {
+      background: #fef7ed;
+      border-radius: 60px;
+      padding: 28px 20px;
+      margin: 12px 0 24px;
+      border: 3px dashed #cc9f73;
+      box-shadow: inset 0 0 0 4px #fbe4cd;
+      text-align: center;
+    }
+
+    .question-text {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #3d2415;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .question-text .highlight {
+      background: #ffe1b3;
+      padding: 4px 14px;
+      border-radius: 40px;
+      display: inline-block;
+      margin: 6px 4px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin: 28px 0 24px;
+    }
+
+    .option-btn {
+      background: #ffffff;
+      border: 4px solid #dbb48b;
+      border-radius: 60px;
+      padding: 18px 6px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #2f1a0e;
+      box-shadow: 0 8px 0 #b0815a;
+      transition: all 0.06s ease-in;
+      cursor: pointer;
+      text-align: center;
+      font-family: 'Segoe UI', 'Fredoka One', cursive;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-height: 80px;
+    }
+
+    .option-btn:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #b0815a;
+    }
+
+    .option-btn.correct {
+      background: #b0e5b0;
+      border-color: #2f8f2f;
+      box-shadow: 0 8px 0 #1f6b1f;
+      transform: scale(1.02);
+    }
+
+    .option-btn.wrong {
+      background: #f7b2b2;
+      border-color: #b34343;
+      box-shadow: 0 8px 0 #7a2e2e;
+    }
+
+    .option-btn.disabled {
+      opacity: 0.7;
+      filter: grayscale(0.3);
+      pointer-events: none;
+    }
+
+    .feedback-area {
+      background: #ebdac8;
+      border-radius: 50px;
+      padding: 16px 20px;
+      margin: 8px 0 20px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d1a0c;
+      text-align: center;
+      border: 2px solid #dbb086;
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn-next {
+      background: #fccc8b;
+      border: none;
+      border-radius: 80px;
+      padding: 18px 32px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2f1a0d;
+      box-shadow: 0 8px 0 #b47a46;
+      transition: 0.08s linear;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      border: 3px solid #fad6a8;
+      margin-top: 6px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-next:active {
+      transform: translateY(6px);
+      box-shadow: 0 2px 0 #b47a46;
+    }
+
+    .btn-next:disabled {
+      opacity: 0.5;
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #b47a46;
+      pointer-events: none;
+    }
+
+    .score-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f5e4d0;
+      padding: 12px 24px;
+      border-radius: 60px;
+      margin-top: 18px;
+      font-weight: 600;
+      font-size: 1.3rem;
+      color: #3d281a;
+      border: 2px solid #d6b188;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .timer-box {
+      background: #3d281a;
+      color: #fbe4cd;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .emoji-big {
+      font-size: 2.2rem;
+      line-height: 1;
+    }
+
+    .game-over-box {
+      background: #fef7ed;
+      border-radius: 60px;
+      padding: 24px 28px;
+      margin: 12px 0 24px;
+      border: 4px solid #cc9f73;
+      text-align: center;
+    }
+
+    .game-over-box h2 {
+      font-size: 2.2rem;
+      color: #3d2415;
+      margin-bottom: 12px;
+    }
+
+    .game-over-box .resultado {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .game-over-box .aprobado {
+      color: #1f7a1f;
+    }
+
+    .game-over-box .desaprobado {
+      color: #b34343;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .game-container {
+        padding: 16px 12px 28px;
+        border-radius: 48px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .question-text {
+        font-size: 1.5rem;
+      }
+      .option-btn {
+        font-size: 1.3rem;
+        padding: 14px 4px;
+        min-height: 70px;
+      }
+      .feedback-area {
+        font-size: 1.2rem;
+        min-height: 70px;
+      }
+      .register-box input {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" role="main">
+    <h1>
+      🧮 Propiedades
+      <span>×</span>
+    </h1>
+
+    <!-- REGISTRO INICIAL -->
+    <div class="register-box" id="registerBox">
+      <label for="nombreInput">📝 Nombre completo del estudiante</label>
+      <input type="text" id="nombreInput" placeholder="Ej: Ana María Pérez" maxlength="60">
+      <label for="gradoInput">📚 Grado</label>
+      <input type="text" id="gradoInput" placeholder="Ej: 4° Primaria" maxlength="30">
+      <button class="btn-register" id="registerBtn">🎮 Comenzar juego</button>
+      <div style="margin-top: 12px; font-size: 1.1rem; color: #5a3f2b;" id="registerError"></div>
+    </div>
+
+    <!-- CONTENIDO DEL JUEGO (oculto hasta registrar) -->
+    <div id="gameContent" class="hidden">
+      <div class="property-badge" id="propertyBadgeContainer">
+        <div class="badge" data-prop="conmutativa">🔁 Conmutativa</div>
+        <div class="badge" data-prop="asociativa">🔗 Asociativa</div>
+        <div class="badge" data-prop="distributiva">📦 Distributiva</div>
+        <div class="badge" data-prop="neutro">1️⃣ Neutro</div>
+        <div class="badge" data-prop="absorbente">0️⃣ Absorbente</div>
+      </div>
+
+      <div class="card-question">
+        <div class="question-text" id="questionDisplay">
+          <span class="highlight">4 × 5</span> = <span class="highlight">5 × 4</span>
+        </div>
+      </div>
+
+      <div class="options-grid" id="optionsContainer">
+        <button class="option-btn" data-index="0">20</button>
+        <button class="option-btn" data-index="1">40</button>
+        <button class="option-btn" data-index="2">9</button>
+        <button class="option-btn" data-index="3">1</button>
+      </div>
+
+      <div class="feedback-area" id="feedbackDisplay">
+        <span>💡 Elige una opción</span>
+      </div>
+
+      <button class="btn-next" id="nextButton">🚀 Siguiente pregunta</button>
+
+      <div class="score-progress">
+        <span>🏆 Aciertos: <span id="scoreCount">0</span></span>
+        <span>📌 <span id="questionCounter">1</span> / <span id="totalQuestions">25</span></span>
+        <span class="timer-box" id="timerDisplay">⏱️ <span id="timerSeconds">120</span>s</span>
+        <span class="emoji-big">✨</span>
+      </div>
+    </div>
+
+    <!-- PANTALLA FINAL (oculta) -->
+    <div id="gameOverBox" class="game-over-box hidden">
+      <h2>🏁 ¡Juego terminado!</h2>
+      <div id="resultadoFinal"></div>
+      <button class="btn-register" id="restartBtn" style="margin-top:20px;">🔄 Volver a jugar</button>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      // ========== CONFIGURACIÓN ==========
+      const TOTAL_QUESTIONS = 25;
+      const TIME_LIMIT = 120; // 2 minutos
+      const PUNTOS_POR_ACIERTO = 4;
+      const NOTA_APROBACION = 80; // 80% (20 aciertos * 4 = 80)
+
+      // ========== BANCO DE PREGUNTAS (25) ==========
+      const questionBank = [
+        // Conmutativa (5)
+        { property: 'conmutativa', text: '🔁 <span class="highlight">7 × 3</span> = <span class="highlight">3 × 7</span>', options: ['21', '10', '28', '24'], correct: 0, hint: '✅ 7×3 = 21' },
+        { property: 'conmutativa', text: '🔁 <span class="highlight">6 × 9</span> = <span class="highlight">9 × 6</span>', options: ['54', '63', '45', '36'], correct: 0, hint: '✅ 6×9 = 54' },
+        { property: 'conmutativa', text: '🔁 <span class="highlight">8 × 5</span> = <span class="highlight">5 × 8</span>', options: ['40', '45', '35', '48'], correct: 0, hint: '✅ 8×5 = 40' },
+        { property: 'conmutativa', text: '🔁 <span class="highlight">4 × 12</span> = <span class="highlight">12 × 4</span>', options: ['48', '44', '52', '36'], correct: 0, hint: '✅ 4×12 = 48' },
+        { property: 'conmutativa', text: '🔁 <span class="highlight">9 × 7</span> = <span class="highlight">7 × 9</span>', options: ['63', '56', '72', '49'], correct: 0, hint: '✅ 9×7 = 63' },
+        // Asociativa (5)
+        { property: 'asociativa', text: '🔗 <span class="highlight">(2 × 4) × 3</span> = <span class="highlight">2 × (4 × 3)</span>', options: ['24', '18', '30', '20'], correct: 0, hint: '✅ (2×4)×3 = 24' },
+        { property: 'asociativa', text: '🔗 <span class="highlight">(5 × 2) × 6</span> = <span class="highlight">5 × (2 × 6)</span>', options: ['60', '72', '48', '56'], correct: 0, hint: '✅ 5×2×6 = 60' },
+        { property: 'asociativa', text: '🔗 <span class="highlight">(3 × 3) × 2</span> = <span class="highlight">3 × (3 × 2)</span>', options: ['18', '24', '12', '15'], correct: 0, hint: '✅ 3×3×2 = 18' },
+        { property: 'asociativa', text: '🔗 <span class="highlight">(4 × 2) × 5</span> = <span class="highlight">4 × (2 × 5)</span>', options: ['40', '32', '48', '36'], correct: 0, hint: '✅ 4×2×5 = 40' },
+        { property: 'asociativa', text: '🔗 <span class="highlight">(6 × 1) × 7</span> = <span class="highlight">6 × (1 × 7)</span>', options: ['42', '48', '36', '54'], correct: 0, hint: '✅ 6×1×7 = 42' },
+        // Distributiva (5)
+        { property: 'distributiva', text: '📦 <span class="highlight">4 × (3 + 2)</span> = <span class="highlight">(4×3)+(4×2)</span>', options: ['20', '24', '16', '28'], correct: 0, hint: '✅ 4×5 = 20' },
+        { property: 'distributiva', text: '📦 <span class="highlight">6 × (5 + 1)</span> = <span class="highlight">(6×5)+(6×1)</span>', options: ['36', '42', '30', '48'], correct: 0, hint: '✅ 6×6 = 36' },
+        { property: 'distributiva', text: '📦 <span class="highlight">3 × (4 + 6)</span> = <span class="highlight">(3×4)+(3×6)</span>', options: ['30', '24', '36', '40'], correct: 0, hint: '✅ 3×10 = 30' },
+        { property: 'distributiva', text: '📦 <span class="highlight">5 × (2 + 8)</span> = <span class="highlight">(5×2)+(5×8)</span>', options: ['50', '40', '60', '45'], correct: 0, hint: '✅ 5×10 = 50' },
+        { property: 'distributiva', text: '📦 <span class="highlight">7 × (3 + 4)</span> = <span class="highlight">(7×3)+(7×4)</span>', options: ['49', '42', '56', '35'], correct: 0, hint: '✅ 7×7 = 49' },
+        // Neutro (5)
+        { property: 'neutro', text: '1️⃣ <span class="highlight">99 × 1</span> = ?', options: ['99', '1', '100', '0'], correct: 0, hint: '✅ 99×1 = 99' },
+        { property: 'neutro', text: '1️⃣ <span class="highlight">1 × 57</span> = ?', options: ['57', '1', '58', '0'], correct: 0, hint: '✅ 1×57 = 57' },
+        { property: 'neutro', text: '1️⃣ <span class="highlight">43 × 1</span> = ?', options: ['43', '1', '44', '0'], correct: 0, hint: '✅ 43×1 = 43' },
+        { property: 'neutro', text: '1️⃣ <span class="highlight">1 × 82</span> = ?', options: ['82', '1', '83', '0'], correct: 0, hint: '✅ 1×82 = 82' },
+        { property: 'neutro', text: '1️⃣ <span class="highlight">16 × 1</span> = ?', options: ['16', '1', '17', '0'], correct: 0, hint: '✅ 16×1 = 16' },
+        // Absorbente (5)
+        { property: 'absorbente', text: '0️⃣ <span class="highlight">45 × 0</span> = ?', options: ['0', '45', '1', '450'], correct: 0, hint: '✅ 45×0 = 0' },
+        { property: 'absorbente', text: '0️⃣ <span class="highlight">0 × 123</span> = ?', options: ['0', '123', '1', '1230'], correct: 0, hint: '✅ 0×123 = 0' },
+        { property: 'absorbente', text: '0️⃣ <span class="highlight">76 × 0</span> = ?', options: ['0', '76', '1', '760'], correct: 0, hint: '✅ 76×0 = 0' },
+        { property: 'absorbente', text: '0️⃣ <span class="highlight">0 × 54</span> = ?', options: ['0', '54', '1', '540'], correct: 0, hint: '✅ 0×54 = 0' },
+        { property: 'absorbente', text: '0️⃣ <span class="highlight">88 × 0</span> = ?', options: ['0', '88', '1', '880'], correct: 0, hint: '✅ 88×0 = 0' }
+      ];
+
+      // ========== ESTADO ==========
+      let questions = [];
+      let currentIndex = 0;
+      let score = 0;
+      let answered = false;
+      let currentQuestion = null;
+      let timerInterval = null;
+      let timeLeft = TIME_LIMIT;
+      let gameActive = false;
+      let studentName = '';
+      let studentGrade = '';
+
+      // ========== DOM ==========
+      const registerBox = document.getElementById('registerBox');
+      const gameContent = document.getElementById('gameContent');
+      const gameOverBox = document.getElementById('gameOverBox');
+      const nombreInput = document.getElementById('nombreInput');
+      const gradoInput = document.getElementById('gradoInput');
+      const registerBtn = document.getElementById('registerBtn');
+      const registerError = document.getElementById('registerError');
+
+      const questionDisplay = document.getElementById('questionDisplay');
+      const optionsBtns = document.querySelectorAll('.option-btn');
+      const feedbackDisplay = document.getElementById('feedbackDisplay');
+      const nextButton = document.getElementById('nextButton');
+      const scoreSpan = document.getElementById('scoreCount');
+      const questionCounterSpan = document.getElementById('questionCounter');
+      const totalQuestionsSpan = document.getElementById('totalQuestions');
+      const timerSecondsSpan = document.getElementById('timerSeconds');
+      const badges = document.querySelectorAll('.badge');
+      const resultadoFinal = document.getElementById('resultadoFinal');
+      const restartBtn = document.getElementById('restartBtn');
+
+      totalQuestionsSpan.textContent = TOTAL_QUESTIONS;
+
+      // ========== FUNCIONES ==========
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function initGame() {
+        // Seleccionar 25 preguntas (mezclar y tomar 25)
+        const shuffled = shuffleArray([...questionBank]);
+        questions = shuffled.slice(0, TOTAL_QUESTIONS);
+        // Si por casualidad hay menos de 25, rellenar con algunas repetidas (pero no debería)
+        while (questions.length < TOTAL_QUESTIONS) {
+          questions.push(shuffled[questions.length % shuffled.length]);
+        }
+        // Mezclar nuevamente para variar
+        questions = shuffleArray(questions);
+        currentIndex = 0;
+        score = 0;
+        timeLeft = TIME_LIMIT;
+        gameActive = true;
+        answered = false;
+        scoreSpan.textContent = '0';
+        timerSecondsSpan.textContent = timeLeft;
+        registerBox.classList.add('hidden');
+        gameContent.classList.remove('hidden');
+        gameOverBox.classList.add('hidden');
+        loadQuestion(0);
+        startTimer();
+      }
+
+      function loadQuestion(index) {
+        if (index >= questions.length || !gameActive) {
+          endGame();
+          return;
+        }
+        answered = false;
+        currentQuestion = questions[index];
+        questionDisplay.innerHTML = currentQuestion.text;
+
+        optionsBtns.forEach((btn, i) => {
+          btn.textContent = currentQuestion.options[i] || '?';
+          btn.className = 'option-btn';
+          btn.disabled = false;
+        });
+
+        feedbackDisplay.innerHTML = `<span>💡 Elige una opción</span>`;
+        nextButton.disabled = true;
+        questionCounterSpan.textContent = index + 1;
+
+        const prop = currentQuestion.property;
+        badges.forEach(badge => {
+          badge.classList.remove('active');
+          if (badge.dataset.prop === prop) {
+            badge.classList.add('active');
+          }
+        });
+      }
+
+      function handleOptionClick(e) {
+        if (!gameActive || answered) return;
+        const btn = e.currentTarget;
+        if (btn.disabled) return;
+        const selectedIndex = parseInt(btn.dataset.index, 10);
+        const isCorrect = (selectedIndex === currentQuestion.correct);
+
+        answered = true;
+        optionsBtns.forEach(b => b.disabled = true);
+
+        optionsBtns.forEach((b, idx) => {
+          if (idx === currentQuestion.correct) {
+            b.classList.add('correct');
+          } else if (idx === selectedIndex && !isCorrect) {
+            b.classList.add('wrong');
+          }
+        });
+
+        if (isCorrect) {
+          score++;
+          scoreSpan.textContent = score;
+          feedbackDisplay.innerHTML = `🎉 ¡Correcto! ${currentQuestion.hint}`;
+        } else {
+          feedbackDisplay.innerHTML = `❌ ${currentQuestion.hint}`;
+        }
+
+        nextButton.disabled = false;
+      }
+
+      function nextQuestion() {
+        if (nextButton.disabled || !gameActive) return;
+        if (currentIndex < questions.length - 1) {
+          currentIndex++;
+          loadQuestion(currentIndex);
+        } else {
+          endGame();
+        }
+      }
+
+      function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          timerSecondsSpan.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            if (gameActive) {
+              endGame();
+            }
+          }
+        }, 1000);
+      }
+
+      function endGame() {
+        if (!gameActive) return;
+        gameActive = false;
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        // Deshabilitar todo
+        optionsBtns.forEach(b => { b.disabled = true; b.className = 'option-btn disabled'; });
+        nextButton.disabled = true;
+        badges.forEach(b => b.classList.remove('active'));
+
+        // Calcular nota
+        const nota = score * PUNTOS_POR_ACIERTO;
+        const aprobado = nota >= NOTA_APROBACION;
+
+        // Mostrar pantalla final
+        gameContent.classList.add('hidden');
+        gameOverBox.classList.remove('hidden');
+
+        let mensaje = `
+          <div style="font-size:1.6rem; margin-bottom:8px;">
+            👤 <strong>${studentName}</strong> (${studentGrade})
+          </div>
+          <div class="resultado">
+            ✅ Aciertos: ${score} de ${TOTAL_QUESTIONS}
+          </div>
+          <div style="font-size:2rem; margin:12px 0;">
+            📊 Nota: <strong>${nota}</strong> / 100
+          </div>
+          <div class="resultado ${aprobado ? 'aprobado' : 'desaprobado'}" style="font-size:2.4rem;">
+            ${aprobado ? '🎉 ¡APROBADO! 🎉' : '😞 DESAPROBADO'}
+          </div>
+          <div style="margin-top:12px; font-size:1.2rem; color:#5a3f2b;">
+            ${aprobado ? '¡Excelente trabajo dominando las propiedades!' : '¡Sigue practicando! Repasa las propiedades.'}
+          </div>
+        `;
+        resultadoFinal.innerHTML = mensaje;
+      }
+
+      function restartGame() {
+        // Reiniciar todo
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+        gameActive = false;
+        gameOverBox.classList.add('hidden');
+        gameContent.classList.add('hidden');
+        registerBox.classList.remove('hidden');
+        registerError.textContent = '';
+        nombreInput.value = '';
+        gradoInput.value = '';
+        // Resetear contadores visuales
+        scoreSpan.textContent = '0';
+        timerSecondsSpan.textContent = TIME_LIMIT;
+        questionCounterSpan.textContent = '1';
+      }
+
+      // ========== REGISTRO ==========
+      function handleRegister() {
+        const nombre = nombreInput.value.trim();
+        const grado = gradoInput.value.trim();
+        if (nombre === '' || grado === '') {
+          registerError.textContent = '⚠️ Por favor, completa ambos campos.';
+          return;
+        }
+        if (nombre.length < 2 || grado.length < 1) {
+          registerError.textContent = '⚠️ Ingresa un nombre y grado válidos.';
+          return;
+        }
+        studentName = nombre;
+        studentGrade = grado;
+        registerError.textContent = '';
+        initGame();
+      }
+
+      // ========== EVENT LISTENERS ==========
+      registerBtn.addEventListener('click', handleRegister);
+      nombreInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleRegister(); });
+      gradoInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleRegister(); });
+
+      optionsBtns.forEach(btn => {
+        btn.addEventListener('click', handleOptionClick);
+      });
+
+      nextButton.addEventListener('click', nextQuestion);
+      restartBtn.addEventListener('click', restartGame);
+
+      // ========== INICIO ==========
+      // Mostrar registro por defecto
+      registerBox.classList.remove('hidden');
+      gameContent.classList.add('hidden');
+      gameOverBox.classList.add('hidden');
+    })();
+  </script>
+</body>
+</html>

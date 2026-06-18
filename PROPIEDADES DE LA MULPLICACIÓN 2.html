@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🧠 Propiedades · 100 Desafíos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #d5e0f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Fredoka One', 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .game-container {
+            max-width: 880px;
+            width: 100%;
+            background: rgba(255, 250, 245, 0.92);
+            backdrop-filter: blur(4px);
+            border-radius: 72px 72px 48px 48px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.08);
+            padding: 24px 28px 40px;
+            border: 4px solid #b0c8e8;
+            transition: 0.3s;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a2a4a;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 0 #c5d3f0;
+            margin-top: -8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        h1 span {
+            background: #a5b9e0;
+            padding: 0 18px;
+            border-radius: 60px;
+            font-size: 1.6rem;
+            color: #1a2340;
+            box-shadow: inset 0 -4px 0 #5f74a0;
+        }
+
+        .register-box {
+            background: #f3f7ff;
+            border-radius: 60px;
+            padding: 28px 24px;
+            margin: 12px 0 24px;
+            border: 3px solid #9bb0d4;
+            box-shadow: inset 0 0 0 4px #e5edff;
+            text-align: center;
+        }
+
+        .register-box label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1f2a4a;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .register-box input {
+            width: 100%;
+            max-width: 360px;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            border-radius: 60px;
+            border: 3px solid #9bb0d4;
+            background: white;
+            font-family: inherit;
+            margin: 6px auto 14px;
+            display: block;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .register-box input:focus {
+            border-color: #4a6a9e;
+            box-shadow: 0 0 0 4px #c5d7f5;
+        }
+
+        .btn-primary {
+            background: #7b9ed4;
+            border: none;
+            border-radius: 80px;
+            padding: 16px 44px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 6px 0 #3d5a82;
+            transition: 0.08s linear;
+            cursor: pointer;
+            border: 3px solid #aec4ec;
+            margin-top: 6px;
+        }
+
+        .btn-primary:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #3d5a82;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #3d5a82;
+            pointer-events: none;
+        }
+
+        .register-error {
+            margin-top: 12px;
+            font-size: 1.1rem;
+            color: #b34a4a;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .game-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: #e9eff9;
+            padding: 12px 20px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            border: 2px solid #b8c9e8;
+        }
+
+        .game-header .info-item {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2a4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timer-box {
+            background: #1f2a4a;
+            color: #e9eff9;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-question {
+            background: #f3f7ff;
+            border-radius: 60px;
+            padding: 28px 20px;
+            margin: 12px 0 20px;
+            border: 3px solid #9bb0d4;
+            box-shadow: inset 0 0 0 4px #e5edff;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a2340;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .question-text .highlight {
+            background: #d6e3ff;
+            padding: 4px 16px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 6px 4px;
+        }
+
+        .sub-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2f3d66;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #dfe9fc;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        .phase-indicator {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #3d5a82;
+            background: #d6e3ff;
+            padding: 4px 20px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin: 24px 0 18px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 4px solid #b8c9e8;
+            border-radius: 60px;
+            padding: 16px 8px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1f2a4a;
+            box-shadow: 0 6px 0 #859fc9;
+            transition: all 0.06s ease-in;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Segoe UI', 'Fredoka One', cursive;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+
+        .option-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #859fc9;
+        }
+
+        .option-btn.correct {
+            background: #b5e6b5;
+            border-color: #2f8f2f;
+            box-shadow: 0 6px 0 #1f6b1f;
+        }
+
+        .option-btn.wrong {
+            background: #f7b2b2;
+            border-color: #b34343;
+            box-shadow: 0 6px 0 #7a2e2e;
+        }
+
+        .option-btn.selected-result {
+            background: #ffd966;
+            border-color: #d4a017;
+            box-shadow: 0 6px 0 #b0801a;
+        }
+
+        .option-btn.selected-prop {
+            background: #ffd966;
+            border-color: #d4a017;
+            box-shadow: 0 6px 0 #b0801a;
+        }
+
+        .option-btn.disabled {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+            pointer-events: none;
+        }
+
+        .feedback-area {
+            background: #dfe9fc;
+            border-radius: 50px;
+            padding: 16px 20px;
+            margin: 8px 0 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1f2a4a;
+            text-align: center;
+            border: 2px solid #9bb0d4;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn-next {
+            background: #7b9ed4;
+            border: none;
+            border-radius: 80px;
+            padding: 18px 32px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 8px 0 #3d5a82;
+            transition: 0.08s linear;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 3px solid #aec4ec;
+            margin-top: 6px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-next:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #3d5a82;
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #3d5a82;
+            pointer-events: none;
+        }
+
+        .progress-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #e9eff9;
+            padding: 12px 24px;
+            border-radius: 60px;
+            margin-top: 18px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1f2a4a;
+            border: 2px solid #b8c9e8;
+            gap: 8px;
+        }
+
+        .game-over-box {
+            background: #f3f7ff;
+            border-radius: 60px;
+            padding: 28px 24px;
+            margin: 12px 0 24px;
+            border: 4px solid #9bb0d4;
+            text-align: center;
+        }
+
+        .game-over-box h2 {
+            font-size: 2.2rem;
+            color: #1f2a4a;
+            margin-bottom: 12px;
+        }
+
+        .game-over-box .resultado {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .game-over-box .aprobado {
+            color: #1f7a1f;
+        }
+
+        .game-over-box .desaprobado {
+            color: #b34343;
+        }
+
+        #propertyOptions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 12px 0 16px;
+        }
+
+        .prop-btn {
+            background: #ffffff;
+            border: 4px solid #b8c9e8;
+            border-radius: 60px;
+            padding: 12px 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2a4a;
+            box-shadow: 0 6px 0 #859fc9;
+            transition: all 0.06s ease-in;
+            cursor: pointer;
+            text-align: center;
+            font-family: 'Segoe UI', 'Fredoka One', cursive;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .prop-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #859fc9;
+        }
+
+        .prop-btn.correct {
+            background: #b5e6b5;
+            border-color: #2f8f2f;
+            box-shadow: 0 6px 0 #1f6b1f;
+        }
+
+        .prop-btn.wrong {
+            background: #f7b2b2;
+            border-color: #b34343;
+            box-shadow: 0 6px 0 #7a2e2e;
+        }
+
+        .prop-btn.selected-prop {
+            background: #ffd966;
+            border-color: #d4a017;
+            box-shadow: 0 6px 0 #b0801a;
+        }
+
+        .prop-btn.disabled {
+            opacity: 0.6;
+            filter: grayscale(0.3);
+            pointer-events: none;
+        }
+
+        @media (max-width: 640px) {
+            .game-container {
+                padding: 16px 12px 28px;
+                border-radius: 48px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .question-text {
+                font-size: 1.6rem;
+            }
+            .sub-question {
+                font-size: 1.1rem;
+            }
+            .option-btn {
+                font-size: 1.1rem;
+                padding: 14px 4px;
+                min-height: 60px;
+            }
+            .feedback-area {
+                font-size: 1.1rem;
+                min-height: 70px;
+            }
+            .game-header .info-item {
+                font-size: 0.95rem;
+            }
+            .timer-box {
+                font-size: 1.2rem;
+                padding: 4px 14px;
+            }
+            .register-box input {
+                max-width: 100%;
+                font-size: 1rem;
+            }
+            .btn-primary {
+                font-size: 1.2rem;
+                padding: 14px 30px;
+            }
+            .btn-next {
+                font-size: 1.3rem;
+                padding: 14px 20px;
+            }
+            .progress-footer {
+                font-size: 0.95rem;
+                padding: 10px 16px;
+            }
+            .game-over-box .resultado {
+                font-size: 1.3rem;
+            }
+            #propertyOptions {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            .prop-btn {
+                font-size: 0.95rem;
+                min-height: 45px;
+                padding: 10px 4px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .option-btn {
+                font-size: 1rem;
+                min-height: 50px;
+                padding: 10px 4px;
+            }
+            .question-text {
+                font-size: 1.3rem;
+            }
+            #propertyOptions {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .prop-btn {
+                font-size: 0.85rem;
+                min-height: 40px;
+                padding: 8px 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" role="main">
+        <h1>
+            🧠 Propiedades
+            <span>×</span>
+        </h1>
+
+        <!-- REGISTRO -->
+        <div class="register-box" id="registerBox">
+            <label for="nombreInput">📝 Nombre completo del estudiante</label>
+            <input type="text" id="nombreInput" placeholder="Ej: Ana María Pérez" maxlength="60" autocomplete="name">
+            <label for="gradoInput">📚 Grado</label>
+            <input type="text" id="gradoInput" placeholder="Ej: 4° Primaria" maxlength="30">
+            <button class="btn-primary" id="registerBtn">🎮 Comenzar</button>
+            <div class="register-error" id="registerError"></div>
+        </div>
+
+        <!-- JUEGO -->
+        <div id="gameContent" class="hidden">
+            <div class="game-header">
+                <span class="info-item">🏆 <span id="scoreCount">0</span> pts</span>
+                <span class="info-item">📌 <span id="questionCounter">1</span>/<span id="totalQuestions">100</span></span>
+                <span class="timer-box">⏱️ <span id="timerSeconds">180</span>s</span>
+            </div>
+
+            <div class="card-question">
+                <div class="phase-indicator" id="phaseIndicator">🔢 Fase 1: Selecciona el resultado</div>
+                <div class="question-text" id="questionDisplay">
+                    <span class="highlight">4 × 5</span> = ?
+                </div>
+                <div class="sub-question" id="propertyQuestion">¿Qué propiedad se aplica?</div>
+            </div>
+
+            <div class="options-grid" id="optionsContainer">
+                <button class="option-btn" data-index="0">20</button>
+                <button class="option-btn" data-index="1">40</button>
+                <button class="option-btn" data-index="2">9</button>
+                <button class="option-btn" data-index="3">1</button>
+            </div>
+
+            <div id="propertyOptions"></div>
+
+            <div class="feedback-area" id="feedbackDisplay">
+                <span>💡 Primero elige el resultado, luego la propiedad</span>
+            </div>
+
+            <button class="btn-next" id="nextButton">🚀 Siguiente</button>
+
+            <div class="progress-footer">
+                <span>👤 <span id="studentNameDisplay">-</span></span>
+                <span>📖 <span id="studentGradeDisplay">-</span></span>
+                <span>⭐ <span id="propertyHint">Conmutativa</span></span>
+            </div>
+        </div>
+
+        <!-- FINAL -->
+        <div id="gameOverBox" class="game-over-box hidden">
+            <h2>🏁 ¡Juego terminado!</h2>
+            <div id="resultadoFinal"></div>
+            <button class="btn-primary" id="restartBtn" style="margin-top:20px;">🔄 Volver a jugar</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ========== CONFIG ==========
+            const TOTAL_QUESTIONS = 100;
+            const TIME_LIMIT = 180; // 3 minutos
+            const PUNTOS_POR_ACIERTO = 4;
+            const NOTA_APROBACION = 80;
+
+            // ========== BANCO DE 100 PREGUNTAS ==========
+            function buildQuestionBank() {
+                const bank = [];
+                const properties = ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'];
+
+                // Conmutativa (20)
+                const conmutativas = [
+                    [7, 3], [6, 9], [8, 5], [4, 12], [9, 7],
+                    [5, 6], [3, 8], [7, 4], [9, 3], [6, 5],
+                    [8, 7], [4, 9], [5, 7], [3, 9], [6, 8],
+                    [7, 5], [8, 3], [9, 4], [5, 8], [4, 7]
+                ];
+                conmutativas.forEach(([a, b]) => {
+                    bank.push({
+                        operation: `${a} × ${b}`,
+                        result: a * b,
+                        property: 'Conmutativa',
+                        propOptions: ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'],
+                        correctProp: 0
+                    });
+                });
+
+                // Asociativa (20)
+                const asociativas = [
+                    [2, 4, 3], [5, 2, 6], [3, 3, 2], [4, 2, 5], [6, 1, 7],
+                    [2, 5, 4], [3, 4, 2], [5, 3, 4], [4, 3, 5], [6, 2, 3],
+                    [2, 6, 3], [3, 5, 2], [4, 4, 3], [5, 2, 5], [6, 3, 4],
+                    [2, 7, 3], [3, 6, 2], [4, 5, 3], [5, 4, 2], [6, 5, 3]
+                ];
+                asociativas.forEach(([a, b, c]) => {
+                    bank.push({
+                        operation: `(${a} × ${b}) × ${c}`,
+                        result: a * b * c,
+                        property: 'Asociativa',
+                        propOptions: ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'],
+                        correctProp: 1
+                    });
+                });
+
+                // Distributiva (20)
+                const distributivas = [
+                    [4, 3, 2], [6, 5, 1], [3, 4, 6], [5, 2, 8], [7, 3, 4],
+                    [4, 5, 3], [6, 4, 2], [3, 6, 5], [5, 3, 7], [7, 4, 5],
+                    [4, 6, 3], [6, 3, 4], [3, 7, 2], [5, 4, 6], [7, 5, 3],
+                    [4, 7, 2], [6, 5, 3], [3, 8, 4], [5, 6, 2], [7, 6, 4]
+                ];
+                distributivas.forEach(([a, b, c]) => {
+                    bank.push({
+                        operation: `${a} × (${b} + ${c})`,
+                        result: a * (b + c),
+                        property: 'Distributiva',
+                        propOptions: ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'],
+                        correctProp: 2
+                    });
+                });
+
+                // Neutro (20)
+                const neutros = [99, 57, 43, 82, 16, 34, 71, 28, 65, 49, 83, 27, 56, 94, 38, 72, 15, 68, 41, 79];
+                neutros.forEach(n => {
+                    bank.push({
+                        operation: `${n} × 1`,
+                        result: n,
+                        property: 'Neutro',
+                        propOptions: ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'],
+                        correctProp: 3
+                    });
+                });
+
+                // Absorbente (20)
+                const absorbentes = [45, 123, 76, 54, 88, 37, 92, 61, 84, 19, 73, 56, 98, 47, 81, 29, 64, 87, 33, 72];
+                absorbentes.forEach(n => {
+                    bank.push({
+                        operation: `${n} × 0`,
+                        result: 0,
+                        property: 'Absorbente',
+                        propOptions: ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'],
+                        correctProp: 4
+                    });
+                });
+
+                return bank;
+            }
+
+            // ========== ESTADO ==========
+            let questions = [];
+            let currentIndex = 0;
+            let score = 0;
+            let answered = false;
+            let currentQuestion = null;
+            let timerInterval = null;
+            let timeLeft = TIME_LIMIT;
+            let gameActive = false;
+            let studentName = '';
+            let studentGrade = '';
+            let resultSelected = false;
+            let propSelected = false;
+            let selectedResultIndex = -1;
+            let selectedPropIndex = -1;
+            let phase = 'result'; // 'result' o 'property'
+
+            // ========== DOM ==========
+            const registerBox = document.getElementById('registerBox');
+            const gameContent = document.getElementById('gameContent');
+            const gameOverBox = document.getElementById('gameOverBox');
+            const nombreInput = document.getElementById('nombreInput');
+            const gradoInput = document.getElementById('gradoInput');
+            const registerBtn = document.getElementById('registerBtn');
+            const registerError = document.getElementById('registerError');
+
+            const questionDisplay = document.getElementById('questionDisplay');
+            const propertyQuestion = document.getElementById('propertyQuestion');
+            const phaseIndicator = document.getElementById('phaseIndicator');
+            const optionsBtns = document.querySelectorAll('.option-btn');
+            const propertyOptionsDiv = document.getElementById('propertyOptions');
+            const feedbackDisplay = document.getElementById('feedbackDisplay');
+            const nextButton = document.getElementById('nextButton');
+            const scoreSpan = document.getElementById('scoreCount');
+            const questionCounterSpan = document.getElementById('questionCounter');
+            const totalQuestionsSpan = document.getElementById('totalQuestions');
+            const timerSecondsSpan = document.getElementById('timerSeconds');
+            const studentNameDisplay = document.getElementById('studentNameDisplay');
+            const studentGradeDisplay = document.getElementById('studentGradeDisplay');
+            const propertyHint = document.getElementById('propertyHint');
+            const resultadoFinal = document.getElementById('resultadoFinal');
+            const restartBtn = document.getElementById('restartBtn');
+
+            totalQuestionsSpan.textContent = TOTAL_QUESTIONS;
+
+            // ========== FUNCIONES ==========
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function initGame() {
+                // Generar banco de 100 preguntas y barajar
+                const fullBank = buildQuestionBank();
+                // Asegurar que haya al menos 100
+                while (fullBank.length < 100) {
+                    fullBank.push(fullBank[Math.floor(Math.random() * fullBank.length)]);
+                }
+                // Barajar y tomar 100
+                const shuffled = shuffleArray([...fullBank]);
+                questions = shuffled.slice(0, 100);
+
+                currentIndex = 0;
+                score = 0;
+                timeLeft = TIME_LIMIT;
+                gameActive = true;
+                answered = false;
+                resultSelected = false;
+                propSelected = false;
+                selectedResultIndex = -1;
+                selectedPropIndex = -1;
+                phase = 'result';
+                scoreSpan.textContent = '0';
+                timerSecondsSpan.textContent = timeLeft;
+                studentNameDisplay.textContent = studentName;
+                studentGradeDisplay.textContent = studentGrade;
+
+                registerBox.classList.add('hidden');
+                gameContent.classList.remove('hidden');
+                gameOverBox.classList.add('hidden');
+                loadQuestion(0);
+                startTimer();
+            }
+
+            function loadQuestion(index) {
+                if (index >= questions.length || !gameActive) {
+                    endGame();
+                    return;
+                }
+                answered = false;
+                resultSelected = false;
+                propSelected = false;
+                selectedResultIndex = -1;
+                selectedPropIndex = -1;
+                phase = 'result';
+                currentQuestion = questions[index];
+
+                // Mostrar operación
+                questionDisplay.innerHTML = `<span class="highlight">${currentQuestion.operation}</span> = ?`;
+                phaseIndicator.textContent = '🔢 Fase 1: Selecciona el resultado';
+                propertyQuestion.textContent = '¿Qué propiedad se aplica? (después del resultado)';
+
+                // Generar opciones de resultado
+                const resultOptions = generateResultOptions(currentQuestion.result);
+                optionsBtns.forEach((btn, i) => {
+                    btn.textContent = resultOptions[i];
+                    btn.className = 'option-btn';
+                    btn.disabled = false;
+                    btn.dataset.type = 'result';
+                    btn.dataset.value = resultOptions[i];
+                    btn.dataset.correct = (parseInt(resultOptions[i]) === currentQuestion.result) ? 'true' : 'false';
+                });
+
+                // Desactivar botones de propiedad
+                document.querySelectorAll('.prop-btn').forEach(b => {
+                    b.className = 'prop-btn disabled';
+                    b.disabled = true;
+                });
+
+                // Desactivar siguiente
+                nextButton.disabled = true;
+                feedbackDisplay.innerHTML = `<span>💡 Primero elige el resultado correcto</span>`;
+                propertyHint.textContent = `🔍 Propiedad: ?`;
+                questionCounterSpan.textContent = index + 1;
+            }
+
+            function generateResultOptions(correctResult) {
+                let options = new Set();
+                options.add(correctResult);
+                let attempts = 0;
+                while (options.size < 4 && attempts < 100) {
+                    let offset = Math.floor(Math.random() * 20) + 1;
+                    let candidate = correctResult + (Math.random() > 0.5 ? offset : -offset);
+                    if (candidate !== correctResult && candidate >= 0 && candidate <= 200) {
+                        options.add(candidate);
+                    }
+                    attempts++;
+                }
+                let fallbacks = [0, 1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+                for (let fb of fallbacks) {
+                    if (options.size >= 4) break;
+                    if (fb !== correctResult) options.add(fb);
+                }
+                let arr = Array.from(options);
+                while (arr.length < 4) {
+                    let extra = Math.floor(Math.random() * 100) + 1;
+                    if (extra !== correctResult && !arr.includes(extra)) arr.push(extra);
+                }
+                return shuffleArray(arr.slice(0, 4));
+            }
+
+            function handleOptionClick(e) {
+                if (!gameActive || answered) return;
+                const btn = e.currentTarget;
+                if (btn.disabled) return;
+
+                const type = btn.dataset.type;
+
+                if (type === 'result' && phase === 'result') {
+                    // Seleccionar resultado
+                    optionsBtns.forEach(b => b.classList.remove('selected-result'));
+                    btn.classList.add('selected-result');
+                    selectedResultIndex = parseInt(btn.dataset.index, 10);
+                    resultSelected = true;
+
+                    const isCorrect = btn.dataset.correct === 'true';
+                    feedbackDisplay.innerHTML = `✅ Resultado: ${btn.textContent} ${isCorrect ? '✔️ Correcto' : '❌ Incorrecto'}`;
+
+                    // Activar fase de propiedad
+                    phase = 'property';
+                    phaseIndicator.textContent = '🧩 Fase 2: Selecciona la propiedad';
+                    // Activar botones de propiedad
+                    document.querySelectorAll('.prop-btn').forEach(b => {
+                        b.className = 'prop-btn';
+                        b.disabled = false;
+                    });
+                    // Desactivar botones de resultado
+                    optionsBtns.forEach(b => b.disabled = true);
+                    feedbackDisplay.innerHTML += ' — Ahora elige la propiedad';
+                }
+            }
+
+            function handlePropClick(e) {
+                if (!gameActive || answered) return;
+                const btn = e.currentTarget;
+                if (btn.disabled) return;
+
+                if (phase === 'property') {
+                    document.querySelectorAll('.prop-btn').forEach(b => b.classList.remove('selected-prop'));
+                    btn.classList.add('selected-prop');
+                    selectedPropIndex = parseInt(btn.dataset.index, 10);
+                    propSelected = true;
+
+                    const isCorrect = btn.dataset.correct === 'true';
+                    feedbackDisplay.innerHTML = `🔍 Propiedad: ${btn.textContent} ${isCorrect ? '✔️ Correcta' : '❌ Incorrecta'}`;
+
+                    // Verificar todo
+                    checkAndProceed();
+                }
+            }
+
+            function checkAndProceed() {
+                if (!resultSelected || !propSelected) return;
+
+                const resultBtn = document.querySelector('.option-btn.selected-result');
+                const propBtn = document.querySelector('.prop-btn.selected-prop');
+                if (!resultBtn || !propBtn) return;
+
+                const resultCorrect = resultBtn.dataset.correct === 'true';
+                const propCorrect = propBtn.dataset.correct === 'true';
+                const bothCorrect = resultCorrect && propCorrect;
+
+                // Bloquear todo
+                optionsBtns.forEach(b => b.disabled = true);
+                document.querySelectorAll('.prop-btn').forEach(b => b.disabled = true);
+
+                // Marcar respuestas correctas/incorrectas visualmente
+                optionsBtns.forEach(b => {
+                    if (b.dataset.correct === 'true') b.classList.add('correct');
+                    else if (b.classList.contains('selected-result') && b.dataset.correct === 'false') b.classList.add('wrong');
+                });
+
+                document.querySelectorAll('.prop-btn').forEach(b => {
+                    if (b.dataset.correct === 'true') b.classList.add('correct');
+                    else if (b.classList.contains('selected-prop') && b.dataset.correct === 'false') b.classList.add('wrong');
+                });
+
+                if (bothCorrect) {
+                    score += PUNTOS_POR_ACIERTO;
+                    scoreSpan.textContent = score;
+                    feedbackDisplay.innerHTML = `🎉 ¡Perfecto! Resultado y propiedad correctos. +${PUNTOS_POR_ACIERTO} pts`;
+                } else {
+                    let msg = '❌ ';
+                    if (!resultCorrect) msg += 'Resultado incorrecto. ';
+                    if (!propCorrect) msg += 'Propiedad incorrecta.';
+                    feedbackDisplay.innerHTML = msg;
+                }
+
+                answered = true;
+                nextButton.disabled = false;
+                propertyHint.textContent = `🔍 Propiedad: ${currentQuestion.property}`;
+                phaseIndicator.textContent = '✅ ¡Completado!';
+            }
+
+            function setupPropertyButtons() {
+                propertyOptionsDiv.innerHTML = '';
+                const propNames = ['Conmutativa', 'Asociativa', 'Distributiva', 'Neutro', 'Absorbente'];
+                propNames.forEach((name, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'prop-btn disabled';
+                    btn.textContent = name;
+                    btn.dataset.prop = name;
+                    btn.dataset.index = idx;
+                    btn.dataset.correct = 'false';
+                    btn.disabled = true;
+                    btn.addEventListener('click', handlePropClick);
+                    propertyOptionsDiv.appendChild(btn);
+                });
+            }
+
+            function updatePropertyCorrect() {
+                if (!currentQuestion) return;
+                const propName = currentQuestion.property;
+                document.querySelectorAll('.prop-btn').forEach((b, idx) => {
+                    b.dataset.correct = (b.dataset.prop === propName) ? 'true' : 'false';
+                });
+            }
+
+            function nextQuestion() {
+                if (nextButton.disabled || !gameActive) return;
+                if (currentIndex < questions.length - 1) {
+                    currentIndex++;
+                    loadQuestion(currentIndex);
+                    // Actualizar correcta de propiedad
+                    updatePropertyCorrect();
+                } else {
+                    endGame();
+                }
+            }
+
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timerSecondsSpan.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        if (gameActive) endGame();
+                    }
+                }, 1000);
+            }
+
+            function endGame() {
+                if (!gameActive) return;
+                gameActive = false;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+
+                optionsBtns.forEach(b => { b.disabled = true; b.className = 'option-btn disabled'; });
+                document.querySelectorAll('.prop-btn').forEach(b => { b.disabled = true; });
+                nextButton.disabled = true;
+
+                const nota = score;
+                const aprobado = nota >= NOTA_APROBACION;
+
+                gameContent.classList.add('hidden');
+                gameOverBox.classList.remove('hidden');
+
+                let mensaje = `
+                    <div style="font-size:1.5rem; margin-bottom:8px;">
+                        👤 <strong>${studentName}</strong> (${studentGrade})
+                    </div>
+                    <div class="resultado">
+                        ✅ Puntaje: ${score} de ${TOTAL_QUESTIONS * PUNTOS_POR_ACIERTO} pts
+                    </div>
+                    <div style="font-size:2rem; margin:12px 0;">
+                        📊 Nota: <strong>${nota}</strong> / 100
+                    </div>
+                    <div class="resultado ${aprobado ? 'aprobado' : 'desaprobado'}" style="font-size:2.2rem;">
+                        ${aprobado ? '🎉 ¡APROBADO! 🎉' : '😞 DESAPROBADO'}
+                    </div>
+                    <div style="margin-top:12px; font-size:1.2rem; color:#3d5a82;">
+                        ${aprobado ? '¡Excelente dominio de las propiedades!' : '¡Sigue practicando! Repasa las propiedades.'}
+                    </div>
+                `;
+                resultadoFinal.innerHTML = mensaje;
+            }
+
+            function restartGame() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                gameActive = false;
+                gameOverBox.classList.add('hidden');
+                gameContent.classList.add('hidden');
+                registerBox.classList.remove('hidden');
+                registerError.textContent = '';
+                scoreSpan.textContent = '0';
+                timerSecondsSpan.textContent = TIME_LIMIT;
+                questionCounterSpan.textContent = '1';
+                nombreInput.value = '';
+                gradoInput.value = '';
+                // Resetear propiedad
+                setupPropertyButtons();
+            }
+
+            // ========== REGISTRO ==========
+            function handleRegister() {
+                const nombre = nombreInput.value.trim();
+                const grado = gradoInput.value.trim();
+                if (nombre === '' || grado === '') {
+                    registerError.textContent = '⚠️ Por favor, completa ambos campos.';
+                    return;
+                }
+                if (nombre.length < 2 || grado.length < 1) {
+                    registerError.textContent = '⚠️ Ingresa un nombre y grado válidos.';
+                    return;
+                }
+                studentName = nombre;
+                studentGrade = grado;
+                registerError.textContent = '';
+                setupPropertyButtons();
+                initGame();
+                // Actualizar propiedad correcta después de cargar
+                setTimeout(updatePropertyCorrect, 100);
+            }
+
+            // ========== EVENT LISTENERS ==========
+            registerBtn.addEventListener('click', handleRegister);
+            nombreInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleRegister(); });
+            gradoInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleRegister(); });
+
+            optionsBtns.forEach(btn => {
+                btn.addEventListener('click', handleOptionClick);
+            });
+
+            nextButton.addEventListener('click', nextQuestion);
+            restartBtn.addEventListener('click', restartGame);
+
+            // ========== INICIO ==========
+            registerBox.classList.remove('hidden');
+            gameContent.classList.add('hidden');
+            gameOverBox.classList.add('hidden');
+            setupPropertyButtons();
+        })();
+    </script>
+</body>
+</html>

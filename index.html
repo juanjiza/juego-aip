@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Juegos Interactivos · Francisco Izquierdo Ríos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f5efe6 0%, #e8dccc 100%);
+      font-family: 'Segoe UI', 'Poppins', 'Comic Neue', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      margin: 0;
+    }
+
+    .portal-container {
+      max-width: 1400px;
+      width: 100%;
+      background: #fefcf7;
+      border-radius: 72px 72px 48px 48px;
+      box-shadow: 0 25px 45px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.05);
+      padding: 28px 30px 40px;
+      border: 2px solid #dacbad;
+      transition: 0.3s;
+    }
+
+    /* HEADER con escudo */
+    .school-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px 30px;
+      background: #8b1e1e;
+      padding: 16px 28px;
+      border-radius: 90px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 0 #5e1313, 0 12px 24px rgba(0,0,0,0.2);
+    }
+
+    .emblem-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .emblem {
+      width: 80px;
+      height: 80px;
+      background: #f4c542;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 10px;
+      color: #8b1e1e;
+      box-shadow: 0 0 0 4px #fad97a, 0 6px 0 #7a1717;
+      text-align: center;
+      line-height: 1.2;
+      padding: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .emblem span {
+      display: block;
+      font-size: 7px;
+      font-weight: 600;
+      color: #5e1313;
+    }
+
+    .school-title {
+      color: #ffefcf;
+      text-shadow: 2px 2px 0 #5e1313;
+    }
+
+    .school-title h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .school-title p {
+      font-size: 1rem;
+      font-weight: 500;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255, 215, 0, 0.2);
+      padding: 8px 24px;
+      border-radius: 60px;
+      border: 2px solid #f4c542;
+      color: #ffefcf;
+      font-weight: 600;
+      font-size: 0.9rem;
+      backdrop-filter: blur(2px);
+      white-space: nowrap;
+    }
+
+    /* Buscador / filtro (opcional, pero bonito) */
+    .search-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .search-area h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #3d2a1a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-area h2 small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #7a6233;
+    }
+
+    .filter-input {
+      background: white;
+      border: 2px solid #dacbad;
+      border-radius: 60px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-family: inherit;
+      width: 260px;
+      max-width: 100%;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .filter-input:focus {
+      border-color: #8b1e1e;
+      box-shadow: 0 0 0 4px #f4c54280;
+    }
+
+    /* GRID DE JUEGOS */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+      margin-top: 8px;
+    }
+
+    .game-card {
+      background: #fcf9f2;
+      border-radius: 40px;
+      padding: 20px 20px 24px;
+      border: 2px solid #e6d6bd;
+      box-shadow: 0 8px 0 #b6a184, 0 6px 16px rgba(0,0,0,0.08);
+      transition: all 0.15s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 0 #9a8468, 0 12px 28px rgba(0,0,0,0.12);
+      border-color: #b8a17e;
+    }
+
+    .game-card:active {
+      transform: translateY(4px);
+      box-shadow: 0 4px 0 #9a8468;
+    }
+
+    .game-icon {
+      font-size: 2.8rem;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .game-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2c1e12;
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+    }
+
+    .game-desc {
+      font-size: 0.85rem;
+      color: #5f4a32;
+      font-weight: 500;
+      line-height: 1.4;
+      flex: 1;
+      margin-bottom: 12px;
+    }
+
+    .game-tag {
+      display: inline-block;
+      background: #8b1e1e20;
+      color: #8b1e1e;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 40px;
+      border: 1px solid #8b1e1e40;
+      align-self: flex-start;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .game-card .btn-play {
+      margin-top: 16px;
+      background: #8b1e1e;
+      color: white;
+      border: none;
+      border-radius: 60px;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      font-family: inherit;
+      box-shadow: 0 5px 0 #5e1313;
+      transition: 0.05s linear;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .game-card .btn-play:active {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 #5e1313;
+    }
+
+    /* Footer */
+    .footer-credit {
+      margin-top: 38px;
+      text-align: center;
+      color: #7a6233;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-top: 2px dashed #dacbad;
+      padding-top: 22px;
+      letter-spacing: 0.3px;
+    }
+
+    .footer-credit strong {
+      color: #8b1e1e;
+    }
+
+    /* Responsive */
+    @media (max-width: 750px) {
+      .portal-container { padding: 18px 16px 28px; border-radius: 48px; }
+      .school-header { flex-direction: column; align-items: flex-start; border-radius: 50px; padding: 18px 20px; }
+      .header-badge { margin-left: 0; align-self: flex-start; }
+      .school-title h1 { font-size: 1.4rem; }
+      .emblem { width: 64px; height: 64px; font-size: 8px; }
+      .games-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .games-grid { grid-template-columns: 1fr; }
+      .search-area { flex-direction: column; align-items: stretch; }
+      .filter-input { width: 100%; }
+    }
+
+    /* animación sutil */
+    .game-card {
+      animation: fadeUp 0.5s ease backwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="portal-container">
+  <!-- HEADER con escudo -->
+  <header class="school-header">
+    <div class="emblem-wrapper">
+      <div class="emblem">
+        EDUC<span>ATIVA</span>
+        FRANCISCO
+        RIO
+        <span>BELLAVISTA · CALLAO</span>
+      </div>
+      <div class="school-title">
+        <h1>FRANCISCO IZQUIERDO RÍOS</h1>
+        <p>“Lecturas Izquierdinas” · Juegos Interactivos</p>
+      </div>
+    </div>
+    <div class="header-badge">
+      🎮 6 juegos · Aprendizaje lúdico
+    </div>
+  </header>
+
+  <!-- Buscador / título -->
+  <div class="search-area">
+    <h2>
+      📚 JUEGOS INTERACTIVOS
+      <small>elige y aprende</small>
+    </h2>
+    <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Buscar juego...">
+  </div>
+
+  <!-- GRID DE JUEGOS -->
+  <div class="games-grid" id="gamesGrid">
+    <!-- Cada juego se genera con JS (para mantener orden y fácil edición) -->
+  </div>
+
+  <footer class="footer-credit">
+    <strong>Institución Educativa Francisco Izquierdo Ríos</strong> · Bellavista – Callao · Todos los derechos reservados · <span id="currentYear"></span>
+  </footer>
+</div>
+
+<script>
+  (function() {
+    // ============================================================
+    // LISTA DE JUEGOS (título, descripción, icono, ruta, etiqueta)
+    // ============================================================
+    const games = [
+      {
+        title: 'ECO-MISIÓN: Reciclaje',
+        desc: 'Clasifica 100 residuos y responde preguntas sobre reciclaje. ¡Cuida el planeta!',
+        icon: '♻️',
+        file: 'JUEGO DE RECICLAJE 2.html',
+        tag: 'ciencias · reciclaje'
+      },
+      {
+        title: 'El Gran Reto del Reciclaje',
+        desc: 'Arrastra residuos al contenedor correcto. 15 objetos, 8 minutos. ¡A reciclar!',
+        icon: '🗑️',
+        file: 'JUEGO RECICLAJE 1.html',
+        tag: 'reciclaje · arrastre'
+      },
+      {
+        title: 'ASTRONAVE MATEMÁTICA',
+        desc: 'Dispara a las naves con la operación correcta. Sumas, restas, multiplicación y división.',
+        icon: '🚀',
+        file: 'MATEMATICA NAVES.html',
+        tag: 'matemáticas · operaciones'
+      },
+      {
+        title: 'MERCADO "LA ESPIGA"',
+        desc: 'Compra frutas y verduras con dinero en soles. Aprende a pagar y calcular vuelto.',
+        icon: '🥬',
+        file: 'MERCADOMATH.html',
+        tag: 'matemáticas · monedas'
+      },
+      {
+        title: 'Lecturas Izquierdinas',
+        desc: 'Todos los cuentos de Francisco Izquierdo Ríos y tradiciones peruanas. +100 preguntas.',
+        icon: '📖',
+        file: 'PLAN LECTOR.html',
+        tag: 'lectura · comprensión'
+      },
+      {
+        title: 'Matemágica Soles',
+        desc: 'Problemas con monedas y operaciones. 4 niveles, 35 preguntas cada uno. ¡Pon a prueba tu cálculo!',
+        icon: '🧮',
+        file: 'PROBLEMMATH.html',
+        tag: 'matemáticas · problemas'
+      },
+      {
+        title: '⭐ Multi-Propiedades 1',
+        desc: 'Practica las propiedades de la multiplicación: conmutativa, asociativa, distributiva, neutro y absorbente.',
+        icon: '✖️',
+        file: 'PROPIEDADES - MULTIPLICACIÓN 1.html',
+        tag: 'matemáticas · propiedades'
+      },
+      {
+        title: '🧠 Propiedades 2 · 100 Desafíos',
+        desc: '100 preguntas en dos fases: elige el resultado y luego la propiedad. ¡Aprende jugando!',
+        icon: '🧩',
+        file: 'PROPIEDADES DE LA MULPLICACIÓN 2.html',
+        tag: 'matemáticas · propiedades'
+      }
+    ];
+
+    // DOM
+    const grid = document.getElementById('gamesGrid');
+    const searchInput = document.getElementById('searchInput');
+
+    // Render
+    function renderGames(filter = '') {
+      grid.innerHTML = '';
+      const filtered = games.filter(g => 
+        g.title.toLowerCase().includes(filter.toLowerCase()) ||
+        g.desc.toLowerCase().includes(filter.toLowerCase()) ||
+        g.tag.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; background:#f5efe6; border-radius:60px; color:#5f4a32;">
+          <span style="font-size:2.5rem;">🔍</span><br>
+          <strong>No se encontraron juegos</strong><br>
+          <span style="font-size:0.9rem;">Intenta con otra palabra clave</span>
+        </div>`;
+        return;
+      }
+
+      filtered.forEach((game, idx) => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.style.animationDelay = `${(idx % 6) * 0.06}s`;
+
+        card.innerHTML = `
+          <div class="game-icon">${game.icon}</div>
+          <div class="game-title">${game.title}</div>
+          <div class="game-desc">${game.desc}</div>
+          <div class="game-tag">${game.tag}</div>
+          <button class="btn-play" data-file="${game.file}">▶ JUGAR</button>
+        `;
+
+        // Evento para abrir el juego en nueva pestaña
+        const btn = card.querySelector('.btn-play');
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const file = btn.dataset.file;
+          if (file) {
+            // Abrir en nueva pestaña
+            window.open(file, '_blank');
+          }
+        });
+
+        // Al hacer clic en la tarjeta también se abre el juego
+        card.addEventListener('click', () => {
+          const file = card.querySelector('.btn-play')?.dataset.file;
+          if (file) window.open(file, '_blank');
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Filtro en tiempo real
+    searchInput.addEventListener('input', (e) => {
+      renderGames(e.target.value.trim());
+    });
+
+    // Año en footer
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Render inicial
+    renderGames();
+  })();
+</script>
+
+</body>
+</html>

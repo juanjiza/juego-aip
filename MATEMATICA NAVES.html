@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ASTRONAVE MATEMÁTICA - Aprende y Dispara</title>
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Ocupar toda la pantalla SIN scroll */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a2f4e 0%, #051e30 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Comic Neue', 'Comic Neue', 'Segoe UI Emoji', 'Chalkboard SE', 'Comic Sans MS', cursive, sans-serif;
+            padding: 12px;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal que ocupa todo el espacio disponible */
+        .game-container {
+            background: #08212e;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 1px 4px rgba(255,255,255,0.2);
+            padding: 12px;
+            width: 100%;
+            max-width: 1400px;
+            height: 98vh;
+            max-height: 98vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+        }
+
+        /* Panel superior compacto (todo visible) */
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9eec1;
+            padding: 6px 16px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-weight: bold;
+            color: #1e3b4a;
+            box-shadow: inset 0 1px 4px #0002, 0 6px 12px #0003;
+            flex-shrink: 0;
+        }
+
+        .stats-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .score-box, .time-box, .level-box, .lives-box {
+            background: #2c1e2f;
+            padding: 4px 12px;
+            border-radius: 3rem;
+            color: #f7d44a;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-shadow: 0 2px 0 #4a2e2e;
+            box-shadow: inset 0 -2px 0 #5f3e3e, 0 4px 8px #0003;
+            white-space: nowrap;
+        }
+
+        .score-box span, .time-box span, .level-box span, .lives-box span {
+            color: #ffefb9;
+            font-size: 0.7rem;
+            margin-right: 4px;
+        }
+
+        .player-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #071b24ba;
+            padding: 3px 12px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+            flex-wrap: wrap;
+        }
+
+        .player-area label {
+            font-weight: bold;
+            color: #ffde9c;
+            font-size: 0.8rem;
+        }
+
+        #displayPlayerName {
+            background: #fff6e0;
+            padding: 3px 10px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #2c1e2f;
+            min-width: 90px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        button {
+            background: #ffb347;
+            border: none;
+            font-family: inherit;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 0 #a1581a;
+            color: #2d1f0c;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #a1581a;
+        }
+
+        /* Canvas responsivo - ocupa el espacio restante */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            background: #0a1c2a;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 24px;
+            box-shadow: 0 8px 18px black;
+            cursor: none;
+            background: #0a1c2a;
+            display: block;
+        }
+
+        .flex-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .message-area {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: #fef7cf;
+            display: inline-block;
+            width: auto;
+            padding: 3px 12px;
+            border-radius: 40px;
+            color: #bf6f00;
+        }
+
+        .controls-tip {
+            font-size: 0.65rem;
+            color: #cae9ff;
+            text-align: center;
+        }
+
+        /* Pantallas modales */
+        .start-overlay, .level-start-overlay, .victory-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 25;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .start-box, .level-start-box, .victory-box {
+            background: linear-gradient(135deg, #f9eec1, #ffefb0);
+            padding: 25px 35px;
+            border-radius: 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 90%;
+            animation: bounceIn 0.4s ease;
+        }
+
+        .victory-box {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .victory-box h1 {
+            font-size: 1.8rem;
+            color: #ffd966;
+            text-shadow: 0 3px 0 #a1581a;
+            margin-bottom: 15px;
+        }
+
+        .victory-box p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .victory-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .victory-buttons button {
+            font-size: 1rem;
+            padding: 8px 25px;
+            background: #ffb347;
+            color: #2d1f0c;
+            box-shadow: 0 5px 0 #a1581a;
+        }
+
+        .victory-buttons button:last-child {
+            background: #e74c3c;
+            box-shadow: 0 5px 0 #c0392b;
+            color: white;
+        }
+
+        .level-start-box {
+            background: linear-gradient(145deg, #2c1e2f, #1e1222);
+            border: 3px solid #ffd966;
+        }
+
+        .start-box h1 {
+            font-size: 1.6rem;
+            color: #2c1e2f;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 #ffb347;
+        }
+
+        .start-box input {
+            font-size: 1rem;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            text-align: center;
+            width: 250px;
+            font-family: inherit;
+            background: white;
+        }
+
+        .start-box button, .level-start-box button {
+            font-size: 1rem;
+            padding: 10px 25px;
+            margin-top: 15px;
+            background: #2ecc71;
+            color: white;
+            box-shadow: 0 5px 0 #229954;
+        }
+
+        .level-start-box h2 {
+            font-size: 1.8rem;
+            color: #ffd966;
+            text-shadow: 0 3px 0 #a1581a;
+            margin-bottom: 10px;
+        }
+
+        .level-start-box p {
+            font-size: 1rem;
+            color: #ffefb9;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            80% { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @media (max-width: 700px) {
+            .start-box h1 { font-size: 1.2rem; }
+            .level-start-box h2 { font-size: 1.3rem; }
+            .victory-box h1 { font-size: 1.3rem; }
+            .victory-box p { font-size: 0.9rem; }
+            .start-box input { width: 200px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="info-panel">
+        <div class="player-area">
+            <label>🚀 PILOTO:</label>
+            <span id="displayPlayerName">---</span>
+            <button id="resetGameBtn">🔄 REINICIAR</button>
+        </div>
+        <div class="stats-group">
+            <div class="score-box"><span>⭐</span> <span id="scoreValue">0</span></div>
+            <div class="time-box"><span>⏱️</span> <span id="timeValue">2:00</span></div>
+            <div class="level-box"><span>🌠</span> <span id="levelName">SUMAS/RESTAS</span></div>
+            <div class="lives-box"><span>❤️</span> <span id="livesValue">3</span></div>
+        </div>
+    </div>
+    <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+        
+        <!-- Pantalla de inicio para pedir el nombre OBLIGATORIO -->
+        <div id="startOverlay" class="start-overlay">
+            <div class="start-box">
+                <h1>🚀 ASTRONAVE MATEMÁTICA 🚀</h1>
+                <p style="margin-bottom:12px;">✏️ ESCRIBE TU NOMBRE COMPLETO PARA COMENZAR</p>
+                <input type="text" id="startNameInput" placeholder="Ej: Ana María Pérez" autocomplete="off" maxlength="35">
+                <br>
+                <button id="startGameBtn">🎮 ¡COMENZAR AVENTURA! 🎮</button>
+            </div>
+        </div>
+        
+        <!-- Pantalla de inicio de nivel (con botón ACEPTAR) -->
+        <div id="levelStartOverlay" class="level-start-overlay" style="display: none;">
+            <div class="level-start-box">
+                <h2 id="levelTitle">🌟 NIVEL 1 🌟</h2>
+                <p id="levelSubtitle">SUMAS Y RESTAS</p>
+                <button id="startLevelBtn">✅ ACEPTAR</button>
+            </div>
+        </div>
+        
+        <!-- Pantalla de victoria final -->
+        <div id="victoryOverlay" class="victory-overlay" style="display: none;">
+            <div class="victory-box">
+                <h1>🏆 ¡FELICIDADES! 🏆</h1>
+                <p id="victoryMessage">✨ ¡COMPLETASTE EL JUEGO! ✨</p>
+                <div class="victory-buttons">
+                    <button id="yesPlayAgain">🎮 SÍ, JUGAR DE NUEVO</button>
+                    <button id="noStayVictory">❌ NO, SALIR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex-bottom">
+        <div class="message-area" id="statusMsg">🔫 ← → mover suave | [ESPACIO] DISPARAR</div>
+        <div class="controls-tip">✨ +2 acierto | 💥 -2 error | ❤️ -1 vida tras 2 errores seguidos</div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- CONFIGURACIÓN ----------
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startOverlay = document.getElementById('startOverlay');
+        const startNameInput = document.getElementById('startNameInput');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const levelStartOverlay = document.getElementById('levelStartOverlay');
+        const startLevelBtn = document.getElementById('startLevelBtn');
+        const victoryOverlay = document.getElementById('victoryOverlay');
+        const victoryMessage = document.getElementById('victoryMessage');
+        const yesPlayAgain = document.getElementById('yesPlayAgain');
+        const noStayVictory = document.getElementById('noStayVictory');
+        const levelTitle = document.getElementById('levelTitle');
+        const levelSubtitle = document.getElementById('levelSubtitle');
+        const displayPlayerSpan = document.getElementById('displayPlayerName');
+        const livesSpan = document.getElementById('livesValue');
+        
+        const CW = 900;
+        const CH = 500;
+        canvas.width = CW;
+        canvas.height = CH;
+        
+        const scoreSpan = document.getElementById('scoreValue');
+        const timeSpan = document.getElementById('timeValue');
+        const levelNameSpan = document.getElementById('levelName');
+        const statusMsgDiv = document.getElementById('statusMsg');
+        const resetBtn = document.getElementById('resetGameBtn');
+        
+        // Variables juego
+        let playerName = "";
+        let gameActive = false;
+        let gameState = "start";
+        let animationId = null;
+        let pendingLevel = 1;
+        let currentLevel = 1;
+        let lives = 3;
+        let consecutiveErrors = 0;
+        
+        // Nave
+        const SHIP_WIDTH = 44;
+        const SHIP_HEIGHT = 44;
+        let shipX = CW/2 - SHIP_WIDTH/2;
+        const shipY = CH - 65;
+        const ELIMINATION_Y = shipY - 10;
+        
+        let shipVelocity = 0;
+        let leftPressed = false;
+        let rightPressed = false;
+        const ACCELERATION = 0.42;
+        const FRICTION = 0.88;
+        const MAX_SPEED = 4.5;
+        
+        // Disparos
+        let bullets = [];
+        const BULLET_W = 5;
+        const BULLET_H = 12;
+        const BULLET_SPEED = -7;
+        let shootCooldown = 0;
+        const SHOOT_DELAY_FRAMES = 10;
+        
+        // Operaciones
+        let fallingItems = [];
+        const ITEM_W = 110;
+        const ITEM_H = 48;
+        let spawnCounter = 0;
+        const SPAWN_DELAY_FRAMES = 85;
+        const MAX_ITEMS_ON_SCREEN = 3;
+        const FALL_SPEED = 0.18;
+        
+        let hitEffects = [];
+        
+        // Progreso
+        let score = 0;
+        let timeLeft = 120;
+        let currentTarget = 20;
+        
+        // ----- FUNCIONES DE OPERACIONES -----
+        function generateOperationForLevel(lvl){
+            let correctAnswer = null;
+            let expr = "";
+            
+            if(lvl === 1){
+                let type = Math.random() < 0.5 ? "suma" : "resta";
+                if(type === "suma"){
+                    let a = Math.floor(Math.random() * 10) + 2;
+                    let b = Math.floor(Math.random() * 9) + 1;
+                    let res = a + b;
+                    if(res > 20) { a = 8; b = 5; res = 13; }
+                    correctAnswer = res;
+                    expr = `${a} + ${b}`;
+                } else {
+                    let a = Math.floor(Math.random() * 14) + 5;
+                    let b = Math.floor(Math.random() * (a-2)) + 1;
+                    let res = a - b;
+                    if(res < 0) { a = 10; b=3; res=7; }
+                    correctAnswer = res;
+                    expr = `${a} - ${b}`;
+                }
+            } 
+            else if(lvl === 2){
+                let type = Math.random() < 0.5 ? "suma" : "resta";
+                if(type === "suma"){
+                    let a = Math.floor(Math.random() * 22) + 6;
+                    let b = Math.floor(Math.random() * 18) + 3;
+                    let res = a + b;
+                    if(res > 45) { a=20; b=12; res=32; }
+                    correctAnswer = res;
+                    expr = `${a} + ${b}`;
+                } else {
+                    let a = Math.floor(Math.random() * 32) + 12;
+                    let b = Math.floor(Math.random() * (a-3)) + 2;
+                    let res = a - b;
+                    if(res < 0){ a=25; b=10; res=15; }
+                    correctAnswer = res;
+                    expr = `${a} - ${b}`;
+                }
+            }
+            else if(lvl === 3){
+                let a = Math.floor(Math.random() * 8) + 2;
+                let b = Math.floor(Math.random() * 8) + 2;
+                let res = a * b;
+                correctAnswer = res;
+                expr = `${a} × ${b}`;
+            }
+            else if(lvl === 4){
+                let divisor = Math.floor(Math.random() * 7) + 2;
+                let cociente = Math.floor(Math.random() * 7) + 2;
+                let dividendo = divisor * cociente;
+                if(dividendo > 64){ divisor = 4; cociente = 6; dividendo = 24; }
+                correctAnswer = cociente;
+                expr = `${dividendo} ÷ ${divisor}`;
+            }
+            
+            let isAnswerCorrect = Math.random() < 0.5;
+            let displayAnswer;
+            if(isAnswerCorrect){
+                displayAnswer = correctAnswer;
+            } else {
+                let offset = Math.floor(Math.random() * 4) + 1;
+                let wrong = correctAnswer + (Math.random() < 0.5 ? offset : -offset);
+                if(wrong === correctAnswer) wrong += 2;
+                if(wrong < 0) wrong = correctAnswer + 1;
+                if(lvl === 3 && wrong > 90) wrong = correctAnswer - 2;
+                if(lvl === 4 && wrong <= 0) wrong = correctAnswer + 1;
+                displayAnswer = wrong;
+            }
+            
+            const fullText = `${expr} = ${displayAnswer}`;
+            return { text: fullText, correct: isAnswerCorrect };
+        }
+        
+        function getRandomXPosition() {
+            if (fallingItems.length === 0) return Math.random() * (CW - ITEM_W - 20) + 10;
+            let attempts = 0, newX, overlapping;
+            do {
+                overlapping = false;
+                newX = Math.random() * (CW - ITEM_W - 20) + 10;
+                for (let item of fallingItems) {
+                    if (Math.abs(item.x - newX) < ITEM_W + 15) { overlapping = true; break; }
+                }
+                attempts++;
+                if (attempts > 15) break;
+            } while (overlapping);
+            return newX;
+        }
+        
+        function spawnItem(){
+            if(!gameActive || gameState !== "active") return;
+            if (fallingItems.length >= MAX_ITEMS_ON_SCREEN) return;
+            const itemData = generateOperationForLevel(currentLevel);
+            const x = getRandomXPosition();
+            fallingItems.push({ x: x, y: -20, w: ITEM_W, h: ITEM_H, data: itemData });
+        }
+        
+        function shoot(){
+            if(!gameActive || gameState !== "active") return;
+            if (shootCooldown > 0) return;
+            bullets.push({ x: shipX + SHIP_WIDTH/2 - BULLET_W/2, y: shipY - 8, w: BULLET_W, h: BULLET_H });
+            shootCooldown = SHOOT_DELAY_FRAMES;
+        }
+        
+        function handleCollisions(){
+            for(let i=0; i<bullets.length; i++){
+                const bullet = bullets[i];
+                let hitIndex = -1;
+                for(let j=0; j<fallingItems.length; j++){
+                    const item = fallingItems[j];
+                    if(bullet.x < item.x+item.w && bullet.x+bullet.w > item.x &&
+                       bullet.y < item.y+item.h && bullet.y+bullet.h > item.y){
+                        hitIndex = j; break;
+                    }
+                }
+                if(hitIndex !== -1){
+                    const target = fallingItems[hitIndex];
+                    const isCorrect = target.data.correct;
+                    const opText = target.data.text;
+                    hitEffects.push({ x: target.x + ITEM_W/2, y: target.y + ITEM_H/2, text: opText, timer: 40, isCorrect: isCorrect });
+                    
+                    if(isCorrect){
+                        score = Math.min(score + 2, 999);
+                        consecutiveErrors = 0;
+                        statusMsgDiv.innerHTML = "✔️ ¡CORRECTO! +2 puntos";
+                        setTimeout(()=>{ if(statusMsgDiv.innerHTML.includes("CORRECTO")) statusMsgDiv.innerHTML = "🔫 ← → mover | [ESPACIO] DISPARAR"; }, 800);
+                    } else {
+                        score = Math.max(score - 2, 0);
+                        consecutiveErrors++;
+                        statusMsgDiv.innerHTML = "❌ ¡ERROR! -2 puntos";
+                        
+                        if(consecutiveErrors >= 2){
+                            lives = Math.max(0, lives - 1);
+                            livesSpan.innerText = lives;
+                            consecutiveErrors = 0;
+                            statusMsgDiv.innerHTML = "💔 ¡PERDISTE UNA VIDA!";
+                            if(lives <= 0){
+                                gameActive = false;
+                                gameState = "gameOver";
+                                statusMsgDiv.innerHTML = `💀 GAME OVER ${playerName}. Presiona REINICIAR`;
+                                cancelAnimationFrame(animationId);
+                                animationId = null;
+                                return;
+                            }
+                            setTimeout(()=>{ if(statusMsgDiv.innerHTML.includes("VIDA")) statusMsgDiv.innerHTML = "🔫 ← → mover | [ESPACIO] DISPARAR"; }, 1000);
+                        } else {
+                            setTimeout(()=>{ if(statusMsgDiv.innerHTML.includes("ERROR")) statusMsgDiv.innerHTML = "🔫 ← → mover | [ESPACIO] DISPARAR"; }, 800);
+                        }
+                    }
+                    scoreSpan.innerText = score;
+                    bullets.splice(i,1);
+                    fallingItems.splice(hitIndex,1);
+                    i--;
+                }
+            }
+        }
+        
+        function updateMovement(){
+            for(let i=0; i<bullets.length; i++){
+                bullets[i].y += BULLET_SPEED;
+                if(bullets[i].y + bullets[i].h < 0 || bullets[i].y > CH){ bullets.splice(i,1); i--; }
+            }
+            if(shootCooldown > 0) shootCooldown--;
+            
+            for(let i=0; i<fallingItems.length; i++){
+                fallingItems[i].y += FALL_SPEED;
+                if(fallingItems[i].y + fallingItems[i].h >= ELIMINATION_Y){ fallingItems.splice(i,1); i--; }
+                else if(fallingItems[i].y + fallingItems[i].h > CH + 80){ fallingItems.splice(i,1); i--; }
+            }
+            
+            for(let i=0; i<hitEffects.length; i++){
+                hitEffects[i].timer--;
+                if(hitEffects[i].timer <= 0) { hitEffects.splice(i,1); i--; }
+            }
+        }
+        
+        function updateSpawner(){
+            if(!gameActive || gameState !== "active") return;
+            if(spawnCounter <= 0){ spawnItem(); spawnCounter = SPAWN_DELAY_FRAMES; } 
+            else { spawnCounter--; }
+        }
+        
+        function updateShipMovement() {
+            if (!gameActive) return;
+            if (leftPressed) { shipVelocity -= ACCELERATION; if (shipVelocity < -MAX_SPEED) shipVelocity = -MAX_SPEED; }
+            if (rightPressed) { shipVelocity += ACCELERATION; if (shipVelocity > MAX_SPEED) shipVelocity = MAX_SPEED; }
+            if (!leftPressed && !rightPressed) shipVelocity *= FRICTION;
+            shipX += shipVelocity;
+            if (shipX < 8) { shipX = 8; shipVelocity = 0; }
+            if (shipX + SHIP_WIDTH > CW - 8) { shipX = CW - SHIP_WIDTH - 8; shipVelocity = 0; }
+        }
+        
+        function showVictoryScreen() {
+            gameActive = false;
+            gameState = "victory";
+            victoryMessage.innerHTML = `✨ ${playerName}, ¡COMPLETASTE LOS 4 NIVELES! ✨<br>¿DESEA JUGAR DE NUEVO?`;
+            victoryOverlay.style.display = "flex";
+            if(animationId) cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        
+        function showLevelStartScreen(lvl) {
+            gameActive = false;
+            gameState = "waitingLevel";
+            pendingLevel = lvl;
+            let levelNames = ["SUMAS Y RESTAS", "SUMAS Y RESTAS AVANZADAS", "MULTIPLICACIÓN", "DIVISIÓN"];
+            let emojis = ["🌱", "⭐", "✖️", "➗"];
+            levelTitle.innerHTML = `🌟 NIVEL ${lvl} ${emojis[lvl-1]} 🌟`;
+            levelSubtitle.innerHTML = levelNames[lvl-1];
+            levelStartOverlay.style.display = "flex";
+        }
+        
+        function startCurrentLevel() {
+            levelStartOverlay.style.display = "none";
+            currentLevel = pendingLevel;
+            gameActive = true;
+            gameState = "active";
+            score = 0;
+            timeLeft = 120;
+            lives = 3;
+            consecutiveErrors = 0;
+            scoreSpan.innerText = "0";
+            livesSpan.innerText = "3";
+            fallingItems = [];
+            bullets = [];
+            hitEffects = [];
+            let mins = Math.floor(timeLeft/60);
+            let secs = timeLeft%60;
+            timeSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            updateLevelDisplay();
+            statusMsgDiv.innerHTML = `🚀 NIVEL ${currentLevel} - ¡A DISPARAR! Tienes 3 vidas`;
+            shipX = CW/2 - SHIP_WIDTH/2;
+            shipVelocity = 0;
+            spawnCounter = 10;
+            lastSecondUpdate = 0;
+            if(animationId === null) gameLoop();
+        }
+        
+        function resetCurrentLevel() {
+            gameActive = false;
+            gameState = "waitingLevel";
+            fallingItems = [];
+            bullets = [];
+            hitEffects = [];
+            score = 0;
+            timeLeft = 120;
+            lives = 3;
+            consecutiveErrors = 0;
+            scoreSpan.innerText = "0";
+            livesSpan.innerText = "3";
+            let minutes = Math.floor(timeLeft/60);
+            let secs = timeLeft%60;
+            timeSpan.innerText = `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+            statusMsgDiv.innerHTML = "⏰ ¡TIEMPO AGOTADO! Reiniciamos el nivel actual";
+            showLevelStartScreen(currentLevel);
+        }
+        
+        function checkLevelComplete(){
+            if(score >= currentTarget && gameActive && gameState === "active"){
+                gameActive = false;
+                gameState = "levelComplete";
+                if(currentLevel < 4){ 
+                    showLevelStartScreen(currentLevel + 1); 
+                } else {
+                    showVictoryScreen();
+                }
+            }
+        }
+        
+        function updateLevelDisplay(){
+            if(currentLevel === 1) levelNameSpan.innerText = "SUMAS/RESTAS";
+            else if(currentLevel === 2) levelNameSpan.innerText = "SUMAS/RESTAS+";
+            else if(currentLevel === 3) levelNameSpan.innerText = "MULTIPLICACIÓN";
+            else if(currentLevel === 4) levelNameSpan.innerText = "DIVISIÓN";
+        }
+        
+        let lastSecondUpdate = 0;
+        function updateTimer(nowSeconds){
+            if(!gameActive || gameState !== "active") return;
+            if(timeLeft <= 0){
+                resetCurrentLevel();
+                return;
+            }
+            if(nowSeconds && lastSecondUpdate !== Math.floor(nowSeconds)){
+                timeLeft--;
+                if(timeLeft < 0) timeLeft = 0;
+                let minutes = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                timeSpan.innerText = `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+                if(timeLeft === 0) resetCurrentLevel();
+            }
+            lastSecondUpdate = nowSeconds ? Math.floor(nowSeconds) : 0;
+        }
+        
+        function fullResetFromLevel1() {
+            cancelAnimationFrame(animationId);
+            currentLevel = 1;
+            pendingLevel = 1;
+            score = 0;
+            timeLeft = 120;
+            lives = 3;
+            consecutiveErrors = 0;
+            fallingItems = [];
+            bullets = [];
+            hitEffects = [];
+            scoreSpan.innerText = "0";
+            livesSpan.innerText = "3";
+            let mins = Math.floor(timeLeft/60);
+            let secs = timeLeft%60;
+            timeSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            updateLevelDisplay();
+            gameActive = false;
+            gameState = "waitingLevel";
+            victoryOverlay.style.display = "none";
+            startOverlay.style.display = "none";
+            levelStartOverlay.style.display = "flex";
+            shipX = CW/2 - SHIP_WIDTH/2;
+            shipVelocity = 0;
+            statusMsgDiv.innerHTML = "✨ Juego reiniciado. ¡Buena suerte!";
+            showLevelStartScreen(1);
+            if(animationId === null) gameLoop();
+        }
+        
+        function hardResetToStart() {
+            cancelAnimationFrame(animationId);
+            currentLevel = 1;
+            pendingLevel = 1;
+            score = 0;
+            timeLeft = 120;
+            lives = 3;
+            consecutiveErrors = 0;
+            fallingItems = [];
+            bullets = [];
+            hitEffects = [];
+            scoreSpan.innerText = "0";
+            livesSpan.innerText = "3";
+            let mins = Math.floor(timeLeft/60);
+            let secs = timeLeft%60;
+            timeSpan.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            updateLevelDisplay();
+            gameActive = false;
+            gameState = "start";
+            victoryOverlay.style.display = "none";
+            levelStartOverlay.style.display = "none";
+            startOverlay.style.display = "flex";
+            displayPlayerSpan.innerText = "---";
+            shipX = CW/2 - SHIP_WIDTH/2;
+            shipVelocity = 0;
+            statusMsgDiv.innerHTML = "🔫 ← → mover | [ESPACIO] DISPARAR";
+            if(animationId === null) gameLoop();
+        }
+        
+        // Función para cerrar la página web
+        function closeWebPage() {
+            // Intentar cerrar la ventana actual
+            window.close();
+            // Si no se puede cerrar (por políticas del navegador), mostrar mensaje
+            setTimeout(() => {
+                alert("Para salir completamente, cierra esta pestaña del navegador.");
+            }, 100);
+        }
+        
+        function startGame(name) {
+            if(!name || name.trim().length < 3) return;
+            playerName = name.trim();
+            displayPlayerSpan.innerText = playerName;
+            startOverlay.style.display = "none";
+            pendingLevel = 1;
+            currentLevel = 1;
+            lives = 3;
+            consecutiveErrors = 0;
+            livesSpan.innerText = "3";
+            showLevelStartScreen(1);
+        }
+        
+        function roundedRect(ctx, x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            ctx.moveTo(x+r, y);
+            ctx.lineTo(x+w-r, y);
+            ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+            ctx.lineTo(x+w, y+h-r);
+            ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+            ctx.lineTo(x+r, y+h);
+            ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+            ctx.lineTo(x, y+r);
+            ctx.quadraticCurveTo(x, y, x+r, y);
+            return this;
+        }
+        
+        function draw(){
+            ctx.clearRect(0,0,CW,CH);
+            ctx.fillStyle = "#061a26";
+            ctx.fillRect(0,0,CW,CH);
+            for(let i=0;i<150;i++){
+                ctx.fillStyle = `rgba(255,240,170,${Math.random()*0.4+0.2})`;
+                ctx.beginPath();
+                ctx.arc( (i*131)%CW, (i*73)%CH, 1, 0, Math.PI*2);
+                ctx.fill();
+            }
+            
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(255,180,80,0.4)";
+            ctx.setLineDash([6,8]);
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(0, ELIMINATION_Y);
+            ctx.lineTo(CW, ELIMINATION_Y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = "#f5b642";
+            ctx.beginPath();
+            roundedRect(ctx, shipX, shipY, SHIP_WIDTH, SHIP_HEIGHT, 12);
+            ctx.fill();
+            ctx.fillStyle = "#f28705";
+            ctx.beginPath();
+            ctx.moveTo(shipX+SHIP_WIDTH/2, shipY-10);
+            ctx.lineTo(shipX+SHIP_WIDTH/2+12, shipY+5);
+            ctx.lineTo(shipX+SHIP_WIDTH/2-12, shipY+5);
+            ctx.fill();
+            ctx.fillStyle = "#a0e7ff";
+            ctx.beginPath();
+            ctx.arc(shipX+SHIP_WIDTH/2, shipY+12, 10, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "#2c1e2f";
+            ctx.beginPath();
+            ctx.arc(shipX+SHIP_WIDTH/2-3, shipY+10, 2.5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(shipX+SHIP_WIDTH/2+3, shipY+10, 2.5, 0, Math.PI*2);
+            ctx.fill();
+            
+            for(let b of bullets){
+                ctx.fillStyle = "#ffcc44";
+                ctx.shadowBlur = 6;
+                ctx.fillRect(b.x, b.y, b.w, b.h);
+                ctx.fillStyle = "#ffaa22";
+                ctx.fillRect(b.x+1, b.y-2, b.w-2, b.h+3);
+            }
+            ctx.shadowBlur = 0;
+            
+            for(let it of fallingItems){
+                ctx.fillStyle = "#fff9e8";
+                ctx.beginPath();
+                roundedRect(ctx, it.x, it.y, it.w, it.h, 14);
+                ctx.fill();
+                ctx.strokeStyle = "#ffb347";
+                ctx.lineWidth = 2.2;
+                ctx.beginPath();
+                roundedRect(ctx, it.x, it.y, it.w, it.h, 14);
+                ctx.stroke();
+                ctx.fillStyle = "#1f3a45";
+                ctx.font = "bold 13px 'Comic Neue', 'Comic Sans MS', cursive";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(it.data.text, it.x + it.w/2, it.y + it.h/2);
+            }
+            
+            for(let eff of hitEffects){
+                let alpha = Math.min(1, eff.timer / 28);
+                let yOff = (38 - eff.timer) * 0.5;
+                ctx.font = `bold ${14 + (38 - eff.timer) * 0.25}px 'Comic Neue'`;
+                ctx.textAlign = "center";
+                ctx.shadowBlur = 6;
+                if(eff.isCorrect) ctx.fillStyle = `rgba(46, 204, 113, ${alpha})`;
+                else ctx.fillStyle = `rgba(231, 76, 60, ${alpha})`;
+                ctx.fillText(eff.text, eff.x, eff.y - yOff);
+                ctx.font = "bold 12px 'Comic Neue'";
+                ctx.fillStyle = `rgba(255, 220, 100, ${alpha})`;
+                ctx.fillText("💥", eff.x, eff.y - 24);
+            }
+            ctx.textAlign = "left";
+            ctx.font = "bold 11px 'Comic Neue'";
+            ctx.fillStyle = "#b9f6ca";
+            ctx.fillText("🐢 Caída lenta | ❤️ Pierdes vida tras 2 errores seguidos", 18, CH - 12);
+        }
+        
+        function gameLoop(now=0){
+            if(!animationId) animationId = requestAnimationFrame(gameLoop);
+            if(gameActive && gameState === "active"){
+                updateShipMovement();
+                updateSpawner();
+                updateMovement();
+                handleCollisions();
+                updateTimer(now/1000);
+                checkLevelComplete();
+            }
+            draw();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        // Eventos de teclado
+        window.addEventListener('keydown', (e) => {
+            // Permitir usar espacio en el input de nombre
+            const isInputFocused = document.activeElement === startNameInput;
+            if(!isInputFocused && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+                if(e.key === "ArrowLeft") leftPressed = true;
+                if(e.key === "ArrowRight") rightPressed = true;
+                e.preventDefault();
+            }
+            if(!isInputFocused && (e.key === " " || e.key === "Space")){
+                e.preventDefault();
+                if(gameActive && gameState === "active") shoot();
+            }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            if(e.key === "ArrowLeft") { leftPressed = false; e.preventDefault(); }
+            if(e.key === "ArrowRight") { rightPressed = false; e.preventDefault(); }
+        });
+        
+        resetBtn.addEventListener('click', () => { hardResetToStart(); });
+        startGameBtn.addEventListener('click', () => {
+            let name = startNameInput.value.trim();
+            if(name.length >= 3 && /^[a-zA-ZáéíóúñÑÁÉÍÓÚ\s]+$/.test(name)){
+                startGame(name);
+            } else {
+                alert("✏️ ESCRIBE TU NOMBRE COMPLETO (mínimo 3 letras, solo letras y espacios)");
+                startNameInput.focus();
+            }
+        });
+        startNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') startGameBtn.click(); });
+        startLevelBtn.addEventListener('click', () => { startCurrentLevel(); });
+        
+        yesPlayAgain.addEventListener('click', () => { 
+            fullResetFromLevel1(); 
+        });
+        
+        // AL HACER CLIC EN "NO, SALIR" - CIERRA LA PÁGINA WEB
+        noStayVictory.addEventListener('click', () => {
+            closeWebPage();
+        });
+        
+        // Inicializar el juego (muestra la pantalla de nombre obligatoria)
+        hardResetToStart();
+        gameLoop();
+    })();
+</script>
+</body>
+</html>

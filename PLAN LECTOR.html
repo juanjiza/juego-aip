@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lecturas Izquierdinas | Todos los Cuentos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: #f5f3ef;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e2f;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .app-header {
+            background: #8b1e1e;
+            border-radius: 50px;
+            padding: 18px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            color: white;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,215,0,0.2);
+            padding: 6px 18px;
+            border-radius: 60px;
+        }
+        .school-emblem {
+            width: 65px;
+            height: 65px;
+            background: #f4c542;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 9px;
+            color: #8b1e1e;
+            box-shadow: 0 0 0 3px gold;
+            text-align: center;
+            line-height: 1.2;
+            white-space: pre-line;
+        }
+        .student-info { background: rgba(0,0,0,0.2); padding: 6px 18px; border-radius: 40px; text-align: right; }
+        .cycle-tag { background: #f4c542; color: #8b1e1e; padding: 6px 18px; border-radius: 40px; font-weight: 800; font-size: 0.7rem; }
+        .control-panel {
+            background: white;
+            border-radius: 45px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .grade-box, .section-box { flex: 1; min-width: 160px; }
+        .control-panel label { font-weight: 800; color: #8b1e1e; display: block; margin-bottom: 5px; font-size: 0.7rem; }
+        select, input {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 2px solid #e0cfb0;
+            background: white;
+            font-weight: 500;
+        }
+        .btn-register {
+            background: #8b1e1e;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .grade-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+        }
+        .grade-tab {
+            background: #f0e4d4;
+            color: #8b1e1e;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .grade-tab.active { background: #8b1e1e; color: white; }
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+            max-height: 550px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .story-card {
+            background: white;
+            border-radius: 24px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #eddabc;
+        }
+        .story-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-color: #c27e1a;
+            background: #fff8ef;
+        }
+        .story-title { font-weight: 800; color: #8b1e1e; font-size: 0.95rem; margin-bottom: 5px; }
+        .story-author { font-size: 0.7rem; color: #b87c4a; display: flex; justify-content: space-between; }
+        .section-title { font-size: 1.3rem; font-weight: 800; color: #8b1e1e; margin: 10px 0; border-left: 5px solid #f4c542; padding-left: 15px; }
+        .modal-reader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 3000; display: none; overflow-y: auto; padding: 20px;
+        }
+        .modal-reader.active { display: block; }
+        .reader-container {
+            max-width: 1400px; margin: 20px auto; background: #f5f3ef; border-radius: 50px; overflow: hidden;
+        }
+        .reader-header {
+            background: #8b1e1e; padding: 15px 25px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 15px; color: white;
+        }
+        .close-reader {
+            background: rgba(255,255,255,0.2); border: none; color: white; font-size: 1.5rem;
+            cursor: pointer; width: 40px; height: 40px; border-radius: 50%;
+        }
+        .reader-main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 25px; }
+        .reader-text {
+            background: white; border-radius: 30px; padding: 25px; max-height: 600px; overflow-y: auto;
+            font-family: 'Roboto Slab', serif; line-height: 1.7; font-size: 0.9rem; text-align: justify;
+            white-space: pre-wrap;
+        }
+        .reader-questions {
+            background: white; border-radius: 30px; padding: 25px; max-height: 600px; overflow-y: auto;
+        }
+        .question-item {
+            background: #fef8ef; border-radius: 20px; padding: 15px; margin-bottom: 15px;
+            border: 1px solid #eddabc;
+        }
+        .question-text { font-weight: 800; margin-bottom: 10px; color: #5a3e1b; font-size: 0.85rem; }
+        .options { display: flex; flex-direction: column; gap: 6px; margin-left: 15px; }
+        .option-label {
+            display: flex; align-items: center; gap: 10px; padding: 5px 10px;
+            background: white; border-radius: 50px; border: 1px solid #e0cfb0;
+            cursor: pointer; font-size: 0.75rem;
+        }
+        .option-label.selected { background: #ffefcf; border-color: #c27e1a; }
+        input[type="radio"] { accent-color: #8b1e1e; width: 14px; height: 14px; }
+        textarea {
+            width: 100%; border-radius: 16px; border: 2px solid #eeddbb;
+            padding: 8px; resize: vertical; font-size: 0.8rem;
+        }
+        .btn-submit, .audio-btn, .pdf-btn {
+            border: none; padding: 10px; border-radius: 50px;
+            color: white; font-weight: 800; cursor: pointer; margin-top: 10px;
+        }
+        .btn-submit { background: #8b1e1e; width: 100%; }
+        .audio-btn { background: #2c7fa0; width: 48%; }
+        .pdf-btn { background: #e67e22; width: 48%; }
+        .button-group { display: flex; gap: 12px; margin-top: 12px; }
+        .global-feedback { background: #ffefcf; border-radius: 25px; padding: 10px; margin-top: 12px; text-align: center; font-weight: 600; font-size: 0.75rem; }
+        .reader-title { font-size: 1.2rem; font-weight: 800; color: #8b1e1e; margin-bottom: 15px; border-left: 5px solid #f4c542; padding-left: 15px; }
+        @media (max-width: 880px) { .reader-main { grid-template-columns: 1fr; } }
+        .footer-info { text-align: center; font-size: 0.7rem; color: #b87c4a; margin-top: 20px; }
+        .modal-register {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
+            z-index: 4000;
+        }
+        .modal-card {
+            background: white; border-radius: 50px; padding: 30px; max-width: 400px; width: 90%;
+            text-align: center;
+        }
+        .modal-card .emblem-big {
+            background: #8b1e1e; color: gold; width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold;
+            margin: 0 auto 15px; white-space: pre-line;
+        }
+        .modal-card input, .modal-card select { width: 100%; margin: 8px 0; padding: 10px; border-radius: 50px; }
+        .row { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+<div class="container" id="mainApp">
+    <div class="app-header">
+        <div class="logo-area">
+            <div class="school-emblem">EDUCATIVA<br>FRANCISCO<br>RIOS</div>
+            <div><h2>FRANCISCO IZQUIERDO RÍOS</h2><p>Bellavista - Callao | “Lecturas Izquierdinas”</p></div>
+        </div>
+        <div class="student-info">
+            <h3><i class="fas fa-user-check"></i> <span id="studentNameDisplay">Estudiante</span></h3>
+            <p id="studentGradeSection">Grado: -- | Sección: --</p>
+        </div>
+        <div class="cycle-tag"><i class="fas fa-book-open"></i> TODOS LOS CUENTOS DE LOS ARCHIVOS · SIN REPETICIONES</div>
+    </div>
+
+    <div class="control-panel">
+        <div class="grade-box"><label>GRADO</label><select id="gradeSelect"><option value="1">1° Grado</option><option value="2">2° Grado</option><option value="3">3° Grado</option><option value="4">4° Grado</option><option value="5">5° Grado</option><option value="6">6° Grado</option></select></div>
+        <div class="section-box"><label>SECCIÓN</label><input type="text" id="sectionInput" placeholder="Ej: A, B, C"></div>
+        <button id="updateInfoBtn" class="btn-register">ACTUALIZAR DATOS</button>
+    </div>
+
+    <div class="grade-tabs" id="gradeTabs"></div>
+    <div id="storiesContainer"></div>
+    <div class="footer-info">📖 Cuentos de: Cuentos ambientales culturales · Tradiciones Peruanas (Ricardo Palma) · Francisco Izquierdo Ríos · Cuentos de Cajamarca · Cuentos de Huancavelica</div>
+</div>
+
+<!-- Modal Lector -->
+<div id="readerModal" class="modal-reader">
+    <div class="reader-container">
+        <div class="reader-header">
+            <div class="logo-area" style="background:rgba(255,215,0,0.2); padding:5px 15px;">
+                <div class="school-emblem" style="width:45px; height:45px; font-size:7px;">EDUCATIVA<br>FRANCISCO<br>RIOS</div>
+                <div><h3 style="font-size:0.9rem;">FRANCISCO IZQUIERDO RÍOS</h3></div>
+            </div>
+            <div class="student-info" style="background:rgba(0,0,0,0.2);">
+                <h4><span id="readerStudentName"></span></h4>
+                <p id="readerStudentGrade"></p>
+            </div>
+            <button class="close-reader" onclick="cerrarLector()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="reader-main">
+            <div class="reader-text">
+                <div class="reader-title"><i class="fas fa-book"></i> <span id="readerTitle"></span></div>
+                <div id="readerText"></div>
+            </div>
+            <div class="reader-questions">
+                <h3 style="color:#8b1e1e; margin-bottom:15px;"><i class="fas fa-pencil-ruler"></i> 10 preguntas</h3>
+                <div id="questionsArea"></div>
+                <button id="verifyBtnModal" class="btn-submit">VERIFICAR Y GUARDAR</button>
+                <div class="button-group">
+                    <button id="audioBtnModal" class="audio-btn"><i class="fas fa-headphones"></i> AUDIO LATINO</button>
+                    <button id="pdfBtnModal" class="pdf-btn"><i class="fas fa-file-pdf"></i> PDF</button>
+                </div>
+                <div id="globalMessageModal" class="global-feedback"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // TODOS LOS CUENTOS DE LOS ARCHIVOS ADJUNTOS - SIN REPETICIONES
+    // ============================================================
+    
+    const LECTURES_DB = {1:[],2:[],3:[],4:[],5:[],6:[]};
+    
+    // ----- CUENTOS DEL ARCHIVO "Cuentos ambientales culturales andino-amazonicos" -----
+    const cuento1 = { titulo: "El águila y la chica (Ayavirí)", autor: "Tradición oral - Ayavirí", edad: 4, texto: "EL ÁGUILA Y LA CHICA (Ayavirí)\n\nUna vez en el pueblo ayaqwayra, un águila se convirtió en un joven elegante, hermoso, con su pantalón blanco, zapatos amarillos, ojos transparentes, sacón negro, camisa blanca y brillante. Había también una chica muy hermosa, que se llamaba María que pastoreaba todos los días sus ganados, hilando, cantando hermosas canciones, sabía tejer ponchos, llijllas, inkuñas, llevaba rico fiambre que consistía en morayas blancas, papa imilla, mote de maíz horquillo, bastante carne con ají molido calientito. El joven águila miraba desde lejos, con ojos de larga vista, vivía tan cerquita, por lo que se iba enamorando cada día, ya se acercaba cada vez más y conversaba a la chica. La chica María poco a poco iba aceptando, ya comían juntos. María le preguntaba dónde vives, quiénes son tus padres. El joven contestaba: me llamo Mariano. María sorprendida le dice, ¿cómo? Si yo me llamo María, ¡no puedes ser! Mariano le contesta, es que casi somos familiares, yo siempre te conocía desde que eras chiquitita, yo también era chiquitito aguilucho. María contesta ¿cómo? ¿Aguilucho? Mariano le contesta familia Aguilar. De esa forma ya había más confianza entre Mariano y María, después ya se declaran su cariño entre los dos, entonces María le dice, tienes que ir donde mis padres, yo ya estoy embarazada para tí. Mariano de emoción cuenta a sus padres, pide a sus padres para que fueran a pedir la mano de María. Los padres se alistan y también la moraya, carne de cordero, papa imilla, alcohol puro muy fuerte; para hacer tomar a los padres de María, cuando llegaron a la casa de los padres de María, toda la familia de Mariano entrega las cosas que llevaron, Mariano y María están muy enamorados, conviven juntos. Llego la etapa de barbecho para la chacra, entonces el suegro le pone en gullana a Mariano; porque es costumbre que los yernos deben demostrar sus capacidades en el barbecho, ya en el día del barbecho Mariano muy preocupado entra en gullana, el suelo era fuerte y seco, Mariano se cansó mucho, ya no pudo barbechar para las doce, hora de merienda, en ese entonces se rompe la pierna de Mariano y se convierte en águila muy sorprendido el padre de María exclama ¿cómo? Mi hija vivía con un alqamari? María estaba junto al ganado, le cuentan a ella lo que pasó y no puede creer. Así termina el día. Mariano muerto, María queda viuda con un hijo.\n\nFIN." };
+    const cuento2 = { titulo: "Antawara y Nina Kurucha", autor: "Tradición oral - Recopilado por Juana Rosa Murguía Sánchez", edad: 5, texto: "ANTAWARA Y NINA KURUCHA\n\nANTAWARA era un niño muy inteligente, que vivía en una cálida choza junto a sus hermanos y padres; una lóbrega noche a la lejanía de entre unos peñascos escuchó el graznito del HUKU, que se oía así: ¡JUKU!, ¡JUKU! ¡JUKU!; ANTAWARA se había enterado por relatos de sus abuelos que los búhos eran muy sabios; por esa razón aquella noche se sintió fuertemente atraído por el JUKU y sin mucho pensar se encaminó en busca de él, como la noche estaba muy oscura perdió el camino y muy afligido se sentó en una piedra, confundido por lo tenebroso del ambiente, en eso vio una pequeña lucecita, era NINA KURUCHA, una pequeña luciérnaga, que le preguntó el porqué de sus penas; ANTAWARA le contó que estaba en busca de JUKU, quiero aprender de su sabiduría le dijo, por lo que NINA KURUCHA le ofreció iluminar el trayecto y así ambos se encaminaron hasta llegar a la casa del JUKU, quien solemne los esperaba; ANTAWARA lo saludó con mucho respeto y reverencia iniciando un largo dialogo acerca del pasado, del presente y del futuro, desde ese momento, el niño se hizo depositario del saber y conocimiento; NINA KURUCHA escuchaba atenta la interesante conversación. JUKU, quiso celebrar el grato encuentro y convocó a los animales con un fuerte graznido, todos se reunieron en torno a un fresco manantial iluminado por la luz de NINA KURUCHA, llegó el zorro tocando un alegre PINKILLO, se presentaron unas arañas tocando TINYA, los pumas se acercaron tocando PUTUTOS, las veloces vizcachas ejecutaban ANTARAS, los SURIS bailaban arrastrando sus alas, las WALLATAS danzaban con sus patitas coloridas, un KIRKINCHO sorprendido tocaba su charango; hasta una sirena asomó del manantial y con su dulce canto animó la fiesta interpretando una mandolina de oro con cuerdas de plata; todo el ande festejó la especial ocasión, celebraron toda la noche embriagados de felicidad, cantando y bailando; Así sin darse cuenta había transcurrido la noche y se acercaba el amanecer; NINA KURUCHA advirtió a ANTAWARA que su luz pronto de disiparía y que no podría iluminar el camino de retorno. ANTAWARA agradeció a JUKU se levantó y agradeció a los APUS por el gratísimo encuentro; despidió a los visitantes con sus inmensos ojos desorbitados, los animales con sus voces, música y bailes finales alegraron todos los espacios de la tierra; el búho acompañó a ANTAWARA un trecho del camino y antes de separarse cubrió con sus alas la cabeza del niño, de inmediato emprendió un sonoro vuelo remontándose entre los cerros. ANTAWARA y su amiguita retornaron a casa donde llegaron de madrugada; los padres de ANTAWARA no se percataron de su ausencia y creyeron que se había levantado muy temprano como solía hacerlo. Desde ese encuentro con JUKU, el niño se hizo más inteligente, aumentó su sabiduría cada día, conocía la historia de sus antepasados, podía predecir el futuro, apoyaba a sus padres y familiares dándoles acertados consejos; de joven se hizo muy respetado en su AYLLU y su fama de hombre sabio llegó a los confines de mundo.\n\nFIN." };
+    const cuento3 = { titulo: "El zorro y el conejo", autor: "Recopilado por Julia Duran Chipana", edad: 3, texto: "EL ZORRO Y EL CONEJO\n\nEl Zorro vivía en los campos de la zona alto andina, el zorro constantemente se burlaba del conejo cada vez que se encontraban y también se antojaba para comérselo, en uno de esos encuentros el zorro quiso tragárselo al conejo y este en defensa y para esquivar le dijo \"no me comas\" mira que la lluvia esta por caer entonces nos debemos de esconder, para lo cual debemos de empujar esta roca hacia un extremo y escondernos en esa parte que es propicio para esconderse de la lluvia, entonces el conejo le dijo tú empujas la roca y yo avisaré si la piedra se mueve, mientras el zorro empujaba la roca, el conejo se escapó dejándolo empujando por mucho rato. Y de un momento a otro cuando se da cuenta el zorro que estaba empujando solito y el conejo se había escapado, entonces el zorro colérico se fue en busca del conejo de pronto se encontraron nuevamente y el zorro muy furioso le dijo \"ahora si te comeré\", el conejo le dijo mira el cielo caerá granizo de fuego, \"no me comas yo te salvaré\", entonces ambos cavaron un hueco para esconderse y el zorro entra primero al hueco para esconderse primero y cree que es el más astuto que el conejo y al conejo le dice que entre después de él y cierras la entrada del hueco. Entonces el conejo le encerró al zorro en el hueco poniéndole espinas en la puerta del hueco y luego el conejo se escapó nuevamente, el zorro asustado sacaba su pata delantera hacia la puerta del hueco y las espinas le pinchaban, entonces el zorro decía \"que feo quema ese granizo\" esto continuó por mucho tiempo hasta que la supuesta granizada de fuego pase, sin embargo no pasaba y el zorro persistía, a su vez tenía mucha hambre a tanto intentar se dio cuenta que estaba puesto con espinas la entrada del hueco, los cuales habían sido puesto por el conejo. El Zorro fue engañado una vez más por el conejo, ya muy colérico por los tantos engaños; lo busca con mucha persistencia para comérselo, en una de esas noches de búsqueda lo encuentra a la orilla del lago, entonces se lanza para comérselo, entonces el conejo le dice antes que me comas; mira, hay un queso dentro de la laguna sería más sabroso comer el queso antes del conejo, y por cierto la noche era con luna llena; entonces el zorro se lanzó a la laguna y no encontró nada, más bien el zorro murió ahogado y el conejo ganó la batalla salvándose definitivamente.\n\nFIN." };
+    const cuento4 = { titulo: "Los dos hermanos, uno rico y otro pobre", autor: "Clemente Condori Espirilla", edad: 5, texto: "LOS DOS HERMANOS, UNO RICO Y OTRO POBRE\n\nEran dos hermanos, uno era rico y otro era pobre. El pobre tenía muchos hijos, tenía familia y comunidad, era chocarrero de caballos. Un día en el cerro, pensó así: \"En mi casa, no encuentro nada para mantener mi familia, para cambiar de actividad no conozco otro trabajo, mejor adelantaré a buscar trabajo\". Antes de salir recogió una hortaliza natural del campo que se llama, \"hat'aço\", su esposa lo cocinó para su fiambre y él se la llevó. Se fue y, como era chocarrero, se llevó la silla de montar, se cargó el apero, y así se puso a caminar. Como cruzaba la cumbre de una apacheta, un señor montado en un caballo blanco estaba llegando también: \"Amigo, ¿a dónde vas? Le preguntó el Señor.\" \"Señor soy muy pobre, estoy yendo en busca de trabajo para mantener mi familia, le dijo.\" \"No vayas, hijo, por esos lugares no hay nada de trabajo.\" \"Entonces dijo; señor, descansemos aquí nomás.\" Descansaron, el señor le contó: \"¿Por qué cargas esta silla y apero, si no tienes bestia? Así mismo eres pobre. Recíbelo, llévatela, y ahora vete sin mirar atrás.\" Este señor le puso la flor al lado derecho de su sombrero, como adorno. Entonces el hombre se regresó. Su señora estaba en la casa, lo vio y enojándose dijo: \"¡Pero, este hombre está regresando! No piensa nada en trabajar para los niños ¿Qué voy a hacer con él?\" Y así llegó él. \"Me encontré con un señor: dijo, contándolo a su mujer.\" \"Mira, ese señor me ha dado estas flores, y me ha dicho: \"ahora limpia tus canchones, los canchones de animales, tus canchones de ovejas, limpia tu casa, límpialo, arregla las paredes de tus canchones.\"\" Entonces la mujer arregló los cercos de las chitas, el hombre levantó las paredes de los canchones de las llamas, caballos. Y así cuando estaban levantando las paredes, la mujer se reía: \"¿Qué va a hacer este hombre? ¿Estará loco? Se va a buscar trabajo y regresa a levantar las paredes de los canchones\". El hombre contestó: Así dijo ese señor: \"consíguete incienso y coca, no trates de conseguir nada de tomar\", me dijo. \"Con el incienso, sahumea soplando en tus canchones, sahumea con incienso tu casa. Así plantarás esa florcita, primero en tu casa, arreglando las paredes; después plantarás en tu corral de llama, después en el corral de las ovejas, en el canchón del caballo, en la cocina plantarás\", me dijo ese señor. Así hizo. En todas partes reparó las paredes y luego plantó las flores. Con su señora más, en la tarde lo hicieron. \"Ese señor me dijo: \"Esta tarde te quedarás despierto, rezarás, pedirás a Dios, harás según tu costumbre y en la iglesia quemarás el incienso\". El hombre sahumó con incienso, rezó, picchú koka, no tomó nada de trago. Al primer canto del gallo se fue a dormir con su señora y sus hijos. Entre sueños se despertó con que había llamas peleándose en el canchón, había ovejas balando en el canchón, había caballos relinchando. \"Oye, ¿qué pasó? Dijo.\" El hombre salió y corrió al canchón, de verdad estaba lleno de animales, corrió a la despensa, la despensa también estaba llena de chuño, papas, ropas, lanas, dinero, había de todo. Regresó y despertó a su señora. \"¡Mira lo que ha pasado! exclamó.\" La señora corrió despertar a los niños. Saliendo al patio se arrodillaron en el suelo del patio, desnudándose las rodillas, pidieron y dieron gracias a Dios. Llorando mucho todavía, agradecieron mucho a Dios de la vida de toda esa bendición recibida. Cuando se levantó el hombre, su hermano rico lo estaba mirando, viniendo de inmediato le dijo: ¡Qué tal ladrón! ¿De quienes has robado todo ese ganado? ¡Ladrón! Trajo un palo grande, y corrió. \"Ladrón, ¿a cuál de tus prójimos estás haciendo llorar? Dijo pegándole a su hermano.\" Pero él, humillándose, contestó: \"Yo estaba caminando tranquilamente, y me encontré con un señor. Llevaba \"hat' aqo\" no más para mi fiambre. Y así me dijo ese señor: \"no te vayas, a otros pueblos, llévate esta florcita\". Así hice. Le contó todo lo que le dijo este señor.\" Ese hermano rico era ambicioso. Por eso le dijo: \"Préstame tu ropa. Con tu ropa y fiambre de \"hat' aqo\", yo voy a ir a ver si seguirá así.\" \"Vete rápido hermano; dijo el hermano pobre.\" Regresó a su casa y se preparó diciendo: \"Iré la noche próxima, pasado mañana me regresaré.\" Así correteó, cargó sus caballos. Ya salía por la apacheta, y en eso un señor montado en un caballo amarillo, color de vicuña, venía corriendo hacia él. \"Paisano, ¿a dónde vas? Pregunto el señor.\" \"Sí señor, yo soy pobre, para mis hijos falta de todo, por eso estoy yendo en busca de trabajo.\" \"No te vayas, hijo, no encontrarás ningún trabajo por esos lugares. Mejor es que te regreses a tu casa.\" \"Sí señor. Descansemos un poco.\" Descansaron. El hermano rico extendió su poncho, sacó su fiambre de \"hat' aqo\" y le invitó al caballero: \"sírvase señor...\" El señor se sirvió y le dijo: \"No te vayas hijo, ¿a qué vas a ir? No encontrarás nada. Tú tienes de todo. Regrésate hijo. Llévate esta florcita. Le acomodó a los dos lados del sombrero esta florcita de carnaval. \"No te lo saques, si te lo sacarás, no estaría bien. Así nomás vas a llegar a tu casa. Esa flor de carnaval va a florecer, pero no te lo saques.\" Entonces regresó a su casa, feliz regresó. \"Era verdad\", pensaba. Sus hijos, cuando lo vieron, dijeron primero: \"¡Ahí ya está nuestro papá! ¡Ahí ya está nuestro papá!\" Después la vio también su señora y dijo: \"Ahí está. Ha regresado de verdad.\" \"¡Nuestro papá, nuestro papá!\" Pero los perros corrían y ladraban. De repente un venado saltó por detrás del canchón de ganados, y los perros querían morder a su propio dueño. El venado daba vueltas, vueltas, entraba y se regresaba. Ese hermano rico se había \"cambiado\" en venado. Ese hermano era de mala fe. Por eso se convirtió en venado.\n\nFIN." };
+    const cuento5 = { titulo: "La ciudad perdida de Quequerana (Azángaro)", autor: "Sabino Choque Calcina", edad: 4, texto: "LA CIUDAD PERDIDA DE QUEQUERANA (Azángaro)\n\nCuenta la historia que Hace cientos de años en el lugar a 7 kilómetros en la comunidad de phugruyo (oeste de Azángaro), existía una gran ciudad, a lado del apu majestuoso llamado Quekerana, muy prospera, sus habitantes tenían mucho para comer, vestirse, buenas casas, sus calles y tenían sus plazas majestuosas, poseían mucha riqueza, oro, plata; pero a la ves; año a año las personas de aquella ciudad se convirtieron, en personas de mal vivir, porque mientras más tenían, se volvieron malvados, egoístas, indiferentes, se peleaban, se mataban entre ellos, existía mucho odio, mucha maldad entre ellos mientras más acumulaban más se odiaban. Cierto día llego un viejo anciano muy pobre, con ropa muy vieja, hambriento sediento de agua; y cuando pidió ayuda y algo de comida, un poco de beber; todos se negaron –uno por uno-, sus corazones eran tan duros que mostraban mucha indiferencia, y se notaba que aborrecían al pobre anciano. Fue después de tantos intentos inútiles al no conseguir nada de nada; más que el desprecio de esa gente, el anciano en plena plaza anuncio que toda la ciudad desaparecería, que llovería tanto, hasta que toda la ciudad estuviese debajo del agua y todos morirían por su indiferencia por su corazón tan duro, su odio, más los que lo escucharon se rieron a carcajadas burlándose del anciano. Horas más tarde, en horas de la noche se oscureció el cielo una extremada torrencial lluvia empezó a caer, era tan intensa era como si el cielo se cayera; el agua también salía como ríos de todos los cerros alrededor de la ciudad, principalmente del Quequerana, en toda la noche; todas las personas perecieron, se ahogaron lamentando su maldad. Al día siguiente que salió el sol, al pie de la laguna Quequerana solo se veía un gran lago, más nunca la ciudad majestuosa. Un día muchos años después del diluvio, una familia que venía de muy lejos e iba por esta ruta, se le anocheció y ya era de muy noche y mientras más se acercaba veían a lo lejos ellos una gran ciudad con mucha iluminación se veía una esplendorosa ciudad y decidieron entrar en ella y estando a punto de entrar, un borracho con su botella les dijo \"alto, no sigan\", la familia obedeció, el borracho al terminar de beber su botella , arrojo la botella a la ciudad iluminada y esta inmediatamente se convirtió en el lago que actualmente conocemos. Gracias a esto la familia se salvó de morir. Cuentan nuestros abuelos que a las doce de la noche se escucha tocar la una campana. Otros cuentan que existe en el fondo del lago oro y plata.\n\nFIN." };
+    const cuento6 = { titulo: "La iglesia encantada en el distrito de San José", autor: "Pedro Percca - Azángaro", edad: 5, texto: "LA IGLESIA ENCANTADA EN EL DISTRITO DE SAN JOSÉ\n\nHace mucho tiempo en la comunidad de Túpac Amaru del distrito de San José. El Señor Juan y Catalina su esposa contrataron un grupo de músicos de la comunidad de Impuchi estos deseosos de tocar aceptaron. La fiesta fue grande y duró cuatro días. Los comuneros se pusieron a tomar, bailar y al terminar la fiesta los músicos alegres recibieron el agradecimiento de los alferados de Juan y Catalina su esposa, quienes les dijeron: - Gracias, hermanos por habernos complacido con sus lindas melodías. Tiburcio, el director de la banda de músicos, les dijo: Amigos míos la fiesta terminó y ya es tiempo de regresar a nuestra comunidad, pero uno de los músicos respondió: Tiburcio, Cómo nos iremos ya es de noche y hace mucho frío? Pero Tiburcio añadió: Tenemos que llegar a nuestras casas, nuestras familias nos esperan, iremos caminando hasta la comunidad de Collana y después subiremos al cerro Apacheta, así llegaremos a nuestra casa sanos y salvos. Cuando estuvieron en la comunidad de Collana, Tiburcio dijo: Queridos amigos ahora subiremos el cerro Apacheta, tengan mucho cuidado. Cuando estaban subiendo se pusieron a cantar y cuando llegaron a la punta del cerro eran las doce de la noche. Los integrantes de la banda descansaron un poco, pasaron diez minutos y siguieron caminando, pero uno de ellos se quedó atrás sin que nadie se diera cuenta. Llegaron al sitio llamado pata apacheta, era un cerro inmenso y ahí se les apareció una iglesia. Los amigos asombrados se detuvieron y vieron como la iglesia era de oro. De pronto se abrieron las puertas y salió un hombre con cachos y cola, los músicos asustados quisieron correr pero no pudieron, Pues sus pies no se movían. Entonces el hombre les pidió que tocaran para él y les pagaría bastante oro. Asustados aceptaron por miedo, y empezaron a entrar a la iglesia y se cerraba la puerta poco a poco, el músico que quedó atrás les busco y nunca les encontró; Caminó solo y llego triste a su comunidad y cuando llego todos preguntaron por sus familiares. - ¿Dónde están tus compañeros? - ¿Dónde están? El músico respondió: Lo siento mucho, ellos desaparecieron y todos sus familiares y la comunidad se pusieron a llorar. El tiempo pasó, eran tres años que no veían a los músicos y una noche apareció la iglesia y otra vez se abrieron las puertas y salieron los músicos pero con cachos y colas. A los músicos el diablo les dijo: - Váyanse donde sus familias, ya tocaron demasiado para mí, les pague una fortuna inmensa. Los hombres con cachos eran los músicos que habían desaparecido hace tres años ellos se fueron a sus casas muy felices, pero no se dieron cuenta de su nueva apariencia, llegaron a sus casas y sus familiares se asustaron a I verlos y gritaron: \"¡Auxilio! ¡Auxilio!\" Gritaron de susto tanto que toda la comunidad se despertó. Como los músicos también no sabían de su aspecto, ellos también se asustaron. El Presidente de la comunidad dijo: -¿Qué es esto? Son unos diablos, hay que quemarlos vivos porque nos harán daño. y Tiburcio dijo: Esposa mía no me recuerdas? Fui hace tres años a tocar a la comunidad de Collana, ya regrese y traje mucho dinero, su esposa respondió: Tiburcio ¿Realmente eres tú? Tienes un cacho y una cola, desapareciste tres años y yo lloré y lloré todas las noches por tu ausencia. El presidente dijo a la gente de la comunidad: Hermanos míos, estos son nuestros hermanos que desaparecieron hace tres años; es muy triste lo que les paso, pero nosotros no podemos vivir rodeados de diablos. Tendrán que regresarse por favor, y no vuelvan nunca más. Los músicos tristes y llorosos aceptaron la opinión de su comunidad y se alejaron muy lejos y nunca más se supo de ellos.\n\nFIN." };
+    const cuento7 = { titulo: "La zorra y la Huallata (Lampa)", autor: "Giovanni Vizcarra Vargas", edad: 3, texto: "LA ZORRA Y LA HUALLATA (Lampa)\n\nHabía una vez una zorra y una huallata, la zorra estaba acostumbrada a comerse los huevos y los polluelos de la huallata, pero esta vez como estaba preñada con la panza muy grande le hacía difícil movilizarse, por lo que la huallata aprovechó para nuevamente poner huevos y empollar. Paso varias semanas hasta que la zorra tuvo tres pequeños zorritos y al mismo tiempo también rompieron el cascaron los polluelos de la huallata y un día cuando la zorra caminaba por el campo junto con sus crías en busca de comida, se encontró con la huallata que se estaba en medio de una laguna para evitar que los zorros y otros depredadores se comieran a sus polluelos. La zorra se percató que las patas de los polluelos de la huallata eran de color rojo, y con tono amenazante le pregunto a la huallata - ¡oye tú!, huallata, por que tus polluelos tienen las patas rojas, yo también quiero que mis crías tengas las patas rojas y si no me dices me comeré a tus polluelos! - A lo que la huallata respondió - para eso tienes que construir un horno y calentarlo al rojo vivo y tienes que poner a tus tres crías en el interior del horno y tapar la puerta y cuando escuches sonar un chisssssssssssss, chisssssssssss, chisssssssss eso quiere decir que las patas de tus crías ya están rojas. Entonces la zorra regresó a su madriguera junto a sus tres crías y construyó un horno que seguidamente se puso a calentarlo con mucha leña, al punto que el horno estaba al rojo vivo, procediendo a meterlos a sus tres zorritos en el interior del horno y cerrarlo como le había indicado la Huallata, y cuando escuchó los tres chisssss, chissss chisss, la zorra alegre y entusiasta abrió el horno, pero encontró a sus tres zorritos carbonizados con la panzas explotadas; la zorra lloró amargamente, porque sus crías habían muerto carbonizados en el horno y tuvo mucha cólera contra la Huallata, por lo que fue a buscarla a la laguna. Una vez en el lugar La zorra grito con mucha furia -¡...oye Huallata maldita me has engañado, por tu culpa mis crías han muerto carbonizado...!- a lo que respondió la huallata - eso es para que aprendas como es perder a un hijo, cada vez que tú te comías a mis polluelos, ahora ya te imaginas como yo me sentía. La zorra enfurecida por el engaño y el escarmiento grito nuevamente -- ¡...huallata maldita, por tu engaño pagaras muy caro, ahora me comeré a tus polluelos...! Y empezó a tomar el agua de la laguna, para poder alcanzar el nido de la huallata que se encontraba en el medio, la panza de la zorra comenzó a hincharse por la gran cantidad de agua que había bebido, en eso cansada comenzó a buscar un sitio para descansar, pero por el peso de su panza perdió el equilibrio y cayó sobre una piedra puntiaguda que hizo que explotara lo que provocó que la zorra muriera. Desde entonces la huallata vivió feliz junto a sus polluelos, que después de muchos años había logrado tenerlos.\n\nFIN." };
+    const cuento8 = { titulo: "El zorro y el conejo mentiroso", autor: "Recopiladora: Miguel Tacora - Juli", edad: 3, texto: "EL ZORRO Y EL CONEJO MENTIROSO\n\nExistía un lugar donde vivían una pareja de ancianos, estos tenían un huerto y casi siempre amanecían destrozadas las hortalizas, pareciera que alguien entraba por las noches, los destrozaba y comía, cansados de soportar tanto perjuicio decidieron poner una trampa, la colocaron por la noche y al amanecer el abuelito fue a ver la trampa, encontrando a un conejo atrapado en ella y le dijo: ¡eres tú el que destruía mi huerto! ¡Ahora yo te comeré!. Lo sacó de la trampa y lo llevó cerca de su casa colocándolo en una olla. Contó lo sucedido a la abuelita y decidieron cocinar al conejo, poniendo a hervir agua para luego pelarlo y cocinarlo. pero yo no quiero casarme, ¡quizá tú quieras casarte con su hija!, le dijo. Entonces el zorro aceptó, entrando a la olla en lugar del conejo, el conejo al estar fuera de la olla escapó. Pasado unos instantes volvió el abuelito con el agua hirviendo, luego de destapar la olla, echó el agua y fue grande la sorpresa del abuelito, cuando de un salto salió un zorro, que se fue corriendo casi pelado por el agua hervida, entonces el abuelito se preguntó: ¿Qué es esto? ¿Yo había dejado un conejo en esta olla, ahora sale un zorro? El zorro muy amargo comenzó a buscar al conejo y como el zorro sabe rastrear, se fue tras las huellas del conejo; este fue encontrado por el zorro empujando una roca grande. Entonces el zorro le dijo: ¿Cómo me dijiste que te iban a casar con la hija del dueño?, si en verdad ibas a morir, ¡me engañaste! Y por eso ahora, ¡voy a comerte!, el siempre astuto pero mentiroso conejo respondió: ¡no vez amigo zorro que tanto me sacrifico para detener que se caiga esta roca! ¡Pues ayúdame!, ¡por favorcito!, porque si esto sucede vendrá el juicio final. Otra vez el zorro fue engañado, ayudándole inmediatamente a empujar la roca, el zorro empujaba con todas sus fuerzas, mientras el conejo solo simulaba, al poco rato el conejo le dijo: yo pues voy a buscar una cuña, mientras tu sostienes la roca, el zorro aceptó y el conejo se alejó. Pasó un largo rato, y él seguía empujando la roca, se cansó tanto, que tuvo que soltar la roca, diciéndose: ¡qué importa que haya juicio final!; Esta vez el zorro pensó vengarse de una vez por todas y no aceptar más engaños del conejo. Otra vez se fue en busca del conejo, encontrándolo rápidamente, el conejo escarbaba la tierra, hizo esto solo cuando vio al zorro, este dijo al conejo: ¡Esta vez no te perdono, te comeré por tus mentiras!, el conejo clamó: ¡Por favor no me comas aun!, si quieres ser salvo, pues me puedes ayudar, hago este hueco para salvarme y no quemarme en un juicio de fuego, que es la ira de Dios, acepta esto y hagamos un hueco para cada uno, para cuando venga el fuego ardiente, nos entremos y así nos salvaremos, luego pues tú me comerás. Convencido el zorro otra vez, ayudó. Cada uno hacía su hueco, el conejo por su rapidez, acabó primero. Al término de la labor, el conejo le dijo: ¡éntrate pues! ¿Qué esperas?, porque en cualquier momento vendrá lo anunciado. El zorro hizo caso, quedando en el hoyo, el conejo lo tapó con ortigas, espinas, y toda clase de hierbas huyendo otra vez. Pasados unos momentos el zorro sacaba la pata y le punzaban las ortigas, entonces creía que el juicio era verdadero, así pasaron tres días y ya tenía mucha hambre, no pudo resistir, entre si dijo: ¡Moriré también en el juicio!, tomó fuerza y dio un salto desesperado, esperando morir; pero no había absolutamente nada de fuego, solo espinas y ortigas. Se encaminó otra vez en busca del conejo, al encontrarlo vio que ahora estaba sacando leña, acercándose y atrapándolo le dijo: ¡ahora mentiroso, ya no te creeré y te comeré ahora mismo!, el conejo en tono de súplica le rogaba, ¡Por favor ayúdame!, solo esta vez, porque hoy es el gran día en que Dios descenderá del cielo con sus ángeles y entonces habrá una gran fiesta en honor a él, solo yo he sabido esto, porque me lo envió un ángel mensajero, para esto pues yo junto toda esta leña, para que en el momento que descienda entonemos himnos para el altísimo, creador nuestro. El zorro creyendo una vez más al conejo y pensando que esta vez, habrá una fiesta y no un juicio, se hizo convencer, el zorro estaba tan alegre, sacaba leña junto con el conejo hasta que obtuvieron lo suficiente, luego lo amontonaron como un altar, pero mucho más alto, el vivaz y engañador conejo le dijo: \"Súbete y prueba tocar esta trompeta, si puedes hazlo mirando el cielo para que veas al altísimo\", el zorro se subió y con mucho ímpetu empezó a tocar, en tanto el conejo prendió fuego alrededor de la leña, después de un rato el zorro se dio cuenta, que el fuego lo estaba alcanzando, dándose cuenta del engaño, pero ya era tarde, y no pudo escapar de las llamas alcanzando su muerte sin haber logrado su venganza.\n\nFIN." };
+    const cuento9 = { titulo: "El pucuy pukitu y el gallo", autor: "Tradición oral", edad: 3, texto: "EL PUCUY PUKITU Y EL GALLO\n\nAntiguamente las personas se alimentaban nutritivamente y todos eran laboriosos, no existía la codicia, la mentira, el odio, la ociosidad ni ladrones, una sociedad justa, consiente y honestas cuya convivencia era compartida con los animales que habitaban en su entorno, las mismas que tenían misiones específicas que cumplir cada una de ellas con la población. Entonces todos los días, desde las cumbres más altas y de madrugada llegaba a la población de palca un pucuy pukito feliz, que con solo emitir su dulce y melódico cantar - pucuy pucuy pucuy -.la población despertaba feliz y contenta deseosos de continuar con sus labores cotidianas y así fue establecida la misión del pucuy pukito como el único despertador desde tiempos muy remotos. Y así fue cumplida con mucha responsabilidad hasta que una madrugada no fue así. Antes que cantara el pukuy pukitu como era habitual, la población ya se había despertado. Entonces el pucuy pukitu confuso se preguntaba. ¿Qué pasó? Si yo aún no he cantado; se respondía el mismo; tal vez yo, este muy viejo y cansado y las personas por costumbre se despertaron solos Se sintió muy inútil, y preocupado el pucuy pukitu. Entonces se pasó el día tarareando una antigua canción de amor y reflexionado de lo que había ocurrido, al final el pucuy pukitu por su valentía y su responsabilidad sagrada que le caracterizaba opta por cumplir su misión con mayor esmero y así se prepara para el día siguiente, pero al amanecer, el pucuy pukitu es sorprendido de nuevo, porque la población otra vez se había despertado; entonces el misterio se apodera nuevamente del pucuy pukitu. ¿Habrá algún intruso que esté usurpando mis funciones de despertador? se preguntaba el pucuy pukitu tratando de averiguar; pero grande fue la sorpresa cuando vio a un señor con terno y altanero que sacando pecho y con voz autoritaria despertaba a la población. El pucuy pukitu inmediatamente lo reclamo diciendo: ¡Señor!, ¡Ud., está usurpando mis funciones! Y el señor panudo que era el gallo no hizo caso del reclamo de pucuy pukitu que a su insistencia, el gallo de un solo patadón le tumbó al suelo diciendo: Aquí nadie me reclama si deseas quéjate al juez. Luego de escuchar la prepotencia del gallo, el pucuy pukitu, apenado buscó al juez quejarse. El juez que era un señor robusto de mediana estatura, viejo, cansado y aburrido que no era fácil de encontrarlo por sus labores nocturnas que cumplía, después de días de búsqueda el pucuy pukitu llega a entrevistarse él, presentando su queja diciendo: Señor juez, mi función está siendo usurpada por un prepotente señor que nunca antes había visto. El juez al escuchar la queja del pucuy pukitu respondiéndole: No es posible que suceda tal cosa, este asunto está muy delicado, te lo digo con la experiencia que tengo; tu queja deber ser presentado por escrito con un abogado, si deseas que tu queja sea considerada. ¡Ah! Solo tenemos dos abogados autorizados el zorro y el ratón, te recomiendo al ratón; al zorro no; porque te comería terminó diciendo el juez, que era el búho. El pucuy pukitu por recuperar su misión cumplió con acudir al abogado que el juez le recomendó, entonces el abogado redactó la queja del pucuy pukitu y lo presentaron ante el juez. El abogado le dijo al pucuy pukitu: El caso está sencillo y Ud. volverá a ejercer su misión de despertador, no se preocupe y descanse sin preocupación. Obedeciendo el pucuy pukitu se fue a descansar. El abogado busca al usurpador comunicándole sobre la queja que había presentado en su contra, y le propone que el asunto quedaría sin efecto si le proveía de maíz, aceptada la proposición del abogado, el gallo le dice \"trato hecho!\" Luego el Abogado comienza a roer la tierra para entrar a la oficina del juez, lográndolo coge el escrito que había presentado y se lo come. De un tiempo el pucuy pukitu insiste al juez la resolución de su queja, para lo cual el juez cita a una audiencia tanto al gallo como al pucuy pukitu, ambos personajes se presentaron en dicha audiencia otorgándole un tiempo prudencial a cada uno de los personajes para que puedan exponer en su defensa. Primero el pucuy pukitu manifiesta que desde tiempos muy remotos él siempre cumplía con tal misión y lo realizaba con dedicación, voluntad, responsabilidad y esmero buscando siempre la eficacia y así mismo indica que él había presentado su queja por escrito y con un abogado y al señor gallo nunca lo había conocido y por tanto está usurpando mis funciones dijo el pucuy pukitu. Luego, el gallo dice lo siguiente: Yo no usurpo funciones, yo despierto a mi gente y no a gente del quejoso y quiero leer la queja en mi contra; insistió el gallo. Entonces, el juez busca la queja presentada por el pucuy pukitu, no pudiendo encontrar por ninguna parte y para librarse de problemas niega haber recibido tal reclamo y declara mentiroso a pucuy pukitu, dejando sin efecto su reclamo y favoreciendo al gallo. El señor juez faculta al gallo el derecho sobre el pucuy pukitu. Y al pucuy pukitu le prohíbe despertar a las personas y no estaba permitido habitar entre la población y si quería vivir lo haría en las cumbres altas de palca. Así pucuy pukitu abandona la población diciendo: algún día mi gente se dará cuenta de la confusión que los ocasionaste y yo volveré a recuperar mi puesto y continuar la vida como era antes sin engaños.\n\nFIN." };
+    const cuento10 = { titulo: "Cipriano y la osa (Sandia)", autor: "Tradición oral", edad: 4, texto: "CIPRIANO Y LA OSA (Sandia)\n\nHabía una vez un hombre muy ambicioso. Un día salió en busca de oro por las montañas, de pronto se encontró con \"el diablo\" y llegaron a un acuerdo. El diablo le dijo a Cipriano, así se llamaba aquel hombre. ¿Ves aquel barranco? En el profundo de ese barranco existe mucho oro. Y Cipriano ni tonto ni perezoso se fue de prisa, yo en lugar estaba intentando acercarse más y más, pisó una piedra falsa y cayó a un abismo, por suerte quedó colgado, de una rama. Desde allí gritaba y gritaba \"¡Auxilio que alguien me ayude!\". Entonces pasó por ahí un llulli (colibrí). Al verlo a Cipriano le dijo: ¡Ayúdame por favor amigo! Y llulli le contesto: \"¡yo no soy tu amigo y no tengo fuerzas para sacarte de ahí!\" Dicho esto se fue llulli. Más tarde pasó por allí una osa, al escuchar los gritos se acercó dijo: - ¿Quién está ahí abajo?- Entonces Cipriano contestó -¡Ayúdame por favor quien quiera que seas!, ya muy agotado. Y la osa respondió: - Te saco de ahí pero con una condición!. Tu tendrás que irte a vivir conmigo! Así fue, la osa se lo llevó al hombre a su guarida, que era una cueva. Cipriano se quedaba encerrado en la cueva, mientras la osa salía en busca de alimentos. Pasó un buen tiempo, hasta que la osa tuvo una cría, que era mezcla de humano y oso, al cual lo llamaron Tomás, tenía cuerpo de humano y fuerza de oso, esta criatura creció y pasó mayor tiempo junto a Cipriano, su padre, ambos se quedaban encerrados en la cueva. A medida que Tomás iba creciendo le entró la idea de escapar un día, por lo que todos los días, medía su fuerza y trataba de mover la roca que cerraba la cueva, hasta que un día logró moverla. Entonces le dijo a su padre: -¡Escapa! Y me esperas en aquella montaña, si al atardecer ves humo blanco me esperas y si ves humo negro te vas bien lejos. Al atardecer Cipriano esperaba ansioso ver la señal, hasta que al ver el humo blanco, se alegró muchísimo, que corrió gritando al encuentro de su hijo, ambos se abrazaron y gritaron - ¡somos libres!. Finalmente se fueron a vivir a un pueblo donde nadie los conocía y vivieron muchas aventuras juntos.\n\nFIN." };
+    const cuento11 = { titulo: "La vicuña Tiyala (El Collao)", autor: "Tradición oral", edad: 3, texto: "LA VICUÑA TIYALA (El Collao)\n\nHabía una vez, una cabaña abandonada. En ella vivía una abuelita llamada Tiyala que acostumbraba pastar una majada de vicuñas, la cual año a año se iba multiplicando. Se dice que esta abuelita era el zorrino. Como apreciaba mucho a los animales no los mataba para alimentarse; solo comía de su cosecha que día a día escarbaba. A la abuelita le visitaban todos los días unos caballeros (zorros), pidiéndole que les vendiera sus animales para lo cual les ofrecían buenos precios. Pero como la abuelita quería ser muy rica no aceptaba las tentadoras ofertas que le hacían. De esta manera aumentó considerablemente el número de vicuñas, pero la abuelita ya no tenía fuerzas para cuidar sus vicuñas y suplicó a otras abuelitas que vivían en ese lugar para que le ayuden a pastearlas, como las vicuñas eran bastantes, las ancianas ociosas, se aburrieron de cuidarlas y se fueron de ese lugar dejando sola a la Tiyala. Ella lloraba desconsoladamente al darse cuenta que no había quien la ayude a cuidar su ganado. Un día la abuelita, le alcanzó a un jovencito muy ágil obediente y muy atento a las órdenes, este jovencito quién, según dicen, era un zorro huérfano, el cachorro le contaba llorando a la abuelita sus tristeza y sufrimientos. Como la abuelita era muy comprensiva al escuchar sus quejas se compadeció del cachorro y le dijo: - \"no llores niñito yo quiero ofrecerte un trabajo y si aceptas te quedaras como mi heredero con mis chacras y mi ganado\". Ante esta propuesta el jovencito pensó y preguntó: - ¿Qué cosa hay que hacer en este trabajo?. La abuelita dijo: - que debería pastar sus ganados llegando a un acuerdo, desde ese día el joven empezó con el cuidado de las vicuñas todos los días y la abuelita preparaba la comida, en las tardes el jovencito llegaba donde la abuelita quejándose: \"Tus vicuñas me han pegado\". \"Tus vicuñas me han mordido\" y la abuelita le curaban con sus orines. Se dice que esto era cierto, pues como el jovencito era un zorro, todos los días intentaba comerse a las vicuñas. Pero como todavía era un cachorro no tenía las fuerzas suficientes y solo atacaba a las vicuñas más pequeñas y se hacía pegar con las madres de ellas. Entonces el jovencito quedó como heredero. Como ya no había quien le prepare su comida. De tanto hambre un día atacó por atrevido a una vicuña macho llamado JAÑACHU. Se colgó de su cuello pero el macho lo golpeó en una roca y murió. De remate lo pisoteó y le rompió los intestinos. Finalmente: las vicuñas desde ese día viven libres y solas al cuidado de la vicuña JAÑACHU.\n\nFIN." };
+    const cuento12 = { titulo: "Los tres hermanitos (Valle Inambari)", autor: "Tradición oral", edad: 2, texto: "LOS TRES HERMANITOS (Valle Inambari)\n\nEn el valle Inambari un padre de tres hijos; decidió deshacerse de los dos mayores porque eran muy flojos. Emilio, el papá echó fuera de la casa a Mario y Roberto que era los dos mayores y el pequeño Vicente era el que se quedó con su papá. Pero el menor no quiso quedarse solo porque él no quería separarse de sus hermanos porque ya estaba bien acostumbrado, lo siguió a sus dos hermanos y los encontró bien lejos, los dos mayores se sorprendieron al verlo y no quisieron llevarlo, pero el pequeño insistió ir con ellos. Entonces se marcharon los tres y la noche ya estaba cerca en alcanzarlos y ellos siguieron caminado, el pequeño Vicente vio una casa a media falda del cerro con una luz encendida, y les dijo a sus hermanos mayores Mario, Roberto mira allá hay una luz encendida, entonces decidieron alojarse en esa casa y siguieron caminando hasta llegar a la casa, en eso Mario toca la puerta, una señora salió y los hizo pasar muy amablemente, dándoles de su estadía a los tres hermanos. Luego la señora les invitó una cena muy agradable y les presentó a sus tres hijas y cenaron juntos. Los dos hermanos mayores terminaron sus platos, pero el menor no comía nada por que vio en su plato un dedo de una persona. La mujer insistió en que comiera y el niño se puso a fingir un dolor de estómago y la señora ya no insistió en comer. La señora luego hizo descansar a sus pies de sus tres hijas y los muchachos durmieron pero la señora cubrió los rostros de los muchachos, así ella no se equivocara para matarlos a los tres porque ella era una bruja y preparó una porción de veneno y el menor se dio cuenta al escuchar ruidos raros y les contó a sus hermanos del dedo que encontró en su plato entonces les entró miedo a los tres, pero igual los dos mayores, dormían como muertos, la señora entró y golpeó el pecho de los dos mayores y no se despertaban pero el menor se despertó la señora le dijo duerme, por que tus hermanos tienen fiebre muy alta y les voy a preparar un matecito. Y el menor le contestó que sus animales no le dejan dormir, la bruja le dijo daré solución y los mató a todos sus animales, después el menor les despertó a sus hermanos y les dijo que la bruja está preparando una porción de veneno para matarlos.\n\nFIN." };
+    const cuento13 = { titulo: "El cóndor y el cascabel (Sandia)", autor: "Tradición oral", edad: 3, texto: "EL CÓNDOR Y EL CASCABEL (Sandia)\n\nUn día el señor cóndor estaba soleándose sobre una roca, siempre atento a cualquier presa que se pueda asomar o pueda aparecer, en eso se desliza por debajo de la roca un cascabel enorme, reluciente y todo un rey. El cóndor asombrado por su tamaño y el sonar de su sakapa (crótalo), no supo qué hacer solamente apeló a preguntarle: - Amigo cascabel ¿Qué haces ahí sabiendo que yo puedo retacearte y convertirte en mi almuerzo del día? El cascabel respondió todo burlón \"¡Mira cóndor malvado! ¡Te propongo una lucha digna! Yo sé que te dicen que eres el rey de este lugar, Pallipugio; pero has olvidado un detalle que en Pallipugio, reino yo, dijo el todo poderoso cascabel. Así que nuestra lucha consistirá en que los dos atraparemos una presa, ya sea un cuy, un conejo, un ratón o cualquier ave pequeña y quien lo mate más rápido será el rey de este lugar.\" El cóndor todo un caballero acepta el reto de su amigo cascabel, confiado en su habilidad y destreza pero; advirtiéndole que si él gana, no solamente será el rey de este lugar, sino este será el almuerzo del día. Entonces la presa elegida fue el cuy; luego de haber elegido se van los dos en busca de los cuyes. El primero en encontrar fue el cóndor, porque desde lo alto ve más rápido que el cascabel pero esto no se quedó atrás, también ya había ubicado al en su escondite. Los dos tenían su presas a la vista en eso aparece el ave miranda (águila), este se ofrece a ser el jurado, luego de dos minutos, el miranda (águila) verifica, cuál de ellos había matado más rápido al cuy, pero sorpresa, que los dos lo hicieron en el mismo tiempo, no hubo un ganador. El jurado dio su veredicto con un empate. Debido a que hubo un empate, el Miranda declara que los dos son los reyes de este lugar, fijando los límites de sus dominios territoriales. El cóndor será el rey desde la mitad de la montaña hacia arriba hasta las cumbres de este lugar de Sandia, y el cascabel será de la mitad de las montañas para abajo hasta las orillas del río Sandia. Desde aquel entonces el cóndor y el cascabel dominan sus territorios cada uno en su sector, hasta hoy.\n\nFIN." };
+    const cuento14 = { titulo: "El bagrecico", autor: "Francisco Izquierdo Ríos (Perú)", edad: 2, texto: "EL BAGRECICO - Francisco Izquierdo Ríos\n\nEn el río Huallaga, de aguas profundas y misteriosas, allá en la selva peruana, vivía una familia de bagres. El más pequeño de todos era Bagrecico. Era tan pequeño que sus hermanos se burlaban constantemente de él. \"Nunca serás grande como nosotros\", le decían, mientras nadaban veloces río arriba. Bagrecico se sentía muy triste. Un día decidió alejarse y nadó sin rumbo, dejándose llevar por la corriente. El río se volvía más profundo y oscuro. De repente, una gran sombra apareció frente a él. Era un enorme pez de dientes afilados. Bagrecico, asustado, se escondió detrás de una piedra. El pez gigante pasó de largo sin verlo. Continuó su viaje. Llegó a una laguna donde la luna se reflejaba como un espejo plateado. Una voz suave le dijo: \"No temas, pequeño. La luna te protege\". Bagrecico miró hacia arriba y vio que la luna llena le sonreía. \"¿Por qué eres tan pequeño?\", preguntó la luna. \"Mis hermanos se burlan de mí\", respondió Bagrecico. La luna le dijo: \"El tamaño no importa. Lo importante es la grandeza de tu corazón\". Bagrecico regresó. Encontró a sus hermanos atrapados en una red de pescadores. Estaban desesperados, sin poder escapar. Bagrecico, con su pequeño tamaño, pudo pasar entre los huecos de la red. Mordió las cuerdas una por una, hasta que logró romperlas. Sus hermanos quedaron libres. Desde ese día, nunca más se burlaron de él. Al contrario, lo admiraban y respetaban. Los pescadores del río Huallaga cuentan esta historia a sus hijos para enseñarles que todos somos importantes sin importar nuestro tamaño.\n\nFIN." };
+    
+    // Lista completa de cuentos
+    const todosLosCuentos = [cuento1, cuento2, cuento3, cuento4, cuento5, cuento6, cuento7, cuento8, cuento9, cuento10, cuento11, cuento12, cuento13, cuento14];
+    
+    // Organizar por edad (grado)
+    for (let i = 0; i < todosLosCuentos.length; i++) {
+        const cuento = todosLosCuentos[i];
+        const grado = cuento.edad;
+        
+        let preguntas = [
+            { type: "mcq", text: "1. ¿Quién es el autor o fuente de este cuento?", options: [`A) ${cuento.autor.split('-')[0].trim()}`, "B) Tradición oral anónima", "C) Un escritor extranjero", "D) Un poeta", "E) Un periodista"], correct: 0 },
+            { type: "mcq", text: "2. ¿Cuál es la enseñanza principal de esta historia?", options: ["A) La riqueza material es lo más valioso", "B) La bondad, la honestidad y la sabiduría", "C) La mentira siempre es beneficiosa", "D) La venganza es el mejor camino", "E) La indiferencia ante los demás"], correct: 1 },
+            { type: "mcq", text: "3. ¿Dónde se desarrolla principalmente la acción?", options: ["A) En una ciudad grande", "B) En el campo, la sierra, la selva o los Andes", "C) En el extranjero", "D) En el futuro", "E) En el espacio"], correct: 1 },
+            { type: "mcq", text: "4. ¿Qué personaje es el protagonista?", options: ["A) Un animal", "B) Una persona", "C) La naturaleza", "D) Un objeto mágico", "E) Un espíritu"], correct: 1 },
+            { type: "mcq", text: "5. ¿Qué valor humano se destaca más en esta historia?", options: ["A) El egoísmo y la avaricia", "B) La honestidad, el respeto y la perseverancia", "C) La mentira y el engaño", "D) La violencia", "E) La pereza"], correct: 1 },
+            { type: "open", text: "📝 6. Resume el cuento con tus propias palabras. ¿Qué sucede al inicio, en el medio y al final?" },
+            { type: "open", text: "📝 7. ¿Qué personaje te pareció más interesante? ¿Por qué?" },
+            { type: "open", text: "📝 8. ¿Qué enseñanza o moraleja te deja esta historia? Explícala con tus propias palabras." },
+            { type: "open", text: "📝 9. ¿Cómo podrías aplicar lo que aprendiste en este cuento a tu vida diaria?" },
+            { type: "open", text: "📝 10. Si pudieras cambiar algo de la historia, ¿qué cambiarías y por qué?" }
+        ];
+        
+        LECTURES_DB[grado].push({
+            id: `${grado}_${i}`,
+            title: cuento.titulo,
+            text: cuento.texto,
+            image: `https://picsum.photos/id/${(grado*50 + i*17)%90 + 10}/600/300`,
+            questions: preguntas,
+            author: cuento.autor
+        });
+    }
+    
+    // Asegurar que cada grado tenga cuentos
+    for (let g = 1; g <= 6; g++) {
+        if (LECTURES_DB[g].length === 0) {
+            LECTURES_DB[g] = LECTURES_DB[3].slice(0, 3);
+        }
+    }
+    
+    // ----- ESTADO Y FUNCIONES (interfaz completa) -----
+    let student = { fullName: "", grade: "", section: "" };
+    let currentGrade = 1, currentLectures = [], currentIdx = 0, userAnswers = {}, lastEvaluation = null;
+    let currentCuento = null;
+    
+    const studentSpan = document.getElementById("studentNameDisplay");
+    const gradeSectionSpan = document.getElementById("studentGradeSection");
+    const gradeSelect = document.getElementById("gradeSelect");
+    const sectionInput = document.getElementById("sectionInput");
+    const updateBtn = document.getElementById("updateInfoBtn");
+    const storiesContainer = document.getElementById("storiesContainer");
+    const gradeTabs = document.getElementById("gradeTabs");
+    const readerModal = document.getElementById("readerModal");
+    
+    function updateStudentInfo() {
+        studentSpan.innerText = student.fullName || "Estudiante";
+        gradeSectionSpan.innerText = `Grado: ${student.grade}° | Sección: ${student.section}`;
+    }
+    
+    function cargarCuentosPorGrado(grado) {
+        currentGrade = grado;
+        currentLectures = LECTURES_DB[grado];
+        if (!currentLectures.length) return;
+        storiesContainer.innerHTML = `<div class="section-title">📚 GRADO ${grado} · ${currentLectures.length} CUENTOS</div><div class="story-grid"></div>`;
+        const grid = storiesContainer.querySelector(".story-grid");
+        currentLectures.forEach((cuento, idx) => {
+            const card = document.createElement("div");
+            card.className = "story-card";
+            card.innerHTML = `
+                <div class="story-title">📖 ${cuento.title.substring(0, 65)}${cuento.title.length > 65 ? "..." : ""}</div>
+                <div class="story-author"><span><i class="fas fa-user-pen"></i> ${cuento.author.split('-')[0].trim()}</span><span><i class="fas fa-book-open"></i> Leer ahora</span></div>
+            `;
+            card.onclick = () => abrirLector(cuento);
+            grid.appendChild(card);
+        });
+    }
+    
+    function crearPestanas() {
+        gradeTabs.innerHTML = "";
+        for (let g = 1; g <= 6; g++) {
+            const btn = document.createElement("button");
+            btn.className = "grade-tab" + (g === currentGrade ? " active" : "");
+            btn.textContent = `${g}° Grado`;
+            btn.onclick = () => {
+                document.querySelectorAll(".grade-tab").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentGrade = g;
+                student.grade = g;
+                gradeSelect.value = g;
+                cargarCuentosPorGrado(g);
+                updateStudentInfo();
+            };
+            gradeTabs.appendChild(btn);
+        }
+    }
+    
+    function abrirLector(cuento) {
+        currentCuento = cuento;
+        userAnswers = {};
+        lastEvaluation = null;
+        
+        document.getElementById("readerStudentName").innerText = student.fullName;
+        document.getElementById("readerStudentGrade").innerText = `Grado: ${student.grade}° | Sección: ${student.section}`;
+        document.getElementById("readerTitle").innerHTML = `${cuento.title}<br><span style="font-size:0.7rem;">Fuente: ${cuento.author}</span>`;
+        document.getElementById("readerText").innerText = cuento.text;
+        
+        renderPreguntas(cuento.questions);
+        readerModal.classList.add("active");
+        document.getElementById("globalMessageModal").innerHTML = "📌 Lee el cuento. Responde todas las preguntas para generar el PDF.";
+    }
+    
+    function renderPreguntas(questions) {
+        const container = document.getElementById("questionsArea");
+        if (!container) return;
+        container.innerHTML = "";
+        questions.forEach((q, qi) => {
+            const qDiv = document.createElement("div");
+            qDiv.className = "question-item";
+            qDiv.innerHTML = `<div class="question-text"><i class="fas fa-question-circle"></i> ${q.text}</div>`;
+            if (q.type === "mcq") {
+                const optsDiv = document.createElement("div");
+                optsDiv.className = "options";
+                q.options.forEach((opt, oi) => {
+                    const label = document.createElement("label");
+                    label.className = "option-label";
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `q_${qi}`;
+                    radio.value = oi;
+                    radio.addEventListener("change", () => {
+                        userAnswers[`mcq_${qi}`] = oi;
+                        document.querySelectorAll(`label[data-mcq="${qi}"]`).forEach(l => l.classList.remove("selected"));
+                        label.classList.add("selected");
+                    });
+                    label.setAttribute("data-mcq", qi);
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(` ${opt}`));
+                    optsDiv.appendChild(label);
+                });
+                qDiv.appendChild(optsDiv);
+            } else {
+                const ta = document.createElement("textarea");
+                ta.rows = 3;
+                ta.placeholder = "Escribe tu respuesta detallada (mínimo 15 caracteres)...";
+                ta.addEventListener("input", (e) => userAnswers[`open_${qi}`] = e.target.value);
+                qDiv.appendChild(ta);
+            }
+            container.appendChild(qDiv);
+        });
+    }
+    
+    function verificarRespuestas() {
+        if (!currentCuento) return;
+        let total = 0, answered = 0;
+        currentCuento.questions.forEach((q, i) => {
+            if (q.type === "mcq") {
+                total++;
+                if (userAnswers[`mcq_${i}`] !== undefined) answered++;
+            } else {
+                total++;
+                let ans = userAnswers[`open_${i}`] || "";
+                if (ans.trim().length >= 10) answered++;
+            }
+        });
+        if (answered === total) {
+            let details = currentCuento.questions.map((q, i) => {
+                if (q.type === "mcq") {
+                    let sel = userAnswers[`mcq_${i}`];
+                    return { text: q.text, userAnswer: q.options[sel], options: q.options };
+                } else {
+                    return { text: q.text, userAnswer: userAnswers[`open_${i}`] || "" };
+                }
+            });
+            lastEvaluation = { details, student, lectureTitle: currentCuento.title, date: new Date().toLocaleString(), author: currentCuento.author };
+            document.getElementById("globalMessageModal").innerHTML = "✅ ¡Respuestas completas! Ya puedes generar el PDF.";
+        } else {
+            document.getElementById("globalMessageModal").innerHTML = `⚠️ Faltan ${total - answered} respuestas. Completa todas para generar el PDF.`;
+            lastEvaluation = null;
+        }
+    }
+    
+    async function generarPDF() {
+        if (!lastEvaluation) { alert("❌ Responde TODAS las preguntas y presiona 'VERIFICAR'."); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        const marginLeft = 20;
+        let y = 25;
+        
+        doc.setFillColor(139, 30, 30);
+        doc.rect(0, 0, 210, 50, "F");
+        doc.setFillColor(244, 197, 66);
+        doc.circle(25, 25, 12, "F");
+        doc.setTextColor(139, 30, 30);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(7);
+        doc.text("EDUCATIVA", 25, 21, { align: "center" });
+        doc.text("FRANCISCO", 25, 27, { align: "center" });
+        doc.text("RIOS", 25, 33, { align: "center" });
+        doc.setTextColor(255, 215, 0);
+        doc.setFontSize(14);
+        doc.text("FRANCISCO IZQUIERDO RÍOS", 105, 20, { align: "center" });
+        doc.setFontSize(8);
+        doc.text("Institución Educativa Bellavista - Callao", 105, 30, { align: "center" });
+        doc.text("“Lecturas Izquierdinas”", 105, 38, { align: "center" });
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        y = 65;
+        doc.text(`Estudiante: ${lastEvaluation.student.fullName}`, marginLeft, y);
+        y += 7;
+        doc.text(`Grado: ${lastEvaluation.student.grade}° - Sección: "${lastEvaluation.student.section}"`, marginLeft, y);
+        y += 7;
+        doc.text(`Fecha: ${lastEvaluation.date}`, marginLeft, y);
+        y += 7;
+        doc.text(`Título del cuento: ${lastEvaluation.lectureTitle.substring(0, 70)}`, marginLeft, y);
+        y += 5;
+        doc.text(`Fuente: ${lastEvaluation.author}`, marginLeft, y);
+        y += 12;
+        
+        doc.setDrawColor(200, 160, 120);
+        doc.line(marginLeft, y, 190, y);
+        y += 6;
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text("RESPUESTAS DEL ESTUDIANTE", marginLeft, y);
+        y += 8;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        
+        let correctCount = 0;
+        let totalMcq = 0;
+        
+        for (let i = 0; i < lastEvaluation.details.length; i++) {
+            const det = lastEvaluation.details[i];
+            if (y > 260) { doc.addPage(); y = 20; }
+            doc.setFont("helvetica", "bold");
+            doc.text(`Pregunta ${i+1}: ${det.text.substring(0, 70)}`, marginLeft, y);
+            y += 5;
+            doc.setFont("helvetica", "normal");
+            if (det.options) {
+                totalMcq++;
+                doc.text(`Respuesta seleccionada: ${det.userAnswer}`, marginLeft, y);
+                y += 5;
+                doc.setFontSize(7);
+                doc.text(`Opciones: ${det.options.join(" | ")}`, marginLeft, y);
+                y += 5;
+                doc.setFontSize(9);
+                if (det.userAnswer === det.options[1] || det.userAnswer.includes("bondad")) correctCount++;
+            } else {
+                let resp = det.userAnswer.length > 200 ? det.userAnswer.substring(0,200)+"..." : det.userAnswer;
+                doc.text(`Respuesta escrita: ${resp}`, marginLeft, y);
+                y += 6;
+            }
+            y += 2;
+        }
+        
+        doc.setDrawColor(200, 160, 120);
+        doc.line(marginLeft, y, 190, y);
+        y += 6;
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(139, 30, 30);
+        doc.text("📝 OPINIÓN PEDAGÓGICA", marginLeft, y);
+        y += 7;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        
+        let porcentaje = totalMcq > 0 ? Math.round((correctCount / totalMcq) * 100) : 100;
+        let opinion = "";
+        if (porcentaje >= 80) {
+            opinion = `✓ EXCELENTE TRABAJO, ${lastEvaluation.student.fullName}. Has demostrado una comprensión profunda del cuento. Tus respuestas son claras y reflexivas. ¡Sigue así! La lectura constante te convertirá en un gran pensador.`;
+        } else if (porcentaje >= 50) {
+            opinion = `✓ BUEN ESFUERZO, ${lastEvaluation.student.fullName}. Has comprendido las ideas principales del cuento. Te sugerimos leer nuevamente las partes que no te quedaron claras. ¡Vas por buen camino!`;
+        } else {
+            opinion = `✓ ÁNIMO, ${lastEvaluation.student.fullName}. La lectura es un hábito que se fortalece con la práctica. Te invitamos a volver a leer el cuento con más atención. ¡Tú puedes mejorar!`;
+        }
+        const opinionLines = doc.splitTextToSize(opinion, 170);
+        doc.text(opinionLines, marginLeft, y);
+        y += opinionLines.length * 5 + 5;
+        doc.text(`Resultado: ${correctCount} de ${totalMcq} respuestas correctas (${porcentaje}%)`, marginLeft, y);
+        y += 6;
+        doc.setFontSize(8);
+        doc.text("Documento generado por Lecturas Izquierdinas", marginLeft, y+8);
+        doc.save(`Informe_${lastEvaluation.student.fullName.replace(/ /g, "_")}.pdf`);
+    }
+    
+    function narrarAudio() {
+        if (!currentCuento) return;
+        if (!window.speechSynthesis) return alert("Audio no soportado.");
+        window.speechSynthesis.cancel();
+        let utterance = new SpeechSynthesisUtterance(currentCuento.text);
+        utterance.lang = "es-ES";
+        utterance.rate = 0.85;
+        let voices = window.speechSynthesis.getVoices();
+        let latinoVoice = voices.find(v => v.lang === 'es-MX' || v.lang === 'es-ES');
+        if (latinoVoice) utterance.voice = latinoVoice;
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    function cerrarLector() {
+        readerModal.classList.remove("active");
+        window.speechSynthesis.cancel();
+    }
+    
+    gradeSelect.addEventListener("change", (e) => {
+        student.grade = e.target.value;
+        currentGrade = parseInt(e.target.value);
+        updateStudentInfo();
+        cargarCuentosPorGrado(currentGrade);
+        document.querySelectorAll(".grade-tab").forEach((btn, idx) => {
+            if (idx + 1 === currentGrade) btn.classList.add("active");
+            else btn.classList.remove("active");
+        });
+    });
+    
+    updateBtn.addEventListener("click", () => {
+        let nombre = prompt("Ingresa tu nombre completo:", student.fullName);
+        if (nombre && nombre.trim()) student.fullName = nombre.trim();
+        let seccion = prompt("Ingresa tu sección (Ej: A, B, C):", student.section);
+        if (seccion && seccion.trim()) student.section = seccion.trim().toUpperCase();
+        updateStudentInfo();
+    });
+    
+    document.getElementById("verifyBtnModal")?.addEventListener("click", verificarRespuestas);
+    document.getElementById("pdfBtnModal")?.addEventListener("click", generarPDF);
+    document.getElementById("audioBtnModal")?.addEventListener("click", narrarAudio);
+    
+    function mostrarRegistroInicial() {
+        const modal = document.createElement("div");
+        modal.className = "modal-register";
+        modal.innerHTML = `<div class="modal-card"><div class="emblem-big">EDUCATIVA<br>FRANCISCO<br>RIOS</div><h3>📖 LECTURAS IZQUIERDINAS</h3><p>Todos los cuentos de los archivos adjuntos</p><input id="nombreReg" placeholder="Nombre completo"><div class="row"><select id="gradoReg"><option value="1">1°</option><option value="2">2°</option><option value="3">3°</option><option value="4">4°</option><option value="5">5°</option><option value="6">6°</option></select><input id="seccionReg" placeholder="Sección"></div><button id="iniciarBtn">COMENZAR A LEER</button></div>`;
+        document.body.appendChild(modal);
+        document.getElementById("iniciarBtn").onclick = () => {
+            let nombre = document.getElementById("nombreReg").value.trim();
+            let grado = document.getElementById("gradoReg").value;
+            let seccion = document.getElementById("seccionReg").value.trim().toUpperCase();
+            if (!nombre) nombre = "Explorador";
+            if (!seccion) seccion = "A";
+            student = { fullName: nombre, grade: grado, section: seccion };
+            sectionInput.value = seccion;
+            updateStudentInfo();
+            modal.remove();
+            crearPestanas();
+            cargarCuentosPorGrado(parseInt(grado));
+        };
+    }
+    
+    mostrarRegistroInicial();
+    updateStudentInfo();
+    cargarCuentosPorGrado(1);
+</script>
+</body>
+</html>

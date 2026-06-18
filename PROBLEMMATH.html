@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Matemágica Soles - Con Selector de Nivel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background: linear-gradient(145deg, #1e6f5c, #289672);
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Pantalla de bienvenida (nombre) */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .welcome-card {
+            background: #fff7e8;
+            border-radius: 60px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 90vw;
+            width: 450px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            border: 5px solid #f4c542;
+        }
+
+        .welcome-card h1 {
+            font-size: clamp(2rem, 8vw, 2.8rem);
+            color: #d48d1a;
+        }
+
+        .welcome-card p {
+            font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+            margin: 12px 0;
+        }
+
+        .name-input {
+            font-size: 1.8rem;
+            padding: 12px 20px;
+            text-align: center;
+            border: 4px solid #ffb347;
+            border-radius: 60px;
+            width: 85%;
+            margin: 15px 0;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .start-btn {
+            background: #2a9d8f;
+            font-size: 1.6rem;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1f6d62;
+            transition: 0.05s linear;
+        }
+
+        .start-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #1f6d62;
+        }
+
+        /* Modal de nivel */
+        .level-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 900;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s;
+        }
+
+        .level-modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #fff3cf;
+            border-radius: 70px;
+            padding: 35px 40px;
+            text-align: center;
+            border: 6px solid #ffb347;
+            box-shadow: 0 20px 35px black;
+            max-width: 85vw;
+            width: 450px;
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.8rem, 7vw, 2.5rem);
+        }
+
+        .modal-content .level-number {
+            font-size: 5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            background: white;
+            display: inline-block;
+            padding: 5px 40px;
+            border-radius: 80px;
+        }
+
+        .press-enter {
+            font-size: 1.4rem;
+            background: #e9c46a;
+            padding: 12px;
+            border-radius: 50px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* JUEGO PRINCIPAL - SIN SCROLL */
+        .game-wrapper {
+            width: 100vw;
+            height: 100vh;
+            background: #fff9ef;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .game-wrapper.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Header compacto pero legible */
+        .stats-bar {
+            background: #ffb74d;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 4px solid #e67e22;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 50px;
+            padding: 6px 16px;
+            font-weight: bold;
+            box-shadow: 0 3px 0 #c96f1e;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-left: 6px;
+            color: #1f3e48;
+        }
+
+        .timer-box .value {
+            color: #d9534f;
+        }
+
+        .progress-area {
+            background: #fbe9c3;
+            padding: 8px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Selector de nivel - combobox elegante */
+        .level-selector-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffdd99;
+            padding: 5px 15px;
+            border-radius: 50px;
+        }
+
+        .level-selector-control label {
+            font-size: 0.9rem;
+            color: #a45d1a;
+        }
+
+        .level-combo {
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 40px;
+            border: 2px solid #ffb347;
+            background: white;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Área de problema: TEXTO GRANDE */
+        .problem-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 15px 25px;
+            min-height: 0;
+        }
+
+        .story-box {
+            background: #e2f0f7;
+            border-radius: 55px;
+            padding: 28px 22px;
+            margin-bottom: 18px;
+            border-left: 15px solid #f9b43a;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+        }
+
+        /* TEXTO DE PREGUNTA - MUCHO MÁS GRANDE */
+        .problem-text {
+            font-size: clamp(1.6rem, 6vw, 2.3rem);
+            line-height: 1.4;
+            color: #1d3557;
+            font-weight: bold;
+            word-break: break-word;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+        }
+
+        .story-emoji {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .answer-input {
+            width: 85%;
+            font-size: 2rem;
+            padding: 15px 20px;
+            text-align: center;
+            border: 5px solid #ffb347;
+            border-radius: 70px;
+            background: white;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 55px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            transition: 0.05s linear;
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .check-btn { background: #2a9d8f; }
+        .reset-btn { background: #4a4e69; }
+
+        .feedback {
+            background: #fff3cf;
+            padding: 12px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .feedback.correct { background: #c7f9cc; color: #2d6a4f; border-left: 10px solid #40916c; }
+        .feedback.wrong { background: #ffe0db; color: #bc3900; border-left: 10px solid #e76f51; }
+        .feedback.error-central {
+            background: #ffcccc;
+            color: #cc0000;
+            border: 3px solid #ff0000;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+        }
+
+        footer {
+            background: #f4d58c;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        @media (max-height: 650px) {
+            .story-box { padding: 15px 18px; margin-bottom: 10px; }
+            .problem-text { font-size: clamp(1.3rem, 5vw, 1.8rem); }
+            .answer-input { font-size: 1.5rem; padding: 10px 15px; }
+            button { font-size: 1rem; padding: 8px 20px; }
+            .stat-card .value { font-size: 1.1rem; }
+            .story-emoji { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Pantalla nombre obligatoria -->
+<div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-card">
+        <h1>🧮 MATEMÁGICA SOLES 🧮</h1>
+        <p>✨ ¡Hola genio matemático! ✨</p>
+        <p>Escribe tu nombre para empezar:</p>
+        <input type="text" id="playerNameInput" class="name-input" placeholder="Tu nombre" maxlength="20" autocomplete="off">
+        <br>
+        <button id="startGameBtn" class="start-btn">🚀 COMENZAR 🚀</button>
+        <p style="font-size:0.9rem; margin-top:12px;">💰 Problemas con monedas en <strong>SOLES</strong> 💰</p>
+        <p style="font-size:0.85rem;">❌ Error: -20 puntos | 🎲 Cada reinicio = preguntas en orden aleatorio</p>
+    </div>
+</div>
+
+<!-- Modal de transición de nivel -->
+<div id="levelModal" class="level-modal">
+    <div class="modal-content">
+        <h2>🌟 ¡NUEVO NIVEL! 🌟</h2>
+        <div class="level-number" id="modalLevelNumber">1</div>
+        <p style="font-size:1.2rem;">Prepárate, <span id="playerNameSpan"></span></p>
+        <div class="press-enter">⏎ PRESIONA ENTER PARA CONTINUAR ⏎</div>
+    </div>
+</div>
+
+<!-- Juego principal -->
+<div id="gameContainer" class="game-wrapper">
+    <div>
+        <div class="stats-bar">
+            <div class="stat-card">👤 <span id="playerNameDisplay">Jugador</span></div>
+            <div class="stat-card">⭐ PUNTOS <span class="value" id="scoreDisplay">0</span></div>
+            <div class="stat-card">📚 NIVEL <span class="value" id="levelDisplay">1</span></div>
+            <div class="stat-card timer-box">⏱️ TIEMPO <span class="value" id="timerDisplay">05:00</span></div>
+            <div class="stat-card">🏆 ACERTADOS <span class="value" id="correctCountDisplay">0</span></div>
+        </div>
+        <div class="progress-area">
+            <span>🧠 <span id="currentLevelLabel">Nivel 1 · Sumas/Restas Soles</span></span>
+            <div class="level-selector-control">
+                <label>🎮 CAMBIAR NIVEL:</label>
+                <select id="levelCombo" class="level-combo">
+                    <option value="1">🌱 Nivel 1 - Sumas/Restas</option>
+                    <option value="2">⭐ Nivel 2 - Multiplicación/División</option>
+                    <option value="3">🚀 Nivel 3 - Operaciones Combinadas</option>
+                    <option value="4">🏆 Nivel 4 - Experto (Múltiples ops)</option>
+                </select>
+            </div>
+            <span>📋 #<span id="problemIndexCounter">0</span>/<span id="totalProblemsLevel">0</span></span>
+        </div>
+    </div>
+
+    <div class="problem-card">
+        <div class="story-box">
+            <div class="problem-text" id="problemStory">Cargando problema...</div>
+            <div class="story-emoji" id="storyEmoji">💰🪙</div>
+        </div>
+        <div class="input-area">
+            <input type="number" id="answerInput" class="answer-input" placeholder="Respuesta en Soles" inputmode="numeric">
+            <div class="btn-group">
+                <button id="checkBtn" class="check-btn">✔️ COMPROBAR</button>
+                <button id="resetBtn" class="reset-btn">🔄 NUEVA PARTIDA (Mismo Nivel)</button>
+            </div>
+        </div>
+        <div id="feedbackMsg" class="feedback">💡 Escribe la cantidad en soles y presiona Comprobar</div>
+    </div>
+
+    <footer>💰 Problemas en SOLES | + - × ÷ | 5 minutos por nivel | ❌ Error: -20 pts + respuesta correcta</footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // BATERÍA DE PREGUNTAS (35 por nivel) - Nivel 4 con operaciones combinadas avanzadas
+    // --------------------------------------------------------------
+    const LEVEL1_PROBLEMS = [
+        { text: "Ana tiene 8 soles y su mamá le da 5 soles más. ¿Cuántos soles tiene ahora?", answer: 13 },
+        { text: "Luis tenía 15 soles en su alcancía y gastó 7 soles en un helado. ¿Cuántos soles le quedan?", answer: 8 },
+        { text: "Una entrada al cine cuesta 12 soles. Si Sofía paga con 20 soles, ¿cuánto vuelto recibe?", answer: 8 },
+        { text: "Carlos tiene 6 soles, su abuela le regala 9 soles. ¿Cuánto dinero tiene?", answer: 15 },
+        { text: "Una mochila cuesta 35 soles. Pagas con 50 soles, ¿cuánto te devuelven?", answer: 15 },
+        { text: "Valentina tenía 24 soles y compró un cuaderno de 9 soles. ¿Cuánto le queda?", answer: 15 },
+        { text: "Diego ahorró 18 soles y encontró 5 soles. ¿Cuántos soles tiene?", answer: 23 },
+        { text: "Tres bolsas de caramelos cuestan 12 soles. ¿Cuánto cuesta cada bolsa?", answer: 4 },
+        { text: "Lucía tenía 30 soles, pagó 12 soles de un juguete. ¿Cuánto le sobró?", answer: 18 },
+        { text: "Un kilo de manzanas cuesta 6 soles. ¿Cuánto cuestan 2 kilos?", answer: 12 },
+        { text: "Mateo tiene 5 soles y su hermano 7 soles. ¿Cuánto tienen juntos?", answer: 12 },
+        { text: "En la alcancía hay 45 soles, sacan 18 soles. ¿Cuántos quedan?", answer: 27 },
+        { text: "El bus cuesta 3 soles por viaje. ¿Cuánto gastas en 4 viajes?", answer: 12 },
+        { text: "Renata tenía 28 soles y pagó una deuda de 9 soles. ¿Cuánto le queda?", answer: 19 },
+        { text: "Un cuaderno cuesta 7 soles. ¿Cuánto cuestan 3 cuadernos?", answer: 21 },
+        { text: "Seis helados cuestan 30 soles. ¿Cuánto cuesta cada helado?", answer: 5 },
+        { text: "Daniel tenía 50 soles, gastó 32 soles en un libro. ¿Cuánto le queda?", answer: 18 },
+        { text: "Ahorras 9 soles semanales. ¿Cuánto en 2 semanas?", answer: 18 },
+        { text: "4 entradas al museo cuestan 60 soles. ¿Cuánto cuesta cada entrada?", answer: 15 },
+        { text: "Camila compró por 23 soles y pagó con 50. ¿Cuánto vuelto?", answer: 27 },
+        { text: "Cinco jugos cuestan 20 soles. ¿Precio de cada jugo?", answer: 4 },
+        { text: "Mateo tenía 42 soles y regaló 15. ¿Cuánto le queda?", answer: 27 },
+        { text: "Una lámpara cuesta 60 soles, tienes 45. ¿Cuánto falta?", answer: 15 },
+        { text: "3 empanadas cuestan 9 soles. ¿Precio unitario?", answer: 3 },
+        { text: "12 lapiceros cuestan 24 soles. ¿Costo por lapicero?", answer: 2 },
+        { text: "Si un chocolate cuesta 4 soles, ¿cuánto cuestan 5 chocolates?", answer: 20 },
+        { text: "Tienes 55 soles y compras un polo de 28 soles. ¿Cuánto te queda?", answer: 27 },
+        { text: "En una tienda, 7 gomas cuestan 14 soles. ¿Precio unitario?", answer: 2 },
+        { text: "Un peluche cuesta 32 soles. Si pagas con 50, ¿cuánto vuelto?", answer: 18 },
+        { text: "Compras 2 kilogramos de papas a 3 soles cada kilo. ¿Total?", answer: 6 },
+        { text: "Un cuaderno de 5 soles y un lápiz de 2 soles. ¿Cuánto pagas?", answer: 7 },
+        { text: "Si ahorras 15 soles cada mes, ¿cuánto en 3 meses?", answer: 45 },
+        { text: "Un libro cuesta 42 soles, otro cuesta 18 soles menos. ¿Precio del segundo?", answer: 24 },
+        { text: "Un juguete cuesta 75 soles, pagas 50 primero. ¿Cuánto falta?", answer: 25 },
+        { text: "Una mochila vale 68 soles, y una lonchera 22 soles. ¿Diferencia?", answer: 46 }
+    ];
+
+    const LEVEL2_PROBLEMS = [
+        { text: "Cada polo cuesta 25 soles. ¿Cuánto cuestan 4 polos?", answer: 100 },
+        { text: "8 kilos de naranjas cuestan 32 soles. ¿Precio por kilo?", answer: 4 },
+        { text: "Tres amigos juntaron 45 soles por igual. ¿Cuánto puso cada uno?", answer: 15 },
+        { text: "Mochila de 45 soles, pagas con 100. ¿Vuelto?", answer: 55 },
+        { text: "Una caja de galletas cuesta 9 soles. ¿Costo de 7 cajas?", answer: 63 },
+        { text: "Rosa ahorra 12 soles cada semana, ¿en 6 semanas?", answer: 72 },
+        { text: "Tienes 85 soles, compras un juego de 47. ¿Cuánto queda?", answer: 38 },
+        { text: "24 lápices cuestan 48 soles. ¿Precio unitario?", answer: 2 },
+        { text: "6 jugos cuestan 30 soles. ¿Precio por jugo?", answer: 5 },
+        { text: "Pantalón de 56 soles, pagas con 100. ¿Vuelto?", answer: 44 },
+        { text: "Cinco libros cuestan 140 soles. ¿Precio de cada libro?", answer: 28 },
+        { text: "9 entradas de circo cuestan 153 soles. ¿Precio unitario?", answer: 17 },
+        { text: "3 cementos cuestan 108 soles. ¿Cada cemento?", answer: 36 },
+        { text: "Pack de 8 juguetes vale 64 soles. ¿Cada juguete?", answer: 8 },
+        { text: "Ahorro mensual 23 soles, ¿en 4 meses?", answer: 92 },
+        { text: "Pagas la mitad de un teléfono de 150 soles. ¿Cuánto pagaste?", answer: 75 },
+        { text: "7 reglas cuestan 28 soles. ¿Precio por regla?", answer: 4 },
+        { text: "Tres balones cuestan 135 soles. ¿Cada balón?", answer: 45 },
+        { text: "6 camisas de 32 soles cada una. ¿Total?", answer: 192 },
+        { text: "Tienes 200, gastas 78 y 45. ¿Cuánto queda?", answer: 77 },
+        { text: "Repartes 96 soles entre 8 amigos. ¿Cada uno?", answer: 12 },
+        { text: "Audífonos cuestan 65 soles; ahorras 13 semanales. ¿Semanas?", answer: 5 },
+        { text: "Pastel de 40 soles en 8 porciones. ¿Porción?", answer: 5 },
+        { text: "4 entradas a 23 soles cada una. ¿Total?", answer: 92 },
+        { text: "Bicicleta 540 soles en 6 cuotas iguales. ¿Cuota?", answer: 90 },
+        { text: "Un pack de 5 polos cuesta 120 soles. ¿Precio unitario?", answer: 24 },
+        { text: "Si 7 cuadernos cuestan 56 soles, ¿cuánto cuestan 4?", answer: 32 },
+        { text: "Un videojuego cuesta 210 soles, lo pagas en 3 cuotas iguales. ¿Cuota?", answer: 70 },
+        { text: "Tres pantalones cuestan 180 soles. ¿Cada uno?", answer: 60 },
+        { text: "Un celular cuesta 680 soles, otro cuesta 450 soles menos. ¿Precio segundo?", answer: 230 },
+        { text: "Si una camisa cuesta 45 soles y compras 5, ¿cuánto pagas?", answer: 225 },
+        { text: "Ahorras 28 soles cada mes, ¿en 5 meses?", answer: 140 },
+        { text: "Un escritorio cuesta 340 soles, pagas 80 soles de inicial. ¿Cuánto falta?", answer: 260 },
+        { text: "Repartes 144 soles entre 12 niños. ¿Cada uno?", answer: 12 },
+        { text: "Un televisor cuesta 1250 soles, pagas la mitad. ¿Cuánto pagas?", answer: 625 }
+    ];
+
+    const LEVEL3_PROBLEMS = [
+        { text: "Laptop 1250 soles, pagas la mitad y luego 350. ¿Cuánto falta?", answer: 275 },
+        { text: "Ganas 25 soles diarios por 6 días, gastas 48. ¿Te queda?", answer: 102 },
+        { text: "3 kg de pollo cuestan 24 soles. ¿5 kg?", answer: 40 },
+        { text: "5 cuadernos de 12 soles c/u con descuento de 15. ¿Pagas?", answer: 45 },
+        { text: "4 peluches valen 84 soles. ¿7 peluches?", answer: 147 },
+        { text: "Pedro 235 soles, hermana 178, compran tablet de 360. ¿Sobra?", answer: 53 },
+        { text: "Curso de 480 soles en 8 cuotas. ¿Valor cuota?", answer: 60 },
+        { text: "3 polos de 35 y 2 pantalones de 55. ¿Total?", answer: 215 },
+        { text: "TV 950 soles, pagas 300 y luego 250. ¿Adeudas?", answer: 400 },
+        { text: "Trabajas 8h/día, 5 días, ganas 12 soles/hora. ¿Ganancia?", answer: 480 },
+        { text: "Terreno 12500 soles entre 5 hermanos. ¿Cada uno?", answer: 2500 },
+        { text: "Computadora 3200 soles con 10% descuento. ¿Precio final?", answer: 2880 },
+        { text: "6 entradas VIP de 75 soles c/u, pagas con 500. ¿Vuelto?", answer: 50 },
+        { text: "8 autitos cuestan 144 soles. ¿12 autitos?", answer: 216 },
+        { text: "Celular 680 soles, otro cuesta 450 soles menos. ¿Precio segundo?", answer: 230 },
+        { text: "Ahorras 30 soles semanales en 12 semanas. ¿Total?", answer: 360 },
+        { text: "Membresía 840 soles al año, pago mensual igual. ¿Mes?", answer: 70 },
+        { text: "Concierto: 450 entradas de 45 y 320 de 60. ¿Recaudación?", answer: 39450 },
+        { text: "Inicial del 30% de nevera 2100 soles. ¿Monto inicial?", answer: 630 },
+        { text: "Videojuego 180 soles con aumento del 25%. ¿Nuevo precio?", answer: 225 },
+        { text: "2 kg de pescado cuestan 56. ¿5 kg?", answer: 140 },
+        { text: "Préstamo 1200 soles, 6 cuotas de 220. ¿Interés total?", answer: 120 },
+        { text: "Gana 1345 soles, gasta 980. ¿Ahorro en 3 meses?", answer: 1095 },
+        { text: "2 amigos compran 3 juegos de 85 soles c/u y dividen. ¿Paga c/u?", answer: 127.5 },
+        { text: "5 polos + 3 bermudas (40 c/u) = 420 soles. ¿Precio de cada polo?", answer: 60 },
+        { text: "Un celular cuesta 950 soles, tiene descuento 15%. ¿Precio final?", answer: 807.5 },
+        { text: "Ganas 18 soles por hora, trabajas 25 horas. ¿Total?", answer: 450 },
+        { text: "Un colegio recauda 5420 soles, gasta 3850. ¿Cuánto queda?", answer: 1570 },
+        { text: "Un terreno cuesta 9800 soles, pagas el 40%. ¿Cuánto pagas?", answer: 3920 },
+        { text: "Si una computadora cuesta 2100 y otra 1750, ¿diferencia?", answer: 350 },
+        { text: "Un viaje cuesta 2400 soles, se paga en 8 cuotas. ¿Cuota mensual?", answer: 300 },
+        { text: "Vendes 45 polos a 28 soles cada uno. ¿Ingreso total?", answer: 1260 },
+        { text: "Un préstamo de 4500 soles, pagas el 20% de inicial. ¿Saldo?", answer: 3600 },
+        { text: "Un parlante cuesta 560 soles, aumentan 12%. ¿Nuevo precio?", answer: 627.2 },
+        { text: "Si ahorras 125 soles mensuales por 8 meses, ¿total ahorrado?", answer: 1000 }
+    ];
+
+    const LEVEL4_PROBLEMS = [
+        { text: "Una tienda ofrece 3 polos por 70 soles. Si compras 6 polos, ¿cuánto pagas? Luego, con un descuento de 10 soles por cada 3 polos, ¿cuánto pagarías en total?", answer: 130 },
+        { text: "Ana compró 4 cuadernos a 12 soles cada uno y 3 lapiceros a 3 soles cada uno. Pagó con un billete de 100 soles. ¿Cuánto recibió de vuelto?", answer: 39 },
+        { text: "Un agricultor vende 8 kilos de papas a 3 soles el kilo y 5 kilos de cebollas a 2 soles el kilo. Si gasta 15 soles en semillas, ¿cuánto dinero le queda?", answer: 19 },
+        { text: "En un juego, Pedro ganó 25 soles, luego perdió 12 soles, después ganó el triple de lo que perdió. ¿Cuánto dinero tiene al final?", answer: 49 },
+        { text: "Si compras 2 mochilas de 45 soles cada una y te descuentan 8 soles por cada mochila, ¿cuánto pagas en total?", answer: 74 },
+        { text: "Un grupo de 5 amigos junta dinero: 20, 35, 28, 42 y 15 soles. Compran un regalo de 100 soles y reparten el resto en partes iguales. ¿Cuánto recibe cada uno?", answer: 8 },
+        { text: "En una feria, 3 empanadas cuestan 9 soles y 2 jugos cuestan 8 soles. Si compras 6 empanadas y 4 jugos, ¿cuánto pagas?", answer: 34 },
+        { text: "María tenía 120 soles. Gastó la mitad en ropa y luego la tercera parte de lo que le quedaba en libros. ¿Cuánto dinero le sobra?", answer: 40 },
+        { text: "Un celular cuesta 850 soles, pero tiene un descuento del 20% y luego un impuesto del 10% sobre el precio con descuento. ¿Cuánto pagas finalmente?", answer: 748 },
+        { text: "Si ahorras 40 soles cada semana durante 5 semanas y luego gastas 85 soles, ¿cuánto dinero te queda? Además, si recibes 30 soles de propina, ¿cuál es el total final?", answer: 145 },
+        { text: "En una tienda, 4 polos cuestan 140 soles. Si compras 7 polos, ¿cuánto pagas? Y si tienes un cupón de descuento de 15 soles, ¿cuánto pagas?", answer: 230 },
+        { text: "Un trabajador gana 45 soles por hora durante 8 horas al día, trabaja 5 días. Si paga 250 soles de alquiler, ¿cuánto le queda?", answer: 1550 },
+        { text: "Pedro tiene 3 veces la cantidad de soles que tiene Luis. Si entre los dos suman 120 soles, ¿cuánto tiene cada uno? (Respuesta: soles de Pedro)", answer: 90 },
+        { text: "Un pantalón cuesta 80 soles, una camisa cuesta la mitad del pantalón, y un par de zapatos cuesta el doble de la camisa. ¿Cuánto cuesta todo junto?", answer: 200 },
+        { text: "Si repartes 240 soles entre 8 niños y luego cada niño dona 5 soles, ¿cuánto dinero les queda en total?", answer: 200 },
+        { text: "Un auto recorre 60 km con 4 galones de gasolina. ¿Cuántos galones necesitará para recorrer 150 km? Si cada galón cuesta 15 soles, ¿cuánto pagará?", answer: 225 },
+        { text: "En una liquidación, todos los productos tienen 25% de descuento. Si compras un libro de 64 soles y un cuaderno de 16 soles, ¿cuánto pagas en total?", answer: 60 },
+        { text: "Un paquete de 12 galletas cuesta 18 soles. Si compras 36 galletas y pagas con 100 soles, ¿cuánto vuelto te dan?", answer: 46 },
+        { text: "El doble de un número más 15 es igual a 45. ¿Cuál es ese número? Luego, si compras ese número de libros a 7 soles cada uno, ¿cuánto pagas?", answer: 105 },
+        { text: "Luis tenía el triple de dinero que su hermana. Si entre ambos tienen 200 soles, ¿cuánto tiene Luis? Luego gasta 35 soles, ¿cuánto le queda?", answer: 115 },
+        { text: "Un terreno rectangular mide 40 m de largo y 25 m de ancho. Si cada metro cuadrado cuesta 50 soles, ¿cuánto cuesta todo el terreno?", answer: 50000 },
+        { text: "Un padre reparte 180 soles entre sus tres hijos. El mayor recibe el doble del mediano, y el mediano recibe el triple del menor. ¿Cuánto recibe el menor?", answer: 18 },
+        { text: "Si compras 3 lápices a 2 soles cada uno y 4 borradores a 1.5 soles cada uno, ¿cuánto pagas? Si tienes un descuento del 10%, ¿cuánto pagas?", answer: 10.8 },
+        { text: "Un grupo de estudiantes recolectó 250 soles. Gastaron 85 soles en materiales y el resto lo dividieron en partes iguales para 5 actividades. ¿Cuánto destinaron a cada actividad?", answer: 33 },
+        { text: "En una granja hay 120 animales entre gallinas y conejos. Si hay 40 gallinas, ¿cuántos conejos hay? Cada conejo tiene 4 patas y cada gallina 2. ¿Cuántas patas hay en total?", answer: 320 },
+        { text: "Si el perímetro de un cuadrado es 80 metros, ¿cuánto mide su lado? Luego, si cada metro de cerca cuesta 12 soles, ¿cuánto cuesta cercar todo?", answer: 240 },
+        { text: "Un curso tiene 36 alumnos. La mitad son niños y la tercera parte de los niños usan lentes. ¿Cuántos niños usan lentes? Luego, si cada lente cuesta 45 soles, ¿cuánto gastan en total?", answer: 270 },
+        { text: "Juan tiene 45 soles más que Ana. Si juntos tienen 125 soles, ¿cuánto tiene Juan? Luego gasta 20, ¿cuánto le queda?", answer: 65 },
+        { text: "Una caja tiene 24 bombones. Si repartes 3/4 de los bombones entre 6 amigos, ¿cuántos bombones recibe cada amigo? Luego, si cada bombón cuesta 2 soles, ¿cuánto pagó cada amigo?", answer: 6 },
+        { text: "Un televisor cuesta 2400 soles. Si pagas el 30% de inicial y el resto en 12 cuotas iguales, ¿cuánto pagas en cada cuota?", answer: 140 },
+        { text: "En una tienda, por la compra de 3 camisas te regalan 1. Si compras 9 camisas y cada una cuesta 35 soles, ¿cuánto pagas en total?", answer: 210 },
+        { text: "Un ciclista recorre 15 km en 45 minutos. ¿Cuántos km recorrerá en 2 horas a la misma velocidad? Luego, si recibe 2 soles por km, ¿cuánto gana?", answer: 80 },
+        { text: "Si el área de un rectángulo es 120 m² y el ancho es 8 m, ¿cuánto mide el largo? Luego, si cada metro de cerco cuesta 10 soles, ¿cuánto cuesta cercarlo (perímetro)?", answer: 460 },
+        { text: "Un número más su triple es igual a 80. ¿Cuál es el número? Luego, si compras esa cantidad de lapiceros a 4 soles cada uno, ¿cuánto pagas?", answer: 80 },
+        { text: "En un colegio, 1/3 de los estudiantes practica fútbol, 1/4 practica básquet y el resto 25 practica natación. ¿Cuántos estudiantes hay en total?", answer: 60 }
+    ];
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    let playerName = "";
+    let currentLevel = 1;
+    let currentProblemIndex = 0;
+    let currentProblems = [];
+    let score = 0;
+    let correctCount = 0;
+    let waitingForNext = false;
+    let timeLeftSeconds = 300;
+    let timerInterval = null;
+    let gameActive = true;
+    let levelTransition = false;
+    let shuffledLevels = {};
+
+    // DOM
+    const welcomeOverlay = document.getElementById("welcomeOverlay");
+    const playerNameInput = document.getElementById("playerNameInput");
+    const startBtn = document.getElementById("startGameBtn");
+    const gameContainer = document.getElementById("gameContainer");
+    const levelModal = document.getElementById("levelModal");
+    const modalLevelNumber = document.getElementById("modalLevelNumber");
+    const playerNameSpan = document.getElementById("playerNameSpan");
+    const playerNameDisplay = document.getElementById("playerNameDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const levelDisplay = document.getElementById("levelDisplay");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const correctCountSpan = document.getElementById("correctCountDisplay");
+    const problemStoryDiv = document.getElementById("problemStory");
+    const answerInput = document.getElementById("answerInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const feedbackMsg = document.getElementById("feedbackMsg");
+    const levelCombo = document.getElementById("levelCombo");
+
+    function formatTime(sec) {
+        let mins = Math.floor(sec / 60);
+        let secs = sec % 60;
+        return `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    }
+
+    function stopTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    function startTimer() {
+        if (timerInterval) stopTimer();
+        timerInterval = setInterval(() => {
+            if (!gameActive || levelTransition) return;
+            if (timeLeftSeconds <= 0) {
+                stopTimer();
+                gameActive = false;
+                feedbackMsg.innerHTML = "⏰ ¡TIEMPO AGOTADO! Usa 'NUEVA PARTIDA' para jugar de nuevo.";
+                feedbackMsg.className = "feedback error-central";
+                answerInput.disabled = true;
+                checkBtn.disabled = true;
+            } else {
+                timeLeftSeconds--;
+                timerDisplay.innerText = formatTime(timeLeftSeconds);
+                if (timeLeftSeconds <= 60) timerDisplay.style.color = "#ff8888";
+                else timerDisplay.style.color = "#d9534f";
+            }
+        }, 1000);
+    }
+
+    function resetTimerForLevel() {
+        timeLeftSeconds = 300;
+        timerDisplay.innerText = formatTime(300);
+        timerDisplay.style.color = "#d9534f";
+        if (timerInterval) stopTimer();
+        if (gameActive) startTimer();
+    }
+
+    function updateUI() {
+        levelDisplay.innerText = currentLevel;
+        scoreDisplay.innerText = Math.max(0, score);
+        correctCountSpan.innerText = correctCount;
+        document.getElementById("totalProblemsLevel").innerText = currentProblems.length;
+        document.getElementById("problemIndexCounter").innerText = currentProblemIndex + 1;
+        if (currentLevel === 1) document.getElementById("currentLevelLabel").innerHTML = "🌱 Nivel 1 · Sumas y Restas";
+        else if (currentLevel === 2) document.getElementById("currentLevelLabel").innerHTML = "⭐ Nivel 2 · Multiplicación y División";
+        else if (currentLevel === 3) document.getElementById("currentLevelLabel").innerHTML = "🚀 Nivel 3 · Operaciones Combinadas Básicas";
+        else document.getElementById("currentLevelLabel").innerHTML = "🏆 NIVEL 4 · EXPERTO en Operaciones Múltiples 🏆";
+        levelCombo.value = currentLevel;
+    }
+
+    function loadProblem() {
+        if (!currentProblems.length) return;
+        const problem = currentProblems[currentProblemIndex];
+        problemStoryDiv.innerText = problem.text;
+        answerInput.value = "";
+        feedbackMsg.innerHTML = "💰 Escribe la cantidad en soles y comprueba";
+        feedbackMsg.className = "feedback";
+        waitingForNext = false;
+        answerInput.disabled = false;
+        checkBtn.disabled = false;
+        updateUI();
+        answerInput.focus();
+    }
+
+    function goToNextQuestion() {
+        if (currentProblemIndex + 1 >= currentProblems.length) {
+            feedbackMsg.innerHTML = `🎉 ¡FELICITACIONES! Completaste el Nivel ${currentLevel}. Puedes cambiar de nivel con el selector. 🎉`;
+            feedbackMsg.className = "feedback correct";
+            gameActive = false;
+            stopTimer();
+            answerInput.disabled = true;
+            checkBtn.disabled = true;
+        } else {
+            currentProblemIndex++;
+            loadProblem();
+        }
+    }
+
+    function checkAnswer() {
+        if (!gameActive) {
+            feedbackMsg.innerHTML = "⛔ Juego terminado. Usa 'NUEVA PARTIDA' o cambia de nivel.";
+            return;
+        }
+        if (waitingForNext) return;
+        let userVal = parseFloat(answerInput.value.trim());
+        if (isNaN(userVal)) {
+            feedbackMsg.innerHTML = "🔢 Escribe un número (soles).";
+            feedbackMsg.className = "feedback wrong";
+            return;
+        }
+        const correctAns = currentProblems[currentProblemIndex].answer;
+        
+        if (Math.abs(userVal - correctAns) < 0.01) {
+            let points = currentLevel === 1 ? 10 : (currentLevel === 2 ? 15 : (currentLevel === 3 ? 20 : 30));
+            score += points;
+            correctCount++;
+            scoreDisplay.innerText = score;
+            correctCountSpan.innerText = correctCount;
+            feedbackMsg.innerHTML = `🎉 ¡CORRECTO! +${points} soles 🎉`;
+            feedbackMsg.className = "feedback correct";
+            waitingForNext = true;
+            answerInput.disabled = true;
+            checkBtn.disabled = true;
+            setTimeout(() => { if (waitingForNext) goToNextQuestion(); }, 700);
+        } else {
+            let penalty = 20;
+            score = Math.max(0, score - penalty);
+            scoreDisplay.innerText = score;
+            feedbackMsg.innerHTML = `❌ ¡ERROR! Respuesta correcta: ${correctAns} soles. ❌<br> ¡-${penalty} puntos!`;
+            feedbackMsg.className = "feedback error-central";
+            waitingForNext = true;
+            answerInput.disabled = true;
+            checkBtn.disabled = true;
+            setTimeout(() => { if (waitingForNext) goToNextQuestion(); }, 1500);
+        }
+        updateUI();
+    }
+
+    function changeToLevel(level) {
+        if (level < 1 || level > 4) return;
+        stopTimer();
+        currentLevel = level;
+        currentProblems = shuffledLevels[currentLevel];
+        currentProblemIndex = 0;
+        score = 0;
+        correctCount = 0;
+        waitingForNext = false;
+        gameActive = true;
+        levelTransition = false;
+        timeLeftSeconds = 300;
+        updateUI();
+        resetTimerForLevel();
+        loadProblem();
+        startTimer();
+        feedbackMsg.innerHTML = `✨ Cambiaste al Nivel ${level}. ¡Buena suerte! ✨`;
+        feedbackMsg.className = "feedback";
+        answerInput.disabled = false;
+        checkBtn.disabled = false;
+    }
+
+    function resetFullGameWithRandom() {
+        stopTimer();
+        shuffledLevels = {
+            1: shuffleArray([...LEVEL1_PROBLEMS]),
+            2: shuffleArray([...LEVEL2_PROBLEMS]),
+            3: shuffleArray([...LEVEL3_PROBLEMS]),
+            4: shuffleArray([...LEVEL4_PROBLEMS])
+        };
+        currentProblems = shuffledLevels[currentLevel];
+        currentProblemIndex = 0;
+        score = 0;
+        correctCount = 0;
+        waitingForNext = false;
+        gameActive = true;
+        levelTransition = false;
+        timeLeftSeconds = 300;
+        updateUI();
+        resetTimerForLevel();
+        loadProblem();
+        startTimer();
+        feedbackMsg.innerHTML = "🔄 ¡NUEVA PARTIDA! Preguntas reorganizadas aleatoriamente. ¡Suerte!";
+        feedbackMsg.className = "feedback";
+        answerInput.disabled = false;
+        checkBtn.disabled = false;
+    }
+
+    function initGameAfterName() {
+        shuffledLevels = {
+            1: shuffleArray([...LEVEL1_PROBLEMS]),
+            2: shuffleArray([...LEVEL2_PROBLEMS]),
+            3: shuffleArray([...LEVEL3_PROBLEMS]),
+            4: shuffleArray([...LEVEL4_PROBLEMS])
+        };
+        currentLevel = 1;
+        currentProblems = shuffledLevels[1];
+        currentProblemIndex = 0;
+        score = 0;
+        correctCount = 0;
+        gameActive = true;
+        timeLeftSeconds = 300;
+        updateUI();
+        resetTimerForLevel();
+        loadProblem();
+        startTimer();
+    }
+
+    startBtn.addEventListener("click", () => {
+        let name = playerNameInput.value.trim();
+        if (name === "") {
+            alert("✏️ ¡Escribe tu nombre para jugar!");
+            return;
+        }
+        playerName = name;
+        playerNameDisplay.innerText = playerName;
+        welcomeOverlay.style.display = "none";
+        gameContainer.classList.add("active");
+        initGameAfterName();
+        // Mostrar modal nivel 1
+        levelTransition = true;
+        stopTimer();
+        gameActive = false;
+        modalLevelNumber.innerText = "1";
+        playerNameSpan.innerText = playerName;
+        levelModal.classList.add("show");
+        const handleEnter = (e) => {
+            if (e.key === "Enter") {
+                document.removeEventListener("keydown", handleEnter);
+                levelModal.classList.remove("show");
+                gameActive = true;
+                levelTransition = false;
+                resetTimerForLevel();
+                startTimer();
+            }
+        };
+        document.addEventListener("keydown", handleEnter);
+    });
+
+    resetBtn.addEventListener("click", resetFullGameWithRandom);
+    checkBtn.addEventListener("click", checkAnswer);
+    levelCombo.addEventListener("change", (e) => {
+        if (playerName) {
+            changeToLevel(parseInt(e.target.value));
+        } else {
+            alert("Primero inicia sesión con tu nombre");
+            levelCombo.value = currentLevel;
+        }
+    });
+    answerInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" && !waitingForNext && gameActive) checkAnswer();
+    });
+</script>
+</body>
+</html>
