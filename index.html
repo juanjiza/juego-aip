@@ -112,7 +112,7 @@
       white-space: nowrap;
     }
 
-    /* Buscador / filtro (opcional, pero bonito) */
+    /* Buscador / filtro */
     .search-area {
       display: flex;
       justify-content: space-between;
@@ -306,7 +306,7 @@
       </div>
     </div>
     <div class="header-badge">
-      🎮 6 juegos · Aprendizaje lúdico
+      🎮 9 juegos · Aprendizaje lúdico
     </div>
   </header>
 
@@ -321,7 +321,7 @@
 
   <!-- GRID DE JUEGOS -->
   <div class="games-grid" id="gamesGrid">
-    <!-- Cada juego se genera con JS (para mantener orden y fácil edición) -->
+    <!-- Cada juego se genera con JS -->
   </div>
 
   <footer class="footer-credit">
@@ -390,6 +390,13 @@
         icon: '🧩',
         file: 'PROPIEDADES DE LA MULPLICACIÓN 2.html',
         tag: 'matemáticas · propiedades'
+      },
+      {
+        title: '🐘 Organiza los Animales',
+        desc: 'Arrastra animales a su círculo correspondiente y escribe cuántos hay. Ideal para 1° grado.',
+        icon: '🐧',
+        file: 'MATEMATICA - PRIMER GRADO.html',
+        tag: 'matemáticas · conteo'
       }
     ];
 
@@ -434,7 +441,6 @@
           e.stopPropagation();
           const file = btn.dataset.file;
           if (file) {
-            // Abrir en nueva pestaña
             window.open(file, '_blank');
           }
         });
