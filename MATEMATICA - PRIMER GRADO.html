@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>🐘 Organiza los Animales | Juego de Agrupación para Niños 🦁</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #2a9d8f, #1e6b5e);
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            padding: 12px;
+        }
+
+        /* Pantalla de bienvenida */
+        .welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #ffe18a, #ffa047);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .welcome-card {
+            background: #fffff5;
+            border-radius: 70px;
+            padding: 35px 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 35px rgba(0,0,0,0.3);
+            border: 8px solid #ffdd99;
+        }
+
+        .welcome-emoji {
+            font-size: 4.5rem;
+        }
+
+        .welcome-card h1 {
+            font-size: 2.2rem;
+            color: #c4511b;
+            margin: 10px 0;
+        }
+
+        .name-area input {
+            font-size: 1.8rem;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 60px;
+            border: 4px solid #f7b05e;
+            background: #fff6e5;
+            font-family: inherit;
+            font-weight: bold;
+            width: 80%;
+            color: #a5521a;
+        }
+
+        .start-btn {
+            background: #ff9f3d;
+            border: none;
+            font-size: 1.8rem;
+            padding: 12px 28px;
+            border-radius: 70px;
+            color: white;
+            font-weight: bold;
+            font-family: inherit;
+            box-shadow: 0 8px 0 #b45f1b;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .start-btn:active {
+            transform: translateY(4px);
+        }
+
+        /* Juego principal - SIN BARRAS DE DESPLAZAMIENTO */
+        .game-container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #FFF9F0, #FFF5E8);
+            border-radius: 55px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.25);
+            padding: 18px 22px 25px;
+            display: none;
+            overflow: visible;
+        }
+
+        /* Barra superior */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, #FFE8C0, #FFDEA8);
+            border-radius: 55px;
+            padding: 8px 22px;
+            margin-bottom: 18px;
+            gap: 10px;
+            box-shadow: 0 5px 0 #d4a373;
+        }
+
+        .player-badge {
+            background: #e07a3a;
+            padding: 6px 22px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .star-area {
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+            background: #f9d48b;
+            padding: 4px 18px;
+            border-radius: 50px;
+        }
+
+        .exercise-counter {
+            background: #f2b86b;
+            padding: 4px 18px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Área principal */
+        .game-area {
+            background: #FFF3E0;
+            border-radius: 50px;
+            padding: 18px;
+            margin: 8px 0;
+            box-shadow: inset 0 0 0 3px white, 0 8px 18px rgba(0,0,0,0.08);
+        }
+
+        .question {
+            text-align: center;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #FFEFCB, #FFE8BB);
+            padding: 10px;
+            border-radius: 50px;
+            margin-bottom: 18px;
+            font-weight: bold;
+            color: #b45f2a;
+        }
+
+        /* Círculos - sin overflow */
+        .circles-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 20px 0 25px;
+        }
+
+        .circle-card {
+            background: linear-gradient(145deg, #FFE8CC, #FFDFBB);
+            border-radius: 50px;
+            padding: 15px 12px;
+            flex: 1;
+            min-width: 210px;
+            text-align: center;
+            box-shadow: 0 10px 0 #bb854a;
+        }
+
+        .circle-title {
+            font-size: 1.9rem;
+            background: #ffd89a;
+            display: inline-block;
+            padding: 5px 22px;
+            border-radius: 45px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        /* CÍRCULO - TAMAÑO FIJO, SIN SCROLL, CON DISPLAY GRID */
+        .circle-dropzone {
+            background: #FFFDF5;
+            border-radius: 50%;
+            width: 190px;
+            height: 190px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            padding: 12px;
+            border: 5px solid #ffbc6e;
+            box-shadow: 0 8px 0 #c28a4a, inset 0 0 0 4px #FFF8E8;
+            transition: all 0.1s ease;
+            overflow: hidden;
+            place-items: center;
+        }
+
+        .circle-dropzone.drag-over {
+            background: #FFF2DF;
+            border: 5px solid #ff9f3d;
+            transform: scale(1.02);
+            box-shadow: 0 5px 0 #c28a4a;
+        }
+
+        /* Animales dentro del círculo - bien encajados, sin desbordar */
+        .animal-in-circle {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: #FFF4E4;
+            border-radius: 50%;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+
+        .circle-need {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            background: #ffebc2;
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 35px;
+            font-weight: bold;
+            color: #a0551a;
+        }
+
+        /* Zona de animales sueltos - diseño compacto */
+        .animals-pool {
+            background: linear-gradient(135deg, #F5E5C8, #EFDDB8);
+            border-radius: 50px;
+            padding: 15px;
+            margin: 12px 0;
+            box-shadow: inset 0 0 0 2px white, 0 6px 12px rgba(0,0,0,0.08);
+        }
+
+        .pool-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+            background: #ffdd99;
+            display: inline-block;
+            width: 100%;
+            padding: 8px;
+            border-radius: 45px;
+            color: #9b4e1a;
+        }
+
+        .loose-animals {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            background: #FFFBF0;
+            border-radius: 55px;
+            padding: 16px;
+            border: 3px solid #ffcf8a;
+            min-height: 100px;
+        }
+
+        .animal-drag {
+            font-size: 2.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            cursor: grab;
+            transition: all 0.08s linear;
+            background: #FFF3E0;
+            border-radius: 50%;
+            box-shadow: 0 5px 0 #c48f4a;
+        }
+
+        .animal-drag:active {
+            cursor: grabbing;
+            transform: scale(0.94);
+            box-shadow: 0 2px 0 #c48f4a;
+        }
+
+        /* Área de escritura */
+        .counts-area {
+            background: #F9EEDB;
+            border-radius: 50px;
+            padding: 15px;
+            margin-top: 15px;
+            box-shadow: inset 0 0 0 2px white, 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .counts-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #b45f2a;
+        }
+
+        .counts-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .count-item {
+            background: #FFF6E8;
+            border-radius: 55px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
+            border: 2px solid #ffd89a;
+        }
+
+        .count-emoji {
+            font-size: 1.8rem;
+        }
+
+        .count-input {
+            font-size: 1.7rem;
+            width: 70px;
+            text-align: center;
+            font-family: monospace;
+            font-weight: bold;
+            background: white;
+            border: 3px solid #f3b15a;
+            border-radius: 50px;
+            padding: 5px;
+            color: #b95412;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin: 20px 0 12px;
+            flex-wrap: wrap;
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #7bbfaa, #5a9b86);
+            border: none;
+            font-size: 1.3rem;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            color: white;
+            font-family: inherit;
+            box-shadow: 0 5px 0 #3b685c;
+            cursor: pointer;
+        }
+
+        .game-btn:active {
+            transform: translateY(3px);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #e5943b, #c97a2a);
+            box-shadow: 0 5px 0 #9a5518;
+        }
+
+        .feedback {
+            background: #eef3d3;
+            border-radius: 50px;
+            padding: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #3a6b47;
+        }
+
+        .correct-feedback {
+            background: #d4f0b5;
+            color: #2a6e2f;
+            border-left: 8px solid #6bc46b;
+        }
+
+        .wrong-feedback {
+            background: #ffe0cc;
+            color: #c9441a;
+            border-left: 8px solid #ff8c42;
+        }
+
+        /* Responsive - se ajusta sin scroll */
+        @media (max-width: 850px) {
+            .circle-dropzone { width: 170px; height: 170px; gap: 5px; padding: 10px; }
+            .animal-in-circle { font-size: 1.7rem; width: 44px; height: 44px; }
+            .animal-drag { font-size: 2.2rem; width: 55px; height: 55px; }
+            .circle-title { font-size: 1.6rem; }
+            .circle-card { min-width: 190px; }
+        }
+
+        @media (max-width: 700px) {
+            .circle-dropzone { width: 150px; height: 150px; gap: 4px; padding: 8px; }
+            .animal-in-circle { font-size: 1.4rem; width: 40px; height: 40px; }
+            .animal-drag { font-size: 1.9rem; width: 50px; height: 50px; }
+            .circle-title { font-size: 1.4rem; padding: 4px 16px; }
+            .game-container { padding: 12px; }
+        }
+
+        @media (max-width: 580px) {
+            .circles-grid { gap: 15px; }
+            .circle-dropzone { width: 130px; height: 130px; }
+            .animal-in-circle { font-size: 1.2rem; width: 35px; height: 35px; }
+            .animal-drag { font-size: 1.6rem; width: 45px; height: 45px; }
+            .count-input { font-size: 1.4rem; width: 60px; }
+            .game-btn { font-size: 1.1rem; padding: 8px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- BIENVENIDA -->
+<div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-card">
+        <div class="welcome-emoji">🐧🦁🐘🐒🦒🐨</div>
+        <h1>¡ORGANIZA LOS ANIMALES!</h1>
+        <div class="name-area">
+            <div style="font-size: 1.3rem;">⭐ ESCRIBE TU NOMBRE ⭐</div>
+            <input type="text" id="playerNameInput" maxlength="14" placeholder="Ej: SOFÍA" autocomplete="off">
+        </div>
+        <button class="start-btn" id="startGameBtn">🎉 COMENZAR 🎉</button>
+        <div style="margin-top: 10px;">✨ Arrastra CADA animal a su círculo ✨</div>
+    </div>
+</div>
+
+<!-- JUEGO PRINCIPAL -->
+<div class="game-container" id="gameContainer">
+    <div class="top-bar">
+        <div class="player-badge" id="playerNameDisplay">🐣 Aventurero</div>
+        <div class="star-area" id="starArea">☆☆☆☆☆</div>
+        <div class="exercise-counter" id="exerciseCounter">🔢 1 / 30</div>
+    </div>
+
+    <div class="game-area">
+        <div class="question" id="questionText">
+            🎯 ARRASTRA CADA ANIMAL A SU CÍRCULO 🎯
+        </div>
+        
+        <div class="circles-grid" id="circlesContainer"></div>
+
+        <div class="animals-pool">
+            <div class="pool-title">🐣 ANIMALES PARA COLOCAR (arrastra uno por uno) 🐣</div>
+            <div class="loose-animals" id="looseAnimalsContainer"></div>
+        </div>
+
+        <div class="counts-area">
+            <div class="counts-title">✏️ ESCRIBE CUÁNTOS ANIMALES HAY EN CADA CÍRCULO ✏️</div>
+            <div class="counts-grid" id="countsGrid"></div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="game-btn" id="checkBtn">✅ COMPROBAR ✅</button>
+        <button class="game-btn" id="nextBtn">➡️ SIGUIENTE ⬅️</button>
+        <button class="game-btn reset-btn" id="resetBtn">🔄 REINICIAR 🔄</button>
+    </div>
+    <div class="feedback" id="feedbackMsg">
+        🖐️ 1. Arrastra cada animal a su círculo  2. Escribe cuántos hay
+    </div>
+</div>
+
+<script>
+    // ==================== MUCHOS ANIMALES ====================
+    const ANIMALS = ['🐧', '🦁', '🐘', '🐒', '🦒', '🐨', '🐼', '🦊', '🐸', '🦜', '🐢', '🦔', '🐝', '🐙', '🐬', '🦉', '🐺', '🐱', '🐶', '🐭'];
+    
+    let ejercicios = [];
+    
+    function getRandomAnimal() {
+        return ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+    }
+    
+    for (let i = 0; i < 30; i++) {
+        let numGroups = (i % 2 === 0) ? 3 : 4;
+        if (i < 8) numGroups = 3;
+        if (i > 22) numGroups = 4;
+        
+        let groups = [];
+        let usedAnimals = [];
+        
+        for (let g = 0; g < numGroups; g++) {
+            let animal = getRandomAnimal();
+            while (usedAnimals.includes(animal)) animal = getRandomAnimal();
+            usedAnimals.push(animal);
+            let count = 2 + Math.floor(Math.random() * 4); // 2,3,4,5
+            groups.push({
+                animal: animal,
+                required: count,
+                animalEmoji: animal
+            });
+        }
+        ejercicios.push({ id: i, groups: groups });
+    }
+    
+    let currentIndex = 0;
+    let playerName = "Amiguito";
+    let totalCorrect = 0;
+    let exerciseCompleted = false;
+    let circleAnimals = [];
+    let looseAnimalsList = [];
+    
+    const gameContainer = document.getElementById('gameContainer');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const startBtn = document.getElementById('startGameBtn');
+    const playerNameDisplay = document.getElementById('playerNameDisplay');
+    const starArea = document.getElementById('starArea');
+    const exerciseCounterSpan = document.getElementById('exerciseCounter');
+    const questionText = document.getElementById('questionText');
+    const circlesContainer = document.getElementById('circlesContainer');
+    const looseAnimalsContainer = document.getElementById('looseAnimalsContainer');
+    const countsGrid = document.getElementById('countsGrid');
+    const checkBtn = document.getElementById('checkBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const feedbackMsgDiv = document.getElementById('feedbackMsg');
+    
+    function updateStars() {
+        let percent = totalCorrect / ejercicios.length;
+        let stars = 0;
+        if (percent >= 0.9) stars = 5;
+        else if (percent >= 0.7) stars = 4;
+        else if (percent >= 0.5) stars = 3;
+        else if (percent >= 0.25) stars = 2;
+        else if (percent >= 0.1) stars = 1;
+        let starString = "";
+        for (let i=0; i<5; i++) starString += (i < stars) ? "⭐" : "☆";
+        starArea.innerText = starString;
+    }
+    
+    function initCurrentExercise() {
+        const ex = ejercicios[currentIndex];
+        circleAnimals = ex.groups.map(() => []);
+        let allNeeded = [];
+        ex.groups.forEach(group => {
+            for (let i = 0; i < group.required; i++) allNeeded.push(group.animalEmoji);
+        });
+        for (let i = allNeeded.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allNeeded[i], allNeeded[j]] = [allNeeded[j], allNeeded[i]];
+        }
+        looseAnimalsList = [...allNeeded];
+        exerciseCompleted = false;
+        renderAll();
+    }
+    
+    let draggedAnimal = null;
+    let draggedAnimalOrigin = null;
+    
+    function renderAll() {
+        const ex = ejercicios[currentIndex];
+        circlesContainer.innerHTML = '';
+        ex.groups.forEach((group, idx) => {
+            const circleCard = document.createElement('div');
+            circleCard.className = 'circle-card';
+            circleCard.innerHTML = `
+                <div class="circle-title">${group.animalEmoji} ${group.animalEmoji}</div>
+                <div class="circle-dropzone" data-circle-index="${idx}" id="circleDrop_${idx}"></div>
+                <div class="circle-need">🎯 Necesitas ${group.required}</div>
+            `;
+            circlesContainer.appendChild(circleCard);
+        });
+        
+        for (let i = 0; i < circleAnimals.length; i++) {
+            const dropZone = document.getElementById(`circleDrop_${i}`);
+            if (dropZone) {
+                dropZone.innerHTML = '';
+                const gridCols = Math.min(3, Math.ceil(Math.sqrt(circleAnimals[i].length)));
+                dropZone.style.gridTemplateColumns = `repeat(${gridCols}, 1fr)`;
+                circleAnimals[i].forEach(animal => {
+                    const animalSpan = document.createElement('span');
+                    animalSpan.className = 'animal-in-circle';
+                    animalSpan.textContent = animal;
+                    dropZone.appendChild(animalSpan);
+                });
+                setupDropZone(dropZone, i);
+            }
+        }
+        
+        looseAnimalsContainer.innerHTML = '';
+        looseAnimalsList.forEach((animal, idx) => {
+            const animalSpan = document.createElement('span');
+            animalSpan.className = 'animal-drag';
+            animalSpan.textContent = animal;
+            animalSpan.setAttribute('data-animal', animal);
+            animalSpan.setAttribute('data-idx', idx);
+            animalSpan.draggable = true;
+            animalSpan.addEventListener('dragstart', handleDragStart);
+            animalSpan.addEventListener('dragend', handleDragEnd);
+            animalSpan.addEventListener('touchstart', handleTouchStart);
+            animalSpan.addEventListener('touchmove', handleTouchMove);
+            animalSpan.addEventListener('touchend', handleTouchEnd);
+            looseAnimalsContainer.appendChild(animalSpan);
+        });
+        
+        countsGrid.innerHTML = '';
+        ex.groups.forEach((group, idx) => {
+            const countItem = document.createElement('div');
+            countItem.className = 'count-item';
+            countItem.innerHTML = `
+                <span class="count-emoji">${group.animalEmoji}</span>
+                <span>¿Cuántos?</span>
+                <input type="number" class="count-input" id="countInput_${idx}" placeholder="?" inputmode="numeric" min="0" max="8">
+            `;
+            countsGrid.appendChild(countItem);
+        });
+        
+        let missing = looseAnimalsList.length;
+        questionText.innerHTML = missing > 0 ? `🎯 ¡COLOCA LOS ${missing} ANIMALES QUE FALTAN! 🎯` : `🎯 ¡TODOS EN SU LUGAR! ESCRIBE LAS CANTIDADES 🎯`;
+    }
+    
+    function setupDropZone(zone, circleIndex) {
+        zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+        zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            if (draggedAnimal && draggedAnimalOrigin === 'loose') {
+                const animalEmoji = draggedAnimal.getAttribute('data-animal');
+                const targetGroup = ejercicios[currentIndex].groups[circleIndex];
+                if (targetGroup && targetGroup.animalEmoji === animalEmoji) {
+                    if (circleAnimals[circleIndex].length < targetGroup.required) {
+                        const looseIdx = parseInt(draggedAnimal.getAttribute('data-idx'));
+                        if (looseIdx >= 0 && looseIdx < looseAnimalsList.length && looseAnimalsList[looseIdx] === animalEmoji) {
+                            looseAnimalsList.splice(looseIdx, 1);
+                            circleAnimals[circleIndex].push(animalEmoji);
+                            renderAll();
+                            feedbackMsgDiv.innerHTML = `✅ ¡Bien! Colocaste ${animalEmoji} ✅`;
+                            feedbackMsgDiv.classList.add('correct-feedback');
+                            setTimeout(() => feedbackMsgDiv.classList.remove('correct-feedback'), 700);
+                        }
+                    } else {
+                        feedbackMsgDiv.innerHTML = `⚠️ Círculo de ${targetGroup.animalEmoji} lleno (${circleAnimals[circleIndex].length}/${targetGroup.required}) ⚠️`;
+                        feedbackMsgDiv.classList.add('wrong-feedback');
+                        setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1200);
+                    }
+                } else {
+                    feedbackMsgDiv.innerHTML = `🙈 ${animalEmoji} no va en este círculo 🙈`;
+                    feedbackMsgDiv.classList.add('wrong-feedback');
+                    setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1000);
+                }
+            }
+            draggedAnimal = null;
+        });
+    }
+    
+    function handleDragStart(e) {
+        draggedAnimal = e.target.closest('.animal-drag');
+        if (draggedAnimal) { draggedAnimalOrigin = 'loose'; e.dataTransfer.setData('text/plain', ''); }
+    }
+    function handleDragEnd(e) { draggedAnimal = null; }
+    
+    let touchTargetAnimal = null, touchOrigin = null;
+    function handleTouchStart(e) {
+        e.preventDefault();
+        touchTargetAnimal = e.target.closest('.animal-drag');
+        if (touchTargetAnimal) { touchOrigin = 'loose'; touchTargetAnimal.style.opacity = '0.5'; }
+    }
+    function handleTouchMove(e) {
+        if (!touchTargetAnimal) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const elem = document.elementsFromPoint(touch.clientX, touch.clientY);
+        let target = null;
+        for (let el of elem) if (el.classList && el.classList.contains('circle-dropzone')) { target = el; break; }
+        document.querySelectorAll('.circle-dropzone').forEach(dz => dz.classList.remove('drag-over'));
+        if (target) target.classList.add('drag-over');
+    }
+    function handleTouchEnd(e) {
+        if (!touchTargetAnimal) return;
+        e.preventDefault();
+        touchTargetAnimal.style.opacity = '1';
+        const touch = e.changedTouches[0];
+        const elem = document.elementsFromPoint(touch.clientX, touch.clientY);
+        let targetZone = null, circleIdx = -1;
+        for (let el of elem) {
+            if (el.classList && el.classList.contains('circle-dropzone')) {
+                targetZone = el;
+                const idx = targetZone.getAttribute('data-circle-index');
+                if (idx !== null) circleIdx = parseInt(idx);
+                break;
+            }
+        }
+        document.querySelectorAll('.circle-dropzone').forEach(dz => dz.classList.remove('drag-over'));
+        if (targetZone && touchOrigin === 'loose' && circleIdx !== -1) {
+            const animalEmoji = touchTargetAnimal.getAttribute('data-animal');
+            const targetGroup = ejercicios[currentIndex].groups[circleIdx];
+            if (targetGroup && targetGroup.animalEmoji === animalEmoji) {
+                if (circleAnimals[circleIdx].length < targetGroup.required) {
+                    const looseIdx = parseInt(touchTargetAnimal.getAttribute('data-idx'));
+                    if (looseIdx >= 0 && looseIdx < looseAnimalsList.length && looseAnimalsList[looseIdx] === animalEmoji) {
+                        looseAnimalsList.splice(looseIdx, 1);
+                        circleAnimals[circleIdx].push(animalEmoji);
+                        renderAll();
+                        feedbackMsgDiv.innerHTML = `✅ ¡Bien! Colocaste ${animalEmoji} ✅`;
+                        feedbackMsgDiv.classList.add('correct-feedback');
+                        setTimeout(() => feedbackMsgDiv.classList.remove('correct-feedback'), 700);
+                    }
+                } else {
+                    feedbackMsgDiv.innerHTML = `⚠️ Círculo de ${targetGroup.animalEmoji} lleno ⚠️`;
+                    feedbackMsgDiv.classList.add('wrong-feedback');
+                    setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1200);
+                }
+            } else {
+                feedbackMsgDiv.innerHTML = `🙈 ${animalEmoji} no va aquí 🙈`;
+                feedbackMsgDiv.classList.add('wrong-feedback');
+                setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1000);
+            }
+        }
+        touchTargetAnimal = null;
+        touchOrigin = null;
+    }
+    
+    function checkAnswer() {
+        if (exerciseCompleted) {
+            feedbackMsgDiv.innerHTML = "🏆 ¡Ya acertaste! Presiona SIGUIENTE 🏆";
+            feedbackMsgDiv.classList.add('correct-feedback');
+            setTimeout(() => feedbackMsgDiv.classList.remove('correct-feedback'), 1200);
+            return;
+        }
+        const ex = ejercicios[currentIndex];
+        if (looseAnimalsList.length > 0) {
+            feedbackMsgDiv.innerHTML = `🐣 ¡Faltan ${looseAnimalsList.length} animal(es) por colocar! 🐣`;
+            feedbackMsgDiv.classList.add('wrong-feedback');
+            setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1500);
+            return;
+        }
+        let groupsOk = true;
+        for (let i = 0; i < ex.groups.length; i++) {
+            if (circleAnimals[i].length !== ex.groups[i].required) {
+                groupsOk = false;
+                feedbackMsgDiv.innerHTML = `⚠️ El círculo ${ex.groups[i].animalEmoji} tiene ${circleAnimals[i].length} y debe tener ${ex.groups[i].required} ⚠️`;
+                feedbackMsgDiv.classList.add('wrong-feedback');
+                setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1800);
+                break;
+            }
+        }
+        if (!groupsOk) return;
+        let countsOk = true;
+        for (let i = 0; i < ex.groups.length; i++) {
+            const input = document.getElementById(`countInput_${i}`);
+            const val = parseInt(input.value);
+            if (isNaN(val) || val !== ex.groups[i].required) {
+                countsOk = false;
+                feedbackMsgDiv.innerHTML = `✏️ En el círculo ${ex.groups[i].animalEmoji} escribiste "${input.value}" pero hay ${ex.groups[i].required} ✏️`;
+                feedbackMsgDiv.classList.add('wrong-feedback');
+                setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1900);
+                break;
+            }
+        }
+        if (countsOk && groupsOk) {
+            totalCorrect++;
+            exerciseCompleted = true;
+            updateStars();
+            feedbackMsgDiv.innerHTML = `🎉✨ ¡MUY BIEN, ${playerName}! Organizaste TODOS los animales ✨🎉`;
+            feedbackMsgDiv.classList.add('correct-feedback');
+            setTimeout(() => feedbackMsgDiv.classList.remove('correct-feedback'), 2000);
+        }
+    }
+    
+    function nextExercise() {
+        if (!exerciseCompleted) {
+            feedbackMsgDiv.innerHTML = "⭐ ¡Primero coloca todos los animales y escribe las cantidades! ⭐";
+            feedbackMsgDiv.classList.add('wrong-feedback');
+            setTimeout(() => feedbackMsgDiv.classList.remove('wrong-feedback'), 1500);
+            return;
+        }
+        if (currentIndex + 1 < ejercicios.length) {
+            currentIndex++;
+            initCurrentExercise();
+            exerciseCounterSpan.innerText = `🔢 ${currentIndex+1} / ${ejercicios.length}`;
+            feedbackMsgDiv.innerHTML = "✨ Nuevo ejercicio. ¡Arrastra CADA animal a su círculo! ✨";
+            feedbackMsgDiv.classList.remove('correct-feedback', 'wrong-feedback');
+        } else {
+            feedbackMsgDiv.innerHTML = `🏆🏅 ¡FELICIDADES ${playerName}! Completaste 30 ejercicios con ${totalCorrect} aciertos. ¡Eres un genio! 🏅🏆`;
+            feedbackMsgDiv.classList.add('correct-feedback');
+            circlesContainer.innerHTML = `<div style="text-align:center; padding:40px;"><span style="font-size:4rem;">🎉🏆🎉</span><br><span style="font-size:1.8rem;">¡APRENDISTE A CONTAR Y AGRUPAR!</span></div>`;
+            looseAnimalsContainer.innerHTML = '';
+            countsGrid.innerHTML = '';
+            checkBtn.disabled = true;
+            nextBtn.disabled = true;
+        }
+    }
+    
+    function resetGame() {
+        currentIndex = 0;
+        totalCorrect = 0;
+        exerciseCompleted = false;
+        checkBtn.disabled = false;
+        nextBtn.disabled = false;
+        updateStars();
+        initCurrentExercise();
+        exerciseCounterSpan.innerText = `🔢 1 / ${ejercicios.length}`;
+        feedbackMsgDiv.innerHTML = "🔄 Juego reiniciado. Arrastra cada animal a su círculo.";
+        feedbackMsgDiv.classList.remove('correct-feedback', 'wrong-feedback');
+    }
+    
+    function startGame() {
+        let name = playerNameInput.value.trim();
+        if (name === "") name = "Explorador";
+        playerName = name;
+        playerNameDisplay.innerText = `🧒 ${playerName}`;
+        welcomeScreen.style.display = "none";
+        gameContainer.style.display = "block";
+        resetGame();
+    }
+    
+    startBtn.addEventListener('click', startGame);
+    playerNameInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') startGame(); });
+    checkBtn.addEventListener('click', checkAnswer);
+    nextBtn.addEventListener('click', nextExercise);
+    resetBtn.addEventListener('click', () => { if(gameContainer.style.display === 'block') resetGame(); });
+</script>
+</body>
+</html>
