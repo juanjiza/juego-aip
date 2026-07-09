@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>🌍 Eco-Retos: Multijuego Ambiental</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(145deg, #0b3b2e, #1a6b4a);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 5px;
+            margin: 0;
+        }
+
+        .game-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #b7e0c0;
+            background-image: radial-gradient(circle at 20% 30%, #d4f0d9, #8fc9a5);
+            border-radius: 20px 20px 15px 15px;
+            box-shadow: 0 10px 18px rgba(0, 20, 10, 0.6);
+            padding: 6px 8px 12px;
+            border: 3px solid #f9e084;
+            position: relative;
+            margin: 2px auto;
+        }
+
+        /* PANTALLA DE INICIO */
+        #startScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 6px;
+        }
+
+        #startScreen h1 {
+            font-size: clamp(1.4rem, 4vw, 2.5rem);
+            color: #1d4e2b;
+            text-shadow: 3px 3px 0 #f3d37c;
+            text-align: center;
+        }
+
+        #startScreen .subtitle {
+            font-size: clamp(0.7rem, 1.8vw, 1.2rem);
+            background: #fcf3cf;
+            padding: 3px 12px;
+            border-radius: 20px;
+            color: #1f5a31;
+            font-weight: bold;
+            box-shadow: inset 0 -3px 0 #b4934b;
+        }
+
+        #startScreen label {
+            font-size: clamp(0.7rem, 1.6vw, 1.1rem);
+            font-weight: bold;
+            color: #0b3b1e;
+            margin-top: 3px;
+        }
+
+        #startScreen input {
+            width: 90%;
+            max-width: 280px;
+            padding: 6px 12px;
+            font-size: clamp(0.7rem, 1.3vw, 1rem);
+            border: 3px solid #2d7a4b;
+            border-radius: 30px;
+            background: #fefce6;
+            text-align: center;
+            font-weight: bold;
+            color: #134d22;
+            outline: none;
+            box-shadow: 0 4px 0 #146b33;
+        }
+
+        #startScreen input:focus {
+            transform: scale(0.98);
+            border-color: #f5b342;
+        }
+
+        .btn-principal {
+            background: #facc15;
+            border: none;
+            border-radius: 50px;
+            padding: 6px 20px;
+            font-size: clamp(0.9rem, 2vw, 1.3rem);
+            font-weight: bold;
+            color: #1c4d1e;
+            box-shadow: 0 4px 0 #b17d2b, 0 5px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.06s linear;
+            border: 2px solid #ffe48f;
+            margin: 3px 0;
+        }
+
+        .btn-principal:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b17d2b;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-bottom: 5px;
+            background: #1f5f3ab3;
+            backdrop-filter: blur(2px);
+            border-radius: 50px;
+            padding: 3px 10px;
+            border: 2px solid #f9e79f;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: clamp(0.5rem, 1.2vw, 1rem);
+            color: #f9e79f;
+            text-shadow: 2px 2px 0 #1d4e2b;
+        }
+
+        .header .player-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: clamp(0.45rem, 0.9vw, 0.8rem);
+            font-weight: bold;
+            flex-wrap: wrap;
+        }
+
+        .header .player-info span {
+            background: #172e1f;
+            padding: 2px 7px;
+            border-radius: 25px;
+        }
+
+        .header .timer-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: clamp(0.7rem, 1.2vw, 1rem);
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 12px;
+            border-radius: 20px;
+            border: 2px solid #f9e79f;
+        }
+
+        .header .timer-info .tiempo {
+            color: #ffd54f;
+            font-size: clamp(0.8rem, 1.3vw, 1.1rem);
+        }
+
+        /* MENU JUEGOS */
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: center;
+            margin: 3px 0 5px;
+        }
+
+        .menu button {
+            background: #facc15;
+            border: none;
+            border-radius: 18px;
+            padding: 4px 10px;
+            font-size: clamp(0.5rem, 0.9vw, 0.75rem);
+            font-weight: bold;
+            color: #1c4d1e;
+            box-shadow: 0 2px 0 #b17d2b;
+            cursor: pointer;
+            transition: all 0.06s linear;
+            border: 2px solid #ffe48f;
+            flex: 1;
+            min-width: 45px;
+            position: relative;
+        }
+
+        .menu button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b17d2b;
+        }
+
+        .menu button.active {
+            background: #46b87a;
+            color: white;
+            box-shadow: 0 2px 0 #1f6e44;
+            border-color: #86dbaa;
+        }
+
+        /* ÁREA DE JUEGO */
+        .game-area {
+            background: #fef9e3;
+            border-radius: 18px;
+            padding: 8px 6px;
+            min-height: 250px;
+            border: 3px solid #e7b42c;
+            box-shadow: inset 0 -3px 0 #b4913a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-area h2 {
+            text-align: center;
+            color: #00331a;
+            margin-bottom: 5px;
+            font-size: clamp(0.9rem, 1.6vw, 1.3rem);
+        }
+
+        .game-area .instruccion {
+            text-align: center;
+            font-size: clamp(0.5rem, 0.7vw, 0.7rem);
+            color: #1d4e2b;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== SOPA DE LETRAS ===== */
+        #sopaContainer {
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px 0;
+            text-align: center;
+        }
+
+        .sopa-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(14, auto);
+            gap: 1px;
+            margin: 0 auto;
+            touch-action: none;
+            background: #c8e6c9;
+            border: 2px solid #66bb6a;
+            border-radius: 4px;
+            padding: 1px;
+        }
+
+        .sopa-grid .cell {
+            background: #f1f8e9;
+            border: 1px solid #a5d6a7;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.55rem, 1.2vw, 0.9rem);
+            font-weight: 700;
+            color: #1b4823;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+            touch-action: none;
+            position: relative;
+            width: clamp(22px, 3.8vw, 38px);
+            height: clamp(22px, 3.8vw, 38px);
+            min-width: 20px;
+            min-height: 20px;
+        }
+
+        .sopa-grid .cell.highlight {
+            background: #ffd54f !important;
+            border-color: #f9a825 !important;
+            transform: scale(0.92);
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.6);
+            z-index: 2;
+        }
+
+        .sopa-grid .cell.found {
+            background: #43a047;
+            border-color: #2e7d32;
+            color: #ffffff;
+            transform: scale(1);
+            box-shadow: 0 0 8px rgba(46, 125, 50, 0.3);
+            z-index: 1;
+        }
+
+        .sopa-grid .cell.found::after {
+            display: none;
+        }
+
+        .sopa-wordlist {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px 6px;
+            justify-content: center;
+            margin-top: 6px;
+            padding: 4px 6px;
+            background: rgba(200, 230, 201, 0.5);
+            border-radius: 12px;
+        }
+
+        .sopa-wordlist .word-item {
+            background: #a5d6a7;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            color: #1b4823;
+            font-size: clamp(0.5rem, 0.8vw, 0.75rem);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid transparent;
+        }
+
+        .sopa-wordlist .word-item.found {
+            background: #2e7d32;
+            color: white;
+            text-decoration: line-through;
+            border-color: #1b5e20;
+            transform: scale(0.95);
+            opacity: 0.85;
+        }
+
+        .sopa-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+            padding: 2px 8px;
+            font-size: clamp(0.5rem, 0.7vw, 0.7rem);
+            color: #1d4e2b;
+            background: rgba(200, 230, 201, 0.3);
+            border-radius: 10px;
+        }
+
+        /* ===== QUIZ MÚLTIPLE OPCIÓN ===== */
+        .quiz-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 5px;
+        }
+
+        .quiz-pregunta {
+            background: #e8f5e9;
+            padding: 15px 18px;
+            border-radius: 12px;
+            border: 2px solid #81c784;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #00331a;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-pregunta .num-pregunta {
+            background: #2e7d32;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .quiz-opciones {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .quiz-opcion {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: #f5faf5;
+            border: 2px solid #a5d6a7;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-size: 1rem;
+            color: #1b4823;
+        }
+
+        .quiz-opcion:hover:not(.disabled) {
+            background: #e8f5e9;
+            transform: scale(1.01);
+            border-color: #66bb6a;
+        }
+
+        .quiz-opcion input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2e7d32;
+            flex-shrink: 0;
+        }
+
+        .quiz-opcion .letra-opcion {
+            font-weight: bold;
+            color: #1a237e;
+            min-width: 24px;
+        }
+
+        .quiz-opcion.correcta {
+            background: #c8e6c9;
+            border-color: #2e7d32;
+        }
+
+        .quiz-opcion.incorrecta {
+            background: #ffcdd2;
+            border-color: #c62828;
+        }
+
+        .quiz-opcion.disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .quiz-opcion.mostrar-correcta {
+            background: #c8e6c9;
+            border-color: #2e7d32;
+            border-width: 3px;
+        }
+
+        .quiz-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 12px;
+            margin: 8px 0;
+        }
+
+        .quiz-progress {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #1d4e2b;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+
+        .quiz-respuestas {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3e0;
+            border-radius: 10px;
+            border: 2px solid #ffb74d;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quiz-respuestas .respuesta-item {
+            padding: 4px 0;
+            border-bottom: 1px dotted #ffcc80;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .btn-siguiente {
+            background: #46b87a;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 3px 0 #1f6e44;
+            cursor: pointer;
+            transition: all 0.06s linear;
+            border: 2px solid #86dbaa;
+            margin: 5px auto;
+            display: block;
+        }
+
+        .btn-siguiente:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1f6e44;
+        }
+
+        .btn-siguiente:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== AHORCADO ===== */
+        .hangman-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .hangman-word {
+            font-size: 2rem;
+            letter-spacing: 10px;
+            font-weight: bold;
+            color: #00331a;
+            font-family: monospace;
+        }
+
+        .hangman-letters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+            max-width: 380px;
+        }
+
+        .hangman-letters button {
+            width: 32px;
+            height: 32px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 2px solid #4caf50;
+            background: #e8f5e9;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .hangman-letters button:disabled {
+            background: #cfd8dc;
+            border-color: #90a4ae;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .hangman-letters button:hover:not(:disabled) {
+            background: #a5d6a7;
+            transform: scale(1.05);
+        }
+
+        .hangman-drawing {
+            font-size: 1.8rem;
+            font-family: monospace;
+            white-space: pre;
+            line-height: 1.1;
+            background: #e8f5e9;
+            padding: 4px 12px;
+            border-radius: 12px;
+            min-height: 70px;
+            text-align: center;
+        }
+
+        .hangman-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #1d4e2b;
+        }
+
+        .hangman-info .progreso {
+            color: #1a237e;
+        }
+
+        .hangman-info .puntaje {
+            color: #2e7d32;
+        }
+
+        .hangman-respuesta {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #c62828;
+            font-weight: bold;
+            padding: 8px;
+            background: #ffcdd2;
+            border-radius: 10px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .hangman-completado {
+            text-align: center;
+            padding: 20px;
+            background: #c8e6c9;
+            border-radius: 12px;
+            border: 3px solid #2e7d32;
+        }
+
+        .hangman-completado h2 {
+            color: #2e7d32;
+            font-size: 2rem;
+        }
+
+        .hangman-completado .puntaje-final {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #1a237e;
+        }
+
+        /* ===== VERDADERO O FALSO ===== */
+        .vf-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .vf-options button {
+            padding: 10px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 30px;
+            border: 3px solid #4caf50;
+            background: #e8f5e9;
+            cursor: pointer;
+            transition: 0.1s;
+            min-width: 80px;
+        }
+
+        .vf-options button:active {
+            transform: scale(0.95);
+        }
+
+        .vf-options button.correct {
+            background: #66bb6a;
+            border-color: #2e7d32;
+            color: white;
+        }
+
+        .vf-options button.wrong {
+            background: #ef5350;
+            border-color: #b71c1c;
+            color: white;
+        }
+
+        .vf-feedback {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 6px;
+            border-radius: 14px;
+            margin-top: 4px;
+        }
+
+        .vf-progress {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #1d4e2b;
+            margin-top: 4px;
+        }
+
+        .vf-respuestas {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3e0;
+            border-radius: 10px;
+            border: 2px solid #ffb74d;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .vf-respuestas .respuesta-item {
+            padding: 3px 0;
+            border-bottom: 1px dotted #ffcc80;
+            font-size: 0.85rem;
+        }
+
+        /* ===== COMPLETAR ===== */
+        .fill-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .fill-text {
+            font-size: 1.4rem;
+            text-align: center;
+            padding: 15px 10px;
+            color: #00331a;
+            line-height: 2.4;
+            background: #f5faf5;
+            border-radius: 12px;
+            border: 2px solid #a5d6a7;
+            min-height: 80px;
+        }
+
+        .fill-text .blank {
+            display: inline-block;
+            border-bottom: 4px solid #2e7d32;
+            min-width: 160px;
+            margin: 0 6px;
+            padding: 0 10px;
+            background: #ffffff;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .fill-text .blank input {
+            border: none;
+            background: transparent;
+            font-size: 1.6rem;
+            text-align: center;
+            width: 100%;
+            outline: none;
+            color: #00331a;
+            font-weight: bold;
+            font-family: inherit;
+            padding: 4px 0;
+            min-height: 45px;
+        }
+
+        .fill-text .blank input:focus {
+            background: rgba(255, 213, 79, 0.2);
+            border-radius: 4px;
+        }
+
+        .fill-pista {
+            text-align: center;
+            font-size: 1rem;
+            color: #1a237e;
+            background: #e3f2fd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 8px auto;
+            max-width: 400px;
+            border: 2px dashed #64b5f6;
+        }
+
+        .fill-actions {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .btn-general {
+            background: #facc15;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1c4d1e;
+            box-shadow: 0 3px 0 #b17d2b;
+            cursor: pointer;
+            transition: all 0.06s linear;
+            border: 2px solid #ffe48f;
+            margin: 3px;
+        }
+
+        .btn-general:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #b17d2b;
+        }
+
+        .btn-general.green {
+            background: #46b87a;
+            color: white;
+            box-shadow: 0 3px 0 #1f6e44;
+            border-color: #86dbaa;
+        }
+
+        .btn-general.red {
+            background: #ef5350;
+            color: white;
+            box-shadow: 0 3px 0 #b71c1c;
+            border-color: #ef9a9a;
+        }
+
+        .fill-feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 12px;
+            margin: 6px auto;
+            max-width: 500px;
+        }
+
+        .fill-progress {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #1d4e2b;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+
+        .fill-respuestas {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff3e0;
+            border-radius: 10px;
+            border: 2px solid #ffb74d;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .fill-respuestas .respuesta-item {
+            padding: 3px 0;
+            border-bottom: 1px dotted #ffcc80;
+            font-size: 0.85rem;
+        }
+
+        .btn-siguiente-fill {
+            background: #46b87a;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 3px 0 #1f6e44;
+            cursor: pointer;
+            transition: all 0.06s linear;
+            border: 2px solid #86dbaa;
+            margin: 5px auto;
+            display: block;
+        }
+
+        .btn-siguiente-fill:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1f6e44;
+        }
+
+        .btn-siguiente-fill:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            .quiz-pregunta {
+                font-size: 0.95rem;
+                padding: 12px 14px;
+            }
+            .quiz-opcion {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+            .quiz-opcion input[type="radio"] {
+                width: 16px;
+                height: 16px;
+            }
+            .fill-text {
+                font-size: 1.1rem;
+                padding: 10px;
+            }
+            .fill-text .blank {
+                min-width: 120px;
+            }
+            .fill-text .blank input {
+                font-size: 1.2rem;
+                min-height: 35px;
+            }
+            .fill-pista {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+            .hangman-word {
+                font-size: 1.6rem;
+                letter-spacing: 8px;
+            }
+            .hangman-letters button {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+            .hangman-drawing {
+                font-size: 1.4rem;
+                min-height: 60px;
+            }
+            .hangman-info {
+                font-size: 0.8rem;
+                padding: 4px 10px;
+            }
+            .header .timer-info {
+                font-size: 0.7rem;
+                padding: 2px 8px;
+            }
+            .header .timer-info .tiempo {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .quiz-pregunta {
+                font-size: 0.85rem;
+                padding: 10px 10px;
+                flex-wrap: wrap;
+            }
+            .quiz-pregunta .num-pregunta {
+                width: 26px;
+                height: 26px;
+                font-size: 0.75rem;
+                margin-right: 8px;
+            }
+            .quiz-opcion {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                gap: 8px;
+            }
+            .quiz-opcion input[type="radio"] {
+                width: 14px;
+                height: 14px;
+            }
+            .fill-text {
+                font-size: 0.95rem;
+                line-height: 2;
+            }
+            .fill-text .blank {
+                min-width: 90px;
+                margin: 0 3px;
+                padding: 0 5px;
+            }
+            .fill-text .blank input {
+                font-size: 1rem;
+                min-height: 30px;
+            }
+            .fill-pista {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+            .sopa-grid .cell {
+                width: 14px;
+                height: 14px;
+                min-width: 12px;
+                min-height: 12px;
+                font-size: 0.35rem;
+            }
+            .hangman-word {
+                font-size: 1.2rem;
+                letter-spacing: 5px;
+            }
+            .hangman-letters button {
+                width: 24px;
+                height: 24px;
+                font-size: 0.65rem;
+            }
+            .hangman-drawing {
+                font-size: 1.1rem;
+                min-height: 50px;
+            }
+            .hangman-info {
+                font-size: 0.7rem;
+                padding: 3px 8px;
+                flex-wrap: wrap;
+                gap: 4px;
+                justify-content: center;
+            }
+            .vf-options button {
+                font-size: 0.9rem;
+                padding: 6px 16px;
+                min-width: 55px;
+            }
+            .menu button {
+                font-size: 0.45rem;
+                padding: 2px 5px;
+                min-width: 32px;
+            }
+            .header .timer-info {
+                font-size: 0.6rem;
+                padding: 2px 6px;
+            }
+            .header .timer-info .tiempo {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="app">
+    <!-- PANTALLA DE INICIO -->
+    <div id="startScreen">
+        <h1>🌍 Eco-Retos</h1>
+        <div class="subtitle">♻️ 5 Juegos Ambientales</div>
+        <label>✏️ Ingresa tu nombre completo</label>
+        <input type="text" id="playerNameInput" placeholder="Ej: Ana María Pérez" maxlength="50">
+        <button class="btn-principal" id="startBtn">🚀 Comenzar</button>
+        <div style="font-size: clamp(0.9rem, 2.5vw, 1.5rem); margin-top: 3px;">🌱 🌎 ♻️</div>
+    </div>
+
+    <!-- JUEGO PRINCIPAL -->
+    <div id="gameMain" class="hidden">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🌍 Eco-Retos</h1>
+            <div class="player-info">
+                <span>👤 <span id="playerNameDisplay">Jugador</span></span>
+                <span>⭐ <span id="globalScoreDisplay">0</span></span>
+            </div>
+            <div class="timer-info" id="timerDisplay">
+                ⏱️ <span class="tiempo" id="tiempoRestante">5:00</span>
+            </div>
+        </div>
+
+        <!-- MENU -->
+        <div class="menu" id="menu">
+            <button class="active" data-game="sopa">🔍 Sopa</button>
+            <button data-game="quiz">📝 Quiz</button>
+            <button data-game="ahorcado">💀 Ahorcado</button>
+            <button data-game="vf">✅ V/F</button>
+            <button data-game="completar">✏️ Completar</button>
+        </div>
+
+        <!-- ÁREA DE JUEGO -->
+        <div class="game-area" id="gameArea">
+            <!-- Aquí se renderiza el juego activo -->
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ============================================
+        // BANCOS DE PREGUNTAS
+        // ============================================
+        const VF_QUESTIONS_BANK = [
+            { text: 'El plástico es un residuo orgánico.', answer: false },
+            { text: 'Reciclar ayuda a reducir la contaminación.', answer: true },
+            { text: 'Tirar aceite por el desagüe contamina el agua.', answer: true },
+            { text: 'Las 3R son: Reciclar, Reutilizar y Recrear.', answer: false },
+            { text: 'El vidrio se puede reciclar infinitamente.', answer: true },
+            { text: 'La basura orgánica se puede convertir en composta.', answer: true },
+            { text: 'Los residuos electrónicos se pueden tirar a la basura común.', answer: false },
+            { text: 'El papel se puede reciclar varias veces.', answer: true },
+            { text: 'La contaminación del agua solo afecta a los peces.', answer: false },
+            { text: 'Reducir significa disminuir la cantidad de residuos que generamos.', answer: true }
+        ];
+
+        const FILL_SENTENCES_BANK = [
+            { text: 'La regla de las 3R son: Reducir, Reutilizar y ______.', answer: 'RECICLAR', pista: 'Comienza con R y termina con R' },
+            { text: 'El ______ es un material que tarda cientos de años en degradarse.', answer: 'PLASTICO', pista: 'Se usa para botellas y bolsas' },
+            { text: 'Separar residuos orgánicos e inorgánicos es parte del ______.', answer: 'RECICLAJE', pista: 'Proceso de convertir residuos en nuevos productos' },
+            { text: 'La ______ es el estudio de las relaciones entre los seres vivos y su entorno.', answer: 'ECOLOGIA', pista: 'Ciencia que estudia el medio ambiente' },
+            { text: '______ consiste en darle un nuevo uso a los objetos.', answer: 'REUTILIZAR', pista: 'Una de las 3R, comienza con R' },
+            { text: '______ es disminuir la cantidad de residuos que generamos.', answer: 'REDUCIR', pista: 'Una de las 3R, comienza con R' },
+            { text: 'El ______ se puede reciclar infinitamente sin perder calidad.', answer: 'VIDRIO', pista: 'Material transparente y frágil' },
+            { text: 'Los residuos ______ se pueden convertir en abono.', answer: 'ORGANICOS', pista: 'Provienen de seres vivos' },
+            { text: 'La ______ es la acumulación de basura en el mar.', answer: 'CONTAMINACION', pista: 'Daño al medio ambiente' },
+            { text: '______ es convertir residuos en nuevos productos.', answer: 'RECICLAR', pista: 'Una de las 3R' }
+        ];
+
+        const WORDS_SOPA_BANK = [
+            'RECICLAR', 'REUTILIZAR', 'REDUCIR', 'CONTAMINACION',
+            'RESIDUOS', 'PLASTICO', 'ORGANICO', 'VIDRIO',
+            'COMPOSTAJE', 'SOSTENIBLE', 'ECOLOGIA', 'MEDIOAMBIENTE',
+            'AHORRO', 'NATURALEZA', 'VERDE', 'LIMPIAR'
+        ];
+
+        const WORDS_AHORCADO_BANK = [
+            'RECICLAJE', 'COMPOSTAJE', 'ECOLOGIA', 'SOSTENIBLE',
+            'MEDIOAMBIENTE', 'NATURALEZA', 'CONSERVACION',
+            'BIODEGRADABLE', 'RENOVABLE', 'PROTEGER', 'AHORRO',
+            'LIMPIAR', 'VERDE', 'ARBOL', 'AGUA', 'AIRE', 'TIERRA'
+        ];
+
+        const QUIZ_QUESTIONS_BANK = [
+            {
+                pregunta: '¿Qué significa la "R" de Reducir?',
+                opciones: ['Usar menos cosas', 'Reutilizar bolsas', 'Reciclar botellas', 'Comprar más'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿Cuál es una forma de Reutilizar?',
+                opciones: ['Tirar a la basura', 'Usar una botella de vidrio varias veces', 'Quemar plásticos', 'Comprar nuevo siempre'],
+                correcta: 1
+            },
+            {
+                pregunta: '¿Qué material se puede Reciclar?',
+                opciones: ['Papel y cartón', 'Comida podrida', 'Medicinas', 'Pilas usadas'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿Qué contamina más el agua?',
+                opciones: ['Filtrar el agua', 'Tirar aceite por el desagüe', 'Recoger basura', 'Usar jabón ecológico'],
+                correcta: 1
+            },
+            {
+                pregunta: '¿Cuál es una acción para Reducir la contaminación?',
+                opciones: ['Usar el auto todos los días', 'Apagar luces al salir', 'Dejar grifos abiertos', 'Usar aerosoles'],
+                correcta: 1
+            },
+            {
+                pregunta: '¿Qué es el reciclaje?',
+                opciones: ['Convertir residuos en nuevos productos', 'Enterrar basura', 'Quemar desechos', 'Tirar todo al mar'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿Cuál es un residuo orgánico?',
+                opciones: ['Cáscara de plátano', 'Botella de plástico', 'Lata de aluminio', 'Bolsa de polietileno'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿Qué es mejor para el ambiente?',
+                opciones: ['Usar bolsas de tela', 'Usar bolsas de plástico nuevas', 'Comprar productos con mucho empaque', 'Tirar pilas al suelo'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿La regla de las 3R ayuda a...?',
+                opciones: ['Reducir residuos', 'Crear más basura', 'Contaminar más', 'Gastar más agua'],
+                correcta: 0
+            },
+            {
+                pregunta: '¿Qué contamina el aire?',
+                opciones: ['Plantar árboles', 'Quemar combustibles fósiles', 'Usar bicicleta', 'Apagar la luz'],
+                correcta: 1
+            }
+        ];
+
+        // Estado global
+        let playerName = '';
+        let globalScore = 0;
+        let gamesCompleted = { sopa: false, quiz: false, ahorcado: false, vf: false, completar: false };
+        let currentGame = 'sopa';
+        let timerInterval = null;
+        let tiempoRestante = 300;
+        let tiempoAgotado = false;
+        let juegoTerminado = false;
+
+        // Estados por juego
+        let sopaState = null;
+        let quizState = null;
+        let ahorcadoState = null;
+        let vfState = null;
+        let fillState = null;
+
+        // DOM
+        const startScreen = document.getElementById('startScreen');
+        const gameMain = document.getElementById('gameMain');
+        const playerNameInput = document.getElementById('playerNameInput');
+        const startBtn = document.getElementById('startBtn');
+        const playerNameDisplay = document.getElementById('playerNameDisplay');
+        const globalScoreDisplay = document.getElementById('globalScoreDisplay');
+        const menu = document.getElementById('menu');
+        const gameArea = document.getElementById('gameArea');
+        const tiempoRestanteEl = document.getElementById('tiempoRestante');
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomWordsFromBank(bank, count) {
+            const shuffled = shuffleArray(bank);
+            return shuffled.slice(0, count);
+        }
+
+        function getRandomQuizQuestions(count) {
+            const shuffled = shuffleArray(QUIZ_QUESTIONS_BANK);
+            const selected = shuffled.slice(0, count);
+            return selected.map(q => {
+                const opcionesConIndices = q.opciones.map((texto, idx) => ({ texto, idx }));
+                const mezcladas = shuffleArray(opcionesConIndices);
+                const nuevaCorrecta = mezcladas.findIndex(o => o.idx === q.correcta);
+                return {
+                    pregunta: q.pregunta,
+                    opciones: mezcladas.map(o => o.texto),
+                    correcta: nuevaCorrecta
+                };
+            });
+        }
+
+        function updateGlobalScore() {
+            globalScoreDisplay.textContent = globalScore;
+        }
+
+        function updateMenuButtons() {
+            document.querySelectorAll('.menu button').forEach(btn => {
+                btn.classList.remove('locked');
+            });
+            document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`.menu button[data-game="${currentGame}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        function showGame(gameId) {
+            if (juegoTerminado) return;
+            currentGame = gameId;
+            document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.menu button[data-game="${gameId}"]`);
+            if (btn) {
+                btn.classList.add('active');
+            }
+            resetTimer();
+            switch (gameId) {
+                case 'sopa': renderSopa(); break;
+                case 'quiz': renderQuiz(); break;
+                case 'ahorcado': renderAhorcado(); break;
+                case 'vf': renderVF(); break;
+                case 'completar': renderCompletar(); break;
+                default: gameArea.innerHTML = '<p>Juego no encontrado</p>';
+            }
+            updateMenuButtons();
+        }
+
+        function resetTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            tiempoRestante = 300;
+            tiempoAgotado = false;
+            juegoTerminado = false;
+            actualizarTimerDisplay();
+            iniciarTimer();
+        }
+
+        function iniciarTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                tiempoRestante--;
+                actualizarTimerDisplay();
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    tiempoAgotado = true;
+                    mostrarRespuestasCompletas();
+                }
+            }, 1000);
+        }
+
+        function actualizarTimerDisplay() {
+            const minutos = Math.floor(tiempoRestante / 60);
+            const segundos = tiempoRestante % 60;
+            tiempoRestanteEl.textContent = `${minutos}:${segundos.toString().padStart(2, '0')}`;
+            if (tiempoRestante < 60) {
+                tiempoRestanteEl.style.color = '#ff5252';
+            } else {
+                tiempoRestanteEl.style.color = '#ffd54f';
+            }
+        }
+
+        function mostrarRespuestasCompletas() {
+            juegoTerminado = true;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            switch (currentGame) {
+                case 'sopa': mostrarRespuestasSopa(); break;
+                case 'quiz': mostrarRespuestasQuiz(); break;
+                case 'ahorcado': mostrarRespuestasAhorcado(); break;
+                case 'vf': mostrarRespuestasVF(); break;
+                case 'completar': mostrarRespuestasCompletar(); break;
+            }
+        }
+
+        function checkAllCompleted() {
+            const allDone = Object.values(gamesCompleted).every(v => v === true);
+            if (allDone) {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                gameArea.innerHTML = `
+                    <div style="text-align:center;padding:20px 10px;">
+                        <h2 style="font-size:2rem;">🎉 ¡FELICITACIONES!</h2>
+                        <p style="font-size:1.3rem;margin:10px 0;">Has completado todos los juegos</p>
+                        <div style="font-size:3rem;">🏆🌍♻️</div>
+                        <p style="font-size:1.1rem;margin-top:10px;">Puntuación total: ${globalScore} puntos</p>
+                        <button class="btn-general green" onclick="resetAllGames()">🔄 Jugar de nuevo</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // 1. SOPA DE LETRAS
+        // ============================================
+        function initSopa() {
+            const selectedWords = getRandomWordsFromBank(WORDS_SOPA_BANK, 14);
+            const gridSize = 14;
+            const grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+            const placed = [];
+
+            for (const word of selectedWords) {
+                let placedOk = false;
+                for (let attempt = 0; attempt < 200; attempt++) {
+                    const dir = Math.floor(Math.random() * 4);
+                    const row = Math.floor(Math.random() * gridSize);
+                    const col = Math.floor(Math.random() * gridSize);
+                    if (canPlaceWord(grid, word, row, col, dir, gridSize)) {
+                        placeWordInGrid(grid, word, row, col, dir);
+                        placed.push(word);
+                        placedOk = true;
+                        break;
+                    }
+                }
+                if (!placedOk) {
+                    for (let i = 0; i < word.length && i < gridSize; i++) {
+                        grid[i][0] = word[i];
+                    }
+                    placed.push(word);
+                }
+            }
+
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c] === '') {
+                        grid[r][c] = letters[Math.floor(Math.random() * letters.length)];
+                    }
+                }
+            }
+
+            sopaState = {
+                grid,
+                placed,
+                found: [],
+                gridSize,
+                selectedCells: [],
+                isDragging: false,
+                startCell: null
+            };
+        }
+
+        function canPlaceWord(grid, word, row, col, dir, size) {
+            for (let i = 0; i < word.length; i++) {
+                let r = row,
+                    c = col;
+                if (dir === 0) c += i;
+                else if (dir === 1) c -= i;
+                else if (dir === 2) r += i;
+                else if (dir === 3) r -= i;
+                if (r < 0 || r >= size || c < 0 || c >= size) return false;
+                if (grid[r][c] !== '' && grid[r][c] !== word[i]) return false;
+            }
+            return true;
+        }
+
+        function placeWordInGrid(grid, word, row, col, dir) {
+            for (let i = 0; i < word.length; i++) {
+                let r = row,
+                    c = col;
+                if (dir === 0) c += i;
+                else if (dir === 1) c -= i;
+                else if (dir === 2) r += i;
+                else if (dir === 3) r -= i;
+                grid[r][c] = word[i];
+            }
+        }
+
+        function getWordCells(grid, word, gridSize) {
+            const dirs = [
+                [0, 1], [0, -1], [1, 0], [-1, 0],
+                [1, 1], [-1, -1], [1, -1], [-1, 1]
+            ];
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    for (const [dr, dc] of dirs) {
+                        let match = true;
+                        let cells = [];
+                        for (let i = 0; i < word.length; i++) {
+                            const nr = r + dr * i;
+                            const nc = c + dc * i;
+                            if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize || grid[nr][nc] !== word[i]) {
+                                match = false;
+                                break;
+                            }
+                            cells.push({ row: nr, col: nc });
+                        }
+                        if (match) {
+                            return cells;
+                        }
+                    }
+                }
+            }
+            return [];
+        }
+
+        function renderSopa() {
+            if (tiempoAgotado) return;
+            if (!sopaState) initSopa();
+            const { grid, placed, found, gridSize } = sopaState;
+
+            let html = `<h2>🔍 Sopa de Letras</h2>`;
+            html += `<p class="instruccion">🖱️ Arrastra sobre las letras para seleccionar | ⏱️ Tiempo: 5:00</p>`;
+            html += `<div id="sopaContainer"><div class="sopa-grid" id="sopaGrid">`;
+
+            const foundCells = new Set();
+            for (const word of found) {
+                const cells = getWordCells(grid, word, gridSize);
+                for (const cell of cells) {
+                    foundCells.add(`${cell.row},${cell.col}`);
+                }
+            }
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    const cell = grid[r][c];
+                    const isFound = foundCells.has(`${r},${c}`);
+                    const cls = isFound ? 'cell found' : 'cell';
+                    html += `<div class="${cls}" data-row="${r}" data-col="${c}">${cell}</div>`;
+                }
+            }
+            html += `</div></div>`;
+
+            html += `<div class="sopa-wordlist">`;
+            for (const word of placed) {
+                const cls = found.includes(word) ? 'word-item found' : 'word-item';
+                html += `<span class="${cls}">${word}</span>`;
+            }
+            html += `</div>`;
+
+            html += `<div class="sopa-info">`;
+            html += `<span>📊 Progreso: <span class="encontradas">${found.length}</span> / <span class="total">${placed.length}</span></span>`;
+            if (found.length === placed.length && placed.length > 0) {
+                html += `<span style="color:#2e7d32;font-weight:bold;">✅ ¡COMPLETADO! +50 pts</span>`;
+                if (!gamesCompleted.sopa) {
+                    globalScore += 50;
+                    updateGlobalScore();
+                    gamesCompleted.sopa = true;
+                    checkAllCompleted();
+                }
+            } else {
+                html += `<span>🔍 Sigue buscando</span>`;
+            }
+            html += `</div>`;
+
+            gameArea.innerHTML = html;
+            if (found.length !== placed.length) {
+                setupSopaDrag();
+            }
+        }
+
+        function mostrarRespuestasSopa() {
+            if (!sopaState) return;
+            const { placed } = sopaState;
+            let html = `<h2>⏰ ¡TIEMPO AGOTADO!</h2>`;
+            html += `<p class="instruccion">Aquí están las palabras que debías encontrar:</p>`;
+            html += `<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px;background:#e8f5e9;border-radius:12px;border:2px solid #66bb6a;">`;
+            for (const word of placed) {
+                html += `<span style="background:#2e7d32;color:white;padding:6px 14px;border-radius:20px;font-weight:bold;font-size:1rem;">${word}</span>`;
+            }
+            html += `</div>`;
+            html += `<div style="text-align:center;margin-top:12px;">`;
+            html += `<button class="btn-general green" onclick="reiniciarJuegoActual('sopa')">🔄 Jugar de nuevo</button>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+        }
+
+        function setupSopaDrag() {
+            const grid = document.getElementById('sopaGrid');
+            if (!grid || juegoTerminado) return;
+
+            let isDown = false;
+            let startCell = null;
+            let selectedCells = [];
+
+            function getCellsInLine(start, end) {
+                const r1 = parseInt(start.dataset.row);
+                const c1 = parseInt(start.dataset.col);
+                const r2 = parseInt(end.dataset.row);
+                const c2 = parseInt(end.dataset.col);
+                const dr = r2 - r1;
+                const dc = c2 - c1;
+                if (dr === 0 && dc === 0) return [start];
+                const stepR = dr === 0 ? 0 : (dr > 0 ? 1 : -1);
+                const stepC = dc === 0 ? 0 : (dc > 0 ? 1 : -1);
+                if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return [start];
+                const cells = [];
+                let r = r1,
+                    c = c1;
+                while (r !== r2 + stepR || c !== c2 + stepC) {
+                    const cell = document.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
+                    if (cell) cells.push(cell);
+                    r += stepR;
+                    c += stepC;
+                }
+                return cells;
+            }
+
+            function isAligned(cell1, cell2) {
+                const r1 = parseInt(cell1.dataset.row);
+                const c1 = parseInt(cell1.dataset.col);
+                const r2 = parseInt(cell2.dataset.row);
+                const c2 = parseInt(cell2.dataset.col);
+                const dr = Math.abs(r1 - r2);
+                const dc = Math.abs(c1 - c2);
+                return (dr === 0 && dc > 0) || (dc === 0 && dr > 0) || (dr === dc && dr > 0);
+            }
+
+            function clearSelection() {
+                selectedCells.forEach(c => c.classList.remove('highlight'));
+                selectedCells = [];
+            }
+
+            grid.addEventListener('mousedown', (e) => {
+                if (juegoTerminado || tiempoAgotado) return;
+                const cell = e.target.closest('.cell');
+                if (!cell) return;
+                isDown = true;
+                startCell = cell;
+                selectedCells = [cell];
+                if (!cell.classList.contains('found')) {
+                    cell.classList.add('highlight');
+                }
+                e.preventDefault();
+            });
+
+            grid.addEventListener('mouseover', (e) => {
+                if (!isDown || juegoTerminado || tiempoAgotado) return;
+                const cell = e.target.closest('.cell');
+                if (!cell) return;
+                if (startCell && isAligned(startCell, cell)) {
+                    clearSelection();
+                    selectedCells = getCellsInLine(startCell, cell);
+                    selectedCells.forEach(c => {
+                        if (!c.classList.contains('found')) {
+                            c.classList.add('highlight');
+                        }
+                    });
+                }
+            });
+
+            grid.addEventListener('mouseup', (e) => {
+                if (!isDown || juegoTerminado || tiempoAgotado) return;
+                isDown = false;
+                if (selectedCells.length > 1) {
+                    const word = selectedCells.map(c => c.textContent).join('');
+                    const reversed = selectedCells.map(c => c.textContent).reverse().join('');
+                    let foundWord = null;
+                    for (const w of sopaState.placed) {
+                        if (!sopaState.found.includes(w)) {
+                            if (w === word || w === reversed) {
+                                foundWord = w;
+                                break;
+                            }
+                        }
+                    }
+                    if (foundWord) {
+                        sopaState.found.push(foundWord);
+                        const cells = getWordCells(sopaState.grid, foundWord, sopaState.gridSize);
+                        for (const cell of cells) {
+                            const cellElement = document.querySelector(`.cell[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                            if (cellElement) {
+                                cellElement.classList.remove('highlight');
+                                cellElement.classList.add('found');
+                            }
+                        }
+                        globalScore += 10;
+                        updateGlobalScore();
+                        renderSopa();
+                        return;
+                    }
+                }
+                clearSelection();
+                startCell = null;
+                selectedCells = [];
+            });
+
+            grid.addEventListener('mouseleave', () => {
+                if (isDown) {
+                    isDown = false;
+                    clearSelection();
+                    startCell = null;
+                    selectedCells = [];
+                }
+            });
+
+            // Touch support
+            let touchStartCell = null;
+            let touchSelectedCells = [];
+            let isTouching = false;
+
+            grid.addEventListener('touchstart', (e) => {
+                if (juegoTerminado || tiempoAgotado) return;
+                const touch = e.touches[0];
+                const cell = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.cell');
+                if (!cell) return;
+                isTouching = true;
+                touchStartCell = cell;
+                touchSelectedCells = [cell];
+                if (!cell.classList.contains('found')) {
+                    cell.classList.add('highlight');
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            grid.addEventListener('touchmove', (e) => {
+                if (!isTouching || juegoTerminado || tiempoAgotado) return;
+                const touch = e.touches[0];
+                const cell = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.cell');
+                if (!cell) return;
+                if (touchStartCell && isAligned(touchStartCell, cell)) {
+                    touchSelectedCells.forEach(c => c.classList.remove('highlight'));
+                    touchSelectedCells = getCellsInLine(touchStartCell, cell);
+                    touchSelectedCells.forEach(c => {
+                        if (!c.classList.contains('found')) {
+                            c.classList.add('highlight');
+                        }
+                    });
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            grid.addEventListener('touchend', (e) => {
+                if (!isTouching || juegoTerminado || tiempoAgotado) return;
+                isTouching = false;
+                if (touchSelectedCells.length > 1) {
+                    const word = touchSelectedCells.map(c => c.textContent).join('');
+                    const reversed = touchSelectedCells.map(c => c.textContent).reverse().join('');
+                    let foundWord = null;
+                    for (const w of sopaState.placed) {
+                        if (!sopaState.found.includes(w)) {
+                            if (w === word || w === reversed) {
+                                foundWord = w;
+                                break;
+                            }
+                        }
+                    }
+                    if (foundWord) {
+                        sopaState.found.push(foundWord);
+                        const cells = getWordCells(sopaState.grid, foundWord, sopaState.gridSize);
+                        for (const cell of cells) {
+                            const cellElement = document.querySelector(`.cell[data-row="${cell.row}"][data-col="${cell.col}"]`);
+                            if (cellElement) {
+                                cellElement.classList.remove('highlight');
+                                cellElement.classList.add('found');
+                            }
+                        }
+                        globalScore += 10;
+                        updateGlobalScore();
+                        renderSopa();
+                        touchStartCell = null;
+                        touchSelectedCells = [];
+                        return;
+                    }
+                }
+                touchSelectedCells.forEach(c => c.classList.remove('highlight'));
+                touchStartCell = null;
+                touchSelectedCells = [];
+                e.preventDefault();
+            }, { passive: false });
+
+            grid.addEventListener('selectstart', (e) => e.preventDefault());
+        }
+
+        // ============================================
+        // 2. QUIZ - CON PENALIZACIÓN Y RESPUESTA CORRECTA
+        // ============================================
+        function initQuiz() {
+            const questions = getRandomQuizQuestions(10);
+            quizState = {
+                questions: questions,
+                index: 0,
+                answered: false,
+                pointsAdded: false,
+                respuestas: [],
+                esperandoSiguiente: false
+            };
+        }
+
+        function renderQuiz() {
+            if (tiempoAgotado) return;
+            if (!quizState) initQuiz();
+            const { questions, index, answered, esperandoSiguiente } = quizState;
+            if (index >= questions.length) {
+                if (!quizState.pointsAdded) {
+                    // Calcular puntaje final
+                    let puntosObtenidos = 0;
+                    for (const r of quizState.respuestas) {
+                        if (r.esCorrecta) puntosObtenidos += 10;
+                    }
+                    globalScore += puntosObtenidos;
+                    updateGlobalScore();
+                    quizState.pointsAdded = true;
+                    gamesCompleted.quiz = true;
+                    checkAllCompleted();
+                }
+                gameArea.innerHTML = `
+                    <h2>📝 ¡Completaste el Quiz!</h2>
+                    <p style="text-align:center;font-size:1.3rem;">+${quizState.respuestas.filter(r => r.esCorrecta).length * 10} puntos</p>
+                    <div style="text-align:center;font-size:2.5rem;margin:10px 0;">🌟</div>
+                    <div style="text-align:center;max-width:500px;margin:0 auto;padding:10px;background:#e8f5e9;border-radius:12px;">
+                        <p><strong>✅ Correctas:</strong> ${quizState.respuestas.filter(r => r.esCorrecta).length}</p>
+                        <p><strong>❌ Incorrectas:</strong> ${quizState.respuestas.filter(r => !r.esCorrecta).length}</p>
+                        <p><strong>📊 Puntaje:</strong> ${quizState.respuestas.filter(r => r.esCorrecta).length * 10} puntos</p>
+                    </div>
+                `;
+                return;
+            }
+            const q = questions[index];
+            const letras = ['A', 'B', 'C', 'D'];
+            let html = `<h2>📝 Preguntas de Opción Múltiple</h2>`;
+            html += `<p class="instruccion">Selecciona la respuesta correcta | ⏱️ Tiempo: 5:00</p>`;
+            html += `<div class="quiz-container">`;
+            html += `<div class="quiz-pregunta">`;
+            html += `<span class="num-pregunta">${index + 1}</span>`;
+            html += `${q.pregunta}`;
+            html += `</div>`;
+            html += `<div class="quiz-opciones" id="quizOpciones">`;
+            for (let i = 0; i < q.opciones.length; i++) {
+                const disabled = answered || juegoTerminado || tiempoAgotado || esperandoSiguiente;
+                let claseExtra = '';
+                if (answered) {
+                    if (i === q.correcta) claseExtra = ' mostrar-correcta';
+                    if (i === quizState.respuestaSeleccionada && i !== q.correcta) claseExtra = ' incorrecta';
+                }
+                html += `<label class="quiz-opcion${answered ? ' disabled' : ''}${claseExtra}" id="opcion-${i}">`;
+                html += `<input type="radio" name="quizRespuesta" value="${i}" ${disabled ? 'disabled' : ''} onchange="window.seleccionarQuizOpcion(${i})">`;
+                html += `<span class="letra-opcion">${letras[i]}.</span>`;
+                html += `${q.opciones[i]}`;
+                html += `</label>`;
+            }
+            html += `</div>`;
+            
+            if (answered) {
+                const isCorrect = quizState.lastCorrect;
+                const correctaIndex = q.correcta;
+                html += `<div class="quiz-feedback" style="background:${isCorrect ? '#c8e6c9' : '#ffcdd2'}">`;
+                if (isCorrect) {
+                    html += `✅ ¡Correcto! +10 puntos`;
+                } else {
+                    html += `❌ Incorrecto. La respuesta correcta era: <strong>${q.opciones[correctaIndex]}</strong> (-5 puntos)`;
+                }
+                html += `</div>`;
+                html += `<button class="btn-siguiente" onclick="window.siguientePreguntaQuiz()">➡️ Siguiente Pregunta</button>`;
+            }
+            
+            html += `<div class="quiz-progress">📊 Pregunta ${index+1}/${questions.length} | Puntaje: ${quizState.respuestas.filter(r => r.esCorrecta).length * 10} pts</div>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+
+            window.seleccionarQuizOpcion = function(valor) {
+                if (quizState.answered || juegoTerminado || tiempoAgotado || quizState.esperandoSiguiente) return;
+                const q = quizState.questions[quizState.index];
+                const correcta = valor === q.correcta;
+                quizState.lastCorrect = correcta;
+                quizState.answered = true;
+                quizState.respuestaSeleccionada = valor;
+                quizState.respuestas.push({
+                    pregunta: q.pregunta,
+                    respuesta: q.opciones[valor],
+                    correcta: q.opciones[q.correcta],
+                    esCorrecta: correcta
+                });
+                if (correcta) {
+                    // Sumar puntos inmediatamente
+                    globalScore += 10;
+                    updateGlobalScore();
+                } else {
+                    // Penalizar con -5 puntos (mínimo 0)
+                    globalScore = Math.max(0, globalScore - 5);
+                    updateGlobalScore();
+                }
+                renderQuiz();
+            };
+
+            window.siguientePreguntaQuiz = function() {
+                if (quizState.esperandoSiguiente) return;
+                quizState.esperandoSiguiente = true;
+                setTimeout(() => {
+                    quizState.index++;
+                    quizState.answered = false;
+                    quizState.esperandoSiguiente = false;
+                    renderQuiz();
+                }, 300);
+            };
+
+            if (answered) {
+                document.querySelectorAll('.quiz-opcion input').forEach(el => el.disabled = true);
+            }
+        }
+
+        function mostrarRespuestasQuiz() {
+            if (!quizState) return;
+            const { respuestas, questions } = quizState;
+            let html = `<h2>⏰ ¡TIEMPO AGOTADO!</h2>`;
+            html += `<p class="instruccion">Aquí están las respuestas correctas:</p>`;
+            html += `<div class="quiz-respuestas">`;
+            const todas = respuestas.length > 0 ? respuestas : questions.map((q) => ({
+                pregunta: q.pregunta,
+                respuesta: 'No respondida',
+                correcta: q.opciones[q.correcta],
+                esCorrecta: false
+            }));
+            for (const item of todas) {
+                const icono = item.esCorrecta ? '✅' : '❌';
+                html += `<div class="respuesta-item">${icono} <strong>${item.pregunta}</strong><br>`;
+                html += `<span style="padding-left:20px;font-size:0.8rem;">Respuesta correcta: <span class="correcta">${item.correcta}</span>`;
+                if (item.respuesta !== 'No respondida') {
+                    html += ` | Tu respuesta: <span class="${item.esCorrecta ? 'correcta' : 'incorrecta'}">${item.respuesta}</span>`;
+                }
+                html += `</span></div>`;
+            }
+            html += `</div>`;
+            html += `<div style="text-align:center;margin-top:12px;">`;
+            html += `<button class="btn-general green" onclick="reiniciarJuegoActual('quiz')">🔄 Jugar de nuevo</button>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+        }
+
+        // ============================================
+        // 3. AHORCADO
+        // ============================================
+        function initAhorcado() {
+            const words = getRandomWordsFromBank(WORDS_AHORCADO_BANK, 5);
+            const word = words[Math.floor(Math.random() * words.length)];
+            ahorcadoState = {
+                word: word.toUpperCase(),
+                guessed: [],
+                wrong: 0,
+                maxWrong: 6,
+                gameOver: false,
+                pointsAdded: false
+            };
+        }
+
+        function renderAhorcado() {
+            if (tiempoAgotado) return;
+            if (!ahorcadoState) initAhorcado();
+            const { word, guessed, wrong, maxWrong, gameOver } = ahorcadoState;
+
+            const displayWord = word.split('').map(ch => guessed.includes(ch) ? ch : '_').join(' ');
+            const isWin = word.split('').every(ch => guessed.includes(ch));
+
+            let html = `<h2>💀 Ahorcado</h2>`;
+            html += `<p class="instruccion">Adivina la palabra seleccionando letras | ⏱️ Tiempo: 5:00</p>`;
+            html += `<div class="hangman-area">`;
+            html += `<div class="hangman-word">${displayWord}</div>`;
+            html += `<div class="hangman-drawing">${getHangmanArt(wrong)}</div>`;
+            html += `<div style="font-size:0.9rem;">❌ Fallos: ${wrong}/${maxWrong}</div>`;
+            html += `<div class="hangman-letters">`;
+            for (let i = 65; i <= 90; i++) {
+                const letter = String.fromCharCode(i);
+                const disabled = guessed.includes(letter) || gameOver || isWin || juegoTerminado || tiempoAgotado;
+                html += `<button onclick="window.handleHangmanLetter('${letter}')" ${disabled ? 'disabled' : ''}>${letter}</button>`;
+            }
+            html += `</div>`;
+            if (isWin) {
+                html += `<div style="font-size:1.3rem;color:#2e7d32;font-weight:bold;">🎉 ¡Ganaste! +30 puntos</div>`;
+                if (!ahorcadoState.pointsAdded) {
+                    globalScore += 30;
+                    updateGlobalScore();
+                    ahorcadoState.pointsAdded = true;
+                    gamesCompleted.ahorcado = true;
+                    checkAllCompleted();
+                }
+            }
+            if (gameOver && !isWin) {
+                html += `<div style="font-size:1.3rem;color:#c62828;font-weight:bold;">😵 Perdiste! La palabra era: ${word}</div>`;
+            }
+            html += `</div>`;
+            gameArea.innerHTML = html;
+
+            window.handleHangmanLetter = function(letter) {
+                if (!ahorcadoState || ahorcadoState.gameOver || juegoTerminado || tiempoAgotado) return;
+                const { word, guessed, wrong, maxWrong } = ahorcadoState;
+                if (guessed.includes(letter)) return;
+                guessed.push(letter);
+                if (!word.includes(letter)) {
+                    ahorcadoState.wrong++;
+                    if (ahorcadoState.wrong >= maxWrong) {
+                        ahorcadoState.gameOver = true;
+                    }
+                }
+                if (word.split('').every(ch => guessed.includes(ch))) {
+                    // Ganó
+                }
+                renderAhorcado();
+            };
+        }
+
+        function mostrarRespuestasAhorcado() {
+            if (!ahorcadoState) return;
+            const { word } = ahorcadoState;
+            let html = `<h2>⏰ ¡TIEMPO AGOTADO!</h2>`;
+            html += `<p class="instruccion">La palabra que debías adivinar era:</p>`;
+            html += `<div style="text-align:center;padding:20px;background:#e8f5e9;border-radius:12px;border:2px solid #66bb6a;max-width:300px;margin:0 auto;">`;
+            html += `<div style="font-size:2.5rem;font-weight:bold;color:#2e7d32;letter-spacing:8px;font-family:monospace;">${word}</div>`;
+            html += `</div>`;
+            html += `<div style="text-align:center;margin-top:12px;">`;
+            html += `<button class="btn-general green" onclick="reiniciarJuegoActual('ahorcado')">🔄 Jugar de nuevo</button>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+        }
+
+        function getHangmanArt(wrong) {
+            const stages = [
+                `  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========`,
+                `  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n=========`
+            ];
+            return stages[Math.min(wrong, stages.length - 1)];
+        }
+
+        // ============================================
+        // 4. VERDADERO O FALSO
+        // ============================================
+        function initVF() {
+            const selectedQuestions = getRandomWordsFromBank(VF_QUESTIONS_BANK, 10);
+            vfState = {
+                questions: selectedQuestions,
+                index: 0,
+                answered: false,
+                pointsAdded: false,
+                respuestas: []
+            };
+        }
+
+        function renderVF() {
+            if (tiempoAgotado) return;
+            if (!vfState) initVF();
+            const { questions, index, answered } = vfState;
+            if (index >= questions.length) {
+                if (!vfState.pointsAdded) {
+                    let puntosObtenidos = 0;
+                    for (const r of vfState.respuestas) {
+                        if (r.esCorrecta) puntosObtenidos += 10;
+                    }
+                    globalScore += puntosObtenidos;
+                    updateGlobalScore();
+                    vfState.pointsAdded = true;
+                    gamesCompleted.vf = true;
+                    checkAllCompleted();
+                }
+                gameArea.innerHTML = `
+                    <h2>✅ ¡Completaste V/F!</h2>
+                    <p style="text-align:center;font-size:1.3rem;">+${vfState.respuestas.filter(r => r.esCorrecta).length * 10} puntos</p>
+                    <div style="text-align:center;font-size:2.5rem;margin:10px 0;">🌟</div>
+                `;
+                return;
+            }
+            const q = questions[index];
+            let html = `<h2>✅ Verdadero o Falso</h2>`;
+            html += `<p class="instruccion">Responde las preguntas | ⏱️ Tiempo: 5:00</p>`;
+            html += `<p style="text-align:center;font-size:1.1rem;font-weight:bold;padding:8px;">${q.text}</p>`;
+            html += `<div class="vf-options">`;
+            html += `<button onclick="window.handleVF(true)" ${answered || juegoTerminado || tiempoAgotado ? 'disabled style="opacity:0.5;"' : ''}>✅ Verdadero</button>`;
+            html += `<button onclick="window.handleVF(false)" ${answered || juegoTerminado || tiempoAgotado ? 'disabled style="opacity:0.5;"' : ''}>❌ Falso</button>`;
+            html += `</div>`;
+            if (answered) {
+                const isCorrect = vfState.lastCorrect;
+                html += `<div class="vf-feedback" style="background:${isCorrect ? '#c8e6c9' : '#ffcdd2'}">`;
+                if (isCorrect) {
+                    html += '✅ ¡Correcto! +10 puntos';
+                } else {
+                    html += `❌ Incorrecto. La respuesta correcta era: <strong>${q.answer ? 'Verdadero' : 'Falso'}</strong> (-5 puntos)`;
+                }
+                html += `</div>`;
+                html += `<button class="btn-siguiente" onclick="window.siguientePreguntaVF()">➡️ Siguiente Pregunta</button>`;
+            }
+            html += `<div class="vf-progress">Pregunta ${index+1}/${questions.length} | Puntaje: ${vfState.respuestas.filter(r => r.esCorrecta).length * 10} pts</div>`;
+            gameArea.innerHTML = html;
+
+            window.handleVF = function(answer) {
+                if (vfState.answered || juegoTerminado || tiempoAgotado) return;
+                const q = vfState.questions[vfState.index];
+                const correct = answer === q.answer;
+                vfState.lastCorrect = correct;
+                vfState.answered = true;
+                vfState.respuestas.push({
+                    pregunta: q.text,
+                    respuesta: answer ? 'Verdadero' : 'Falso',
+                    correcta: q.answer ? 'Verdadero' : 'Falso',
+                    esCorrecta: correct
+                });
+                if (correct) {
+                    globalScore += 10;
+                    updateGlobalScore();
+                } else {
+                    globalScore = Math.max(0, globalScore - 5);
+                    updateGlobalScore();
+                }
+                renderVF();
+            };
+
+            window.siguientePreguntaVF = function() {
+                vfState.index++;
+                vfState.answered = false;
+                renderVF();
+            };
+        }
+
+        function mostrarRespuestasVF() {
+            if (!vfState) return;
+            const { respuestas, questions } = vfState;
+            let html = `<h2>⏰ ¡TIEMPO AGOTADO!</h2>`;
+            html += `<p class="instruccion">Aquí están las respuestas correctas:</p>`;
+            html += `<div class="vf-respuestas">`;
+            const todas = respuestas.length > 0 ? respuestas : questions.map((q, i) => ({
+                pregunta: q.text,
+                respuesta: 'No respondida',
+                correcta: q.answer ? 'Verdadero' : 'Falso',
+                esCorrecta: false
+            }));
+            for (const item of todas) {
+                const icono = item.esCorrecta ? '✅' : '❌';
+                html += `<div class="respuesta-item">${icono} ${item.pregunta} → <span class="${item.esCorrecta ? 'correcta' : 'incorrecta'}">${item.correcta}</span> ${item.respuesta !== 'No respondida' ? `(Tu respuesta: ${item.respuesta})` : ''}</div>`;
+            }
+            html += `</div>`;
+            html += `<div style="text-align:center;margin-top:12px;">`;
+            html += `<button class="btn-general green" onclick="reiniciarJuegoActual('vf')">🔄 Jugar de nuevo</button>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+        }
+
+        // ============================================
+        // 5. COMPLETAR - CON BOTÓN SIGUIENTE
+        // ============================================
+        function initFill() {
+            const selectedSentences = getRandomWordsFromBank(FILL_SENTENCES_BANK, 10);
+            fillState = {
+                sentences: selectedSentences,
+                index: 0,
+                pointsAdded: false,
+                answered: false,
+                respuestas: [],
+                esperandoSiguiente: false
+            };
+        }
+
+        function renderCompletar() {
+            if (tiempoAgotado) return;
+            if (!fillState) initFill();
+            const { sentences, index, answered, esperandoSiguiente } = fillState;
+            if (index >= sentences.length) {
+                if (!fillState.pointsAdded) {
+                    let puntosObtenidos = 0;
+                    for (const r of fillState.respuestas) {
+                        if (r.esCorrecta) puntosObtenidos += 15;
+                    }
+                    globalScore += puntosObtenidos;
+                    updateGlobalScore();
+                    fillState.pointsAdded = true;
+                    gamesCompleted.completar = true;
+                    checkAllCompleted();
+                }
+                gameArea.innerHTML = `
+                    <h2>✏️ ¡Completaste todas!</h2>
+                    <p style="text-align:center;font-size:1.3rem;">+${fillState.respuestas.filter(r => r.esCorrecta).length * 15} puntos</p>
+                    <div style="text-align:center;font-size:2.5rem;margin:10px 0;">📚</div>
+                `;
+                return;
+            }
+            const s = sentences[index];
+            const parts = s.text.split('______');
+            let html = `<h2>✏️ Completar</h2>`;
+            html += `<p class="instruccion">Escribe la palabra que falta | ⏱️ Tiempo: 5:00</p>`;
+            html += `<div class="fill-container">`;
+            html += `<div class="fill-text">`;
+            for (let i = 0; i < parts.length; i++) {
+                html += parts[i];
+                if (i < parts.length - 1) {
+                    html += `<span class="blank"><input type="text" id="fillInput" placeholder="?" autofocus ${answered || juegoTerminado || tiempoAgotado || esperandoSiguiente ? 'disabled' : ''}></span>`;
+                }
+            }
+            html += `</div>`;
+
+            html += `<div class="fill-pista">💡 Pista: <span class="icono">🔍</span> ${s.pista || 'Piensa en el tema ambiental'}</div>`;
+
+            html += `<div class="fill-actions">`;
+            if (!answered) {
+                html += `<button class="btn-general green" onclick="window.checkFill()" ${answered || juegoTerminado || tiempoAgotado || esperandoSiguiente ? 'disabled style="opacity:0.5;"' : ''}>✅ Verificar</button>`;
+            }
+            html += `</div>`;
+
+            if (answered) {
+                const isCorrect = fillState.lastCorrect;
+                html += `<div class="fill-feedback" style="background:${isCorrect ? '#c8e6c9' : '#ffcdd2'}">`;
+                if (isCorrect) {
+                    html += `✅ ¡Correcto! +15 puntos`;
+                } else {
+                    html += `❌ Incorrecto. La respuesta era: <strong>${fillState.correctAnswer}</strong> (-5 puntos)`;
+                }
+                html += `</div>`;
+                html += `<button class="btn-siguiente-fill" onclick="window.siguientePreguntaFill()">➡️ Siguiente Pregunta</button>`;
+            }
+
+            html += `<div class="fill-progress">📊 Frase ${index+1}/${sentences.length} | Puntaje: ${fillState.respuestas.filter(r => r.esCorrecta).length * 15} pts</div>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+
+            const input = document.getElementById('fillInput');
+            if (input && !answered && !juegoTerminado && !tiempoAgotado && !esperandoSiguiente) {
+                setTimeout(() => input.focus(), 100);
+            }
+
+            window.checkFill = function() {
+                if (fillState.answered || juegoTerminado || tiempoAgotado || fillState.esperandoSiguiente) return;
+                const input = document.getElementById('fillInput');
+                if (!input) return;
+                const val = input.value.toUpperCase().trim();
+                const expected = sentences[index].answer;
+                const isCorrect = val === expected;
+                fillState.lastCorrect = isCorrect;
+                fillState.correctAnswer = expected;
+                fillState.answered = true;
+                fillState.respuestas.push({
+                    frase: sentences[index].text,
+                    respuesta: val || '(vacío)',
+                    correcta: expected,
+                    esCorrecta: isCorrect
+                });
+
+                if (isCorrect) {
+                    globalScore += 15;
+                    updateGlobalScore();
+                } else {
+                    globalScore = Math.max(0, globalScore - 5);
+                    updateGlobalScore();
+                }
+                renderCompletar();
+            };
+
+            window.siguientePreguntaFill = function() {
+                if (fillState.esperandoSiguiente) return;
+                fillState.esperandoSiguiente = true;
+                setTimeout(() => {
+                    fillState.index++;
+                    fillState.answered = false;
+                    fillState.esperandoSiguiente = false;
+                    renderCompletar();
+                }, 300);
+            };
+
+            const inputField = document.getElementById('fillInput');
+            if (inputField && !answered && !juegoTerminado && !tiempoAgotado && !esperandoSiguiente) {
+                inputField.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        window.checkFill();
+                    }
+                });
+            }
+        }
+
+        function mostrarRespuestasCompletar() {
+            if (!fillState) return;
+            const { respuestas, sentences } = fillState;
+            let html = `<h2>⏰ ¡TIEMPO AGOTADO!</h2>`;
+            html += `<p class="instruccion">Aquí están las respuestas correctas:</p>`;
+            html += `<div class="fill-respuestas">`;
+            const todas = respuestas.length > 0 ? respuestas : sentences.map((s) => ({
+                frase: s.text,
+                respuesta: 'No respondida',
+                correcta: s.answer,
+                esCorrecta: false
+            }));
+            for (const item of todas) {
+                const icono = item.esCorrecta ? '✅' : '❌';
+                const fraseMostrada = item.frase.replace('______', `____${item.correcta}____`);
+                html += `<div class="respuesta-item">${icono} ${fraseMostrada} ${item.respuesta !== 'No respondida' ? `(Tu respuesta: ${item.respuesta})` : ''}</div>`;
+            }
+            html += `</div>`;
+            html += `<div style="text-align:center;margin-top:12px;">`;
+            html += `<button class="btn-general green" onclick="reiniciarJuegoActual('completar')">🔄 Jugar de nuevo</button>`;
+            html += `</div>`;
+            gameArea.innerHTML = html;
+        }
+
+        // ============================================
+        // REINICIAR JUEGO ACTUAL
+        // ============================================
+        window.reiniciarJuegoActual = function(gameId) {
+            if (gameId === 'ahorcado' && ahorcadoState && ahorcadoState.timerPalabra) {
+                clearInterval(ahorcadoState.timerPalabra);
+            }
+            switch (gameId) {
+                case 'sopa': sopaState = null; break;
+                case 'quiz': quizState = null; break;
+                case 'ahorcado': ahorcadoState = null; break;
+                case 'vf': vfState = null; break;
+                case 'completar': fillState = null; break;
+            }
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            tiempoRestante = 300;
+            tiempoAgotado = false;
+            juegoTerminado = false;
+            actualizarTimerDisplay();
+            iniciarTimer();
+            showGame(gameId);
+        };
+
+        // ============================================
+        // REINICIO COMPLETO
+        // ============================================
+        window.resetAllGames = function() {
+            globalScore = 0;
+            gamesCompleted = { sopa: false, quiz: false, ahorcado: false, vf: false, completar: false };
+            sopaState = null;
+            quizState = null;
+            if (ahorcadoState && ahorcadoState.timerPalabra) {
+                clearInterval(ahorcadoState.timerPalabra);
+            }
+            ahorcadoState = null;
+            vfState = null;
+            fillState = null;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            tiempoRestante = 300;
+            tiempoAgotado = false;
+            juegoTerminado = false;
+            actualizarTimerDisplay();
+            updateGlobalScore();
+            updateMenuButtons();
+            showGame('sopa');
+            iniciarTimer();
+        };
+
+        // ============================================
+        // MENÚ Y NAVEGACIÓN
+        // ============================================
+        menu.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const game = btn.dataset.game;
+            if (!game) return;
+            if (juegoTerminado) {
+                if (confirm('El tiempo se ha agotado. ¿Quieres reiniciar el juego actual?')) {
+                    reiniciarJuegoActual(game);
+                }
+                return;
+            }
+            showGame(game);
+        });
+
+        // ============================================
+        // INICIO DEL JUEGO
+        // ============================================
+        startBtn.addEventListener('click', () => {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                alert('⚠️ Por favor ingresa tu nombre completo.');
+                return;
+            }
+            playerName = name;
+            playerNameDisplay.textContent = playerName;
+            startScreen.classList.add('hidden');
+            gameMain.classList.remove('hidden');
+            resetAllGames();
+        });
+
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startBtn.click();
+        });
+
+        const resetBtn = document.createElement('button');
+        resetBtn.textContent = '🔄 Reiniciar Todo';
+        resetBtn.className = 'btn-general';
+        resetBtn.style.padding = '2px 8px';
+        resetBtn.style.fontSize = '0.7rem';
+        resetBtn.style.margin = '0';
+        resetBtn.style.boxShadow = '0 2px 0 #b17d2b';
+        resetBtn.addEventListener('click', () => {
+            if (confirm('¿Seguro que quieres reiniciar todos los juegos?')) {
+                resetAllGames();
+            }
+        });
+        document.querySelector('.header').appendChild(resetBtn);
+
+        console.log('🌍 Eco-Retos cargado - Quiz y Completar con penalización y botón siguiente!');
+    })();
+</script>
+</body>
+</html>
