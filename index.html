@@ -286,6 +286,27 @@
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* ===== NUEVOS ESTILOS PARA JUEGOS DESTACADOS ===== */
+    .game-card .new-badge {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: #f4c542;
+      color: #8b1e1e;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 2px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 0 #b17d2b;
+    }
+
+    .game-card.featured {
+      border-color: #f4c542;
+      border-width: 3px;
+    }
   </style>
 </head>
 <body>
@@ -306,7 +327,7 @@
       </div>
     </div>
     <div class="header-badge">
-      🎮 9 juegos · Aprendizaje lúdico
+      🎮 12 juegos · Aprendizaje lúdico
     </div>
   </header>
 
@@ -335,6 +356,7 @@
     // LISTA DE JUEGOS (título, descripción, icono, ruta, etiqueta)
     // ============================================================
     const games = [
+      // === JUEGOS EXISTENTES ===
       {
         title: 'ECO-MISIÓN: Reciclaje',
         desc: 'Clasifica 100 residuos y responde preguntas sobre reciclaje. ¡Cuida el planeta!',
@@ -397,6 +419,32 @@
         icon: '🐧',
         file: 'MATEMATICA - PRIMER GRADO.html',
         tag: 'matemáticas · conteo'
+      },
+
+      // === NUEVOS JUEGOS ===
+      {
+        title: '🎈 DiviDiversión',
+        desc: 'Aprende divisiones jugando con 50 preguntas, 5 vidas y sistema de estrellas. ¡Diviértete!',
+        icon: '🎈',
+        file: 'DiviDiversión.html',
+        tag: 'matemáticas · divisiones',
+        new: true
+      },
+      {
+        title: '🌍 Eco-Retos Multijuego',
+        desc: '5 juegos ambientales: Sopa de letras, Quiz, Ahorcado, Verdadero/Falso y Completar. ¡50 palabras de ahorcado!',
+        icon: '🌍',
+        file: 'ECORETOS.html',
+        tag: 'ciencias · medio ambiente · multijuego',
+        new: true
+      },
+      {
+        title: '📚 División por Niveles',
+        desc: '5 niveles de dificultad progresiva con 16 problemas cada uno. 80 problemas totales. ¡Mínimo 80% para avanzar!',
+        icon: '📚',
+        file: 'Prodivi.html',
+        tag: 'matemáticas · divisiones · niveles',
+        new: true
       }
     ];
 
@@ -425,9 +473,15 @@
       filtered.forEach((game, idx) => {
         const card = document.createElement('div');
         card.className = 'game-card';
+        if (game.new) {
+          card.classList.add('featured');
+        }
         card.style.animationDelay = `${(idx % 6) * 0.06}s`;
 
+        const newBadge = game.new ? `<span class="new-badge">✨ Nuevo</span>` : '';
+
         card.innerHTML = `
+          ${newBadge}
           <div class="game-icon">${game.icon}</div>
           <div class="game-title">${game.title}</div>
           <div class="game-desc">${game.desc}</div>
