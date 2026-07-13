@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎮 Aprendiendo a Sumar - 3 Juegos</title>
+    <style>
+        /* ========== RESET Y ESTILOS GLOBALES ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .main-container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 20px 18px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 4px solid #ffffff;
+            text-align: center;
+        }
+
+        /* ========== PANTALLA DE INICIO ========== */
+        #welcomeScreen { display: block; }
+        #welcomeScreen.hidden { display: none; }
+
+        .welcome-icon { font-size: 4rem; animation: bounce 2s ease-in-out infinite; display: block; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        .welcome-title {
+            font-size: 2.2rem;
+            color: #2d4059;
+            text-shadow: 3px 3px 0 #f9d423;
+            margin: 8px 0;
+        }
+
+        .welcome-subtitle { font-size: 1rem; color: #555; margin-bottom: 20px; }
+
+        .name-input-group {
+            background: #f8f9fa;
+            padding: 20px 18px;
+            border-radius: 30px;
+            border: 4px solid #dee2e6;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .name-input-group label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e3c5c;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .name-input-group input {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 1.5rem;
+            border: 4px solid #1e3c5c;
+            border-radius: 25px;
+            text-align: center;
+            font-weight: bold;
+            outline: none;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .name-input-group input:focus {
+            border-color: #f9d423;
+            box-shadow: 0 0 20px rgba(249, 212, 35, 0.3);
+            transform: scale(1.02);
+        }
+
+        .name-input-group .error-msg {
+            color: #c62828;
+            font-size: 1rem;
+            margin-top: 8px;
+            min-height: 25px;
+        }
+
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 40px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 6px 0 #2e7d32;
+            border-bottom: 4px solid #1b5e20;
+            width: 100%;
+        }
+
+        .start-btn:hover { transform: scale(1.02); background: #66bb6a; }
+        .start-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ========== PANTALLA DE JUEGO ========== */
+        #gameScreen { display: none; }
+        #gameScreen.active { display: block; }
+
+        /* ========== HEADER ========== */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e3c5c;
+            padding: 10px 15px;
+            border-radius: 50px;
+            margin-bottom: 12px;
+            border: 3px solid #f9d423;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .player-name { color: white; font-size: 1rem; font-weight: bold; }
+        .player-name span { color: #f9d423; }
+
+        .header-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header-score {
+            background: #f9d423;
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e3c5c;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .header-score .score-number-header {
+            background: #1e3c5c;
+            color: #f9d423;
+            padding: 0 10px;
+            border-radius: 15px;
+            min-width: 30px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .lives-display { display: flex; gap: 3px; font-size: 1.5rem; }
+        .life-heart { transition: all 0.3s; }
+        .life-heart.lost { opacity: 0.2; transform: scale(0.5); }
+
+        .timer-display {
+            background: #f9d423;
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #1e3c5c;
+            min-width: 70px;
+        }
+
+        .timer-display.warning {
+            background: #ff6b6b;
+            color: white;
+            animation: pulse 0.5s ease infinite alternate;
+        }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        /* ========== NAVEGACIÓN ========== */
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+            border-bottom: 3px solid rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 90px;
+        }
+
+        .nav-btn.active {
+            transform: scale(1.05);
+            border-bottom: 5px solid rgba(0,0,0,0.3);
+        }
+
+        .nav-btn:active { transform: translateY(3px); box-shadow: none; }
+
+        .nav-btn.juego1 { background: #4facfe; color: white; }
+        .nav-btn.juego2 { background: #f9d423; color: #1e3c5c; }
+        .nav-btn.juego3 { background: #ff6b6b; color: white; }
+
+        .nav-btn.juego1.active { background: #2196F3; box-shadow: 0 0 15px rgba(79,172,254,0.5); }
+        .nav-btn.juego2.active { background: #fbc02d; box-shadow: 0 0 15px rgba(249,212,35,0.5); }
+        .nav-btn.juego3.active { background: #e53935; box-shadow: 0 0 15px rgba(255,107,107,0.5); }
+
+        /* ========== PANTALLAS DE JUEGO ========== */
+        .game-screen { display: none; animation: fadeIn 0.4s ease; }
+        .game-screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ========== JUEGO 1: SUMA RÁPIDA ========== */
+        .score-panel {
+            background: #1e3c5c;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 15px;
+            border: 3px solid #f9d423;
+        }
+
+        .score-panel span { font-size: 1.1rem; font-weight: bold; }
+        .score-number {
+            background: #f9d423;
+            color: #1e3c5c;
+            padding: 0 15px;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            min-width: 40px;
+            display: inline-block;
+        }
+
+        .operation-box {
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 60px;
+            margin-bottom: 15px;
+            box-shadow: inset 0 -4px 0 #b0bec5, 0 8px 15px rgba(0,0,0,0.1);
+            border: 4px solid #cfd8dc;
+        }
+
+        .operation { font-size: 2.8rem; font-weight: bold; color: #1e3c5c; letter-spacing: 3px; }
+        .operation .operator { color: #f9d423; text-shadow: 2px 2px 0 #b38f1a; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 12px 0 15px;
+        }
+
+        .option-btn {
+            background: #e3f2fd;
+            border: 4px solid #1e3c5c;
+            border-radius: 25px;
+            padding: 12px 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1e3c5c;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 5px 0 #1e3c5c;
+        }
+
+        .option-btn:hover { transform: scale(0.95); background: #bbdefb; }
+        .option-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        .new-sum-btn {
+            background: #f9d423;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #1e3c5c;
+            border-bottom: 6px solid #b38f1a;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            width: 100%;
+            margin-top: 5px;
+            box-shadow: 0 5px 0 #b38f1a;
+        }
+
+        .new-sum-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ========== JUEGO 2: CUENTA Y SUMA ========== */
+        .count-game-area {
+            background: #f8f9fa;
+            border-radius: 30px;
+            padding: 15px;
+            border: 4px solid #dee2e6;
+        }
+
+        .count-game-area .score-mini {
+            background: #1e3c5c;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .count-game-area .score-mini span {
+            background: #f9d423;
+            color: #1e3c5c;
+            padding: 0 12px;
+            border-radius: 15px;
+            margin-left: 5px;
+        }
+
+        .count-instruction {
+            font-size: 1.1rem;
+            color: #1e3c5c;
+            margin-bottom: 12px;
+            background: #fff3cd;
+            padding: 8px 15px;
+            border-radius: 40px;
+            border: 3px dashed #f9d423;
+            font-weight: bold;
+        }
+
+        .animals-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 30px;
+            min-height: 80px;
+            border: 4px solid #cfd8dc;
+            margin-bottom: 15px;
+        }
+
+        .animal-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        .count-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin: 12px 0;
+        }
+
+        .count-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .count-label { font-size: 1.1rem; font-weight: bold; color: #1e3c5c; min-width: 60px; }
+
+        .count-input {
+            width: 75px;
+            padding: 8px 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 4px solid #1e3c5c;
+            border-radius: 18px;
+            font-weight: bold;
+            background: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .count-input:focus {
+            border-color: #f9d423;
+            box-shadow: 0 0 15px rgba(249,212,35,0.4);
+            transform: scale(1.05);
+        }
+
+        .count-input:disabled { opacity: 0.6; background: #e9ecef; }
+
+        .count-check-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #2e7d32;
+            border-bottom: 3px solid #1b5e20;
+        }
+
+        .count-check-btn:active { transform: translateY(4px); box-shadow: none; }
+        .count-check-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(4px); box-shadow: none; }
+
+        .count-result-area {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 25px;
+            background: white;
+            min-height: 60px;
+            border: 4px solid #cfd8dc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .count-result-area .result-text { font-size: 1.2rem; font-weight: bold; color: #1e3c5c; }
+        .count-result-area .result-emoji { font-size: 2rem; }
+        .count-result-area.correct { background: #c8e6c9; border-color: #2e7d32; }
+        .count-result-area.incorrect { background: #ffcdd2; border-color: #c62828; }
+
+        .count-progress {
+            font-size: 1rem;
+            color: #1e3c5c;
+            background: #e3f2fd;
+            padding: 6px 15px;
+            border-radius: 25px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        .reset-count-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+            width: 100%;
+            box-shadow: 0 5px 0 #e65100;
+            border-bottom: 4px solid #bf360c;
+        }
+
+        .reset-count-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ========== JUEGO 3: AGRUPA Y SUMA ========== */
+        .group-game-area {
+            background: #f8f9fa;
+            border-radius: 30px;
+            padding: 15px;
+            border: 4px solid #dee2e6;
+        }
+
+        .group-game-area .score-mini {
+            background: #1e3c5c;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .group-game-area .score-mini span {
+            background: #f9d423;
+            color: #1e3c5c;
+            padding: 0 12px;
+            border-radius: 15px;
+            margin-left: 5px;
+        }
+
+        .group-instruction {
+            font-size: 1.1rem;
+            color: #1e3c5c;
+            margin-bottom: 12px;
+            background: #e8f5e9;
+            padding: 8px 15px;
+            border-radius: 40px;
+            border: 3px dashed #4CAF50;
+            font-weight: bold;
+        }
+
+        .animals-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding: 12px;
+            background: white;
+            border-radius: 25px;
+            min-height: 65px;
+            border: 4px solid #cfd8dc;
+            margin-bottom: 12px;
+            touch-action: none;
+        }
+
+        .animal-draggable {
+            font-size: 2.5rem;
+            cursor: grab;
+            transition: all 0.3s ease;
+            animation: bounce 2s ease-in-out infinite;
+            padding: 4px;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            touch-action: none;
+        }
+
+        .animal-draggable:hover { transform: scale(1.2); border-color: #f9d423; }
+        .animal-draggable.dragging { opacity: 0.4; transform: scale(0.8); }
+
+        .drop-zones {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .drop-zone {
+            flex: 1;
+            min-width: 120px;
+            min-height: 100px;
+            border: 4px dashed #aaa;
+            border-radius: 25px;
+            padding: 12px;
+            background: rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            position: relative;
+            touch-action: none;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #4CAF50;
+            background: rgba(76,175,80,0.15);
+            transform: scale(1.02);
+        }
+
+        .drop-zone .zone-label {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 4px 14px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 3px solid #1e3c5c;
+            white-space: nowrap;
+        }
+
+        .drop-zone .zone-label.z1 { background: #e3f2fd; border-color: #0d47a1; color: #0d47a1; }
+        .drop-zone .zone-label.z2 { background: #fff3cd; border-color: #e65100; color: #e65100; }
+
+        .drop-zone .empty-message { color: #999; font-size: 0.9rem; }
+        .drop-zone .animal-dropped { font-size: 2.2rem; animation: popIn 0.3s ease; }
+
+        @keyframes popIn { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        /* PASOS DE CONTEO Y SUMA - JUEGO 3 */
+        .count-step {
+            background: white;
+            border-radius: 18px;
+            padding: 8px;
+            margin: 4px 0;
+            border: 3px solid #e0e0e0;
+        }
+
+        .count-step .step-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 6px;
+        }
+
+        .step-icon {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .step-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1e3c5c;
+        }
+
+        .group-count-input {
+            width: 65px;
+            padding: 8px 10px;
+            font-size: 1.4rem;
+            text-align: center;
+            border: 4px solid #1e3c5c;
+            border-radius: 18px;
+            font-weight: bold;
+            background: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .group-count-input:focus {
+            border-color: #f9d423;
+            box-shadow: 0 0 15px rgba(249,212,35,0.4);
+        }
+
+        .group-count-input:disabled { opacity: 0.5; background: #e9ecef; }
+
+        .group-count-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #0b7dda;
+            border-bottom: 3px solid #0b5fa0;
+        }
+
+        .group-count-btn:active { transform: translateY(4px); box-shadow: none; }
+        .group-count-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(4px); box-shadow: none; }
+
+        .count-feedback {
+            font-size: 1rem;
+            font-weight: bold;
+            min-width: 120px;
+            text-align: left;
+        }
+
+        .group-result-message {
+            margin-top: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            min-height: 35px;
+            padding: 8px;
+            border-radius: 18px;
+            background: #f8f9fa;
+        }
+
+        .group-reset-btn {
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+            width: 100%;
+            box-shadow: 0 5px 0 #e65100;
+            border-bottom: 4px solid #bf360c;
+        }
+
+        .group-reset-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ========== MENSAJES ========== */
+        .game-message {
+            margin: 8px 0;
+            min-height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.4);
+            border: 3px dashed #1e3c5c;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .game-message.correct { background: #c8e6c9; border: 4px solid #2e7d32; color: #1e5a1e; }
+        .game-message.incorrect { background: #ffcdd2; border: 4px solid #c62828; color: #b71c1c; }
+        .game-message.success { background: #e8f5e9; border: 4px solid #4CAF50; color: #1e5a1e; font-size: 1.5rem; }
+
+        /* ========== PANTALLA DE RESULTADOS ========== */
+        #resultsScreen { display: none; }
+        #resultsScreen.active { display: block; }
+
+        .results-card {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            border: 4px solid #f9d423;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .results-card .result-icon { font-size: 3.5rem; }
+        .results-card .result-title { font-size: 1.8rem; font-weight: bold; color: #1e3c5c; margin: 8px 0; }
+        .results-card .result-detail { font-size: 1.1rem; color: #555; margin: 4px 0; }
+        .results-card .result-detail strong { color: #1e3c5c; }
+        .results-card .result-score { font-size: 3rem; font-weight: bold; color: #f9d423; text-shadow: 3px 3px 0 #b38f1a; margin: 8px 0; }
+        .results-card .result-stars { font-size: 2rem; letter-spacing: 6px; }
+
+        .play-again-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 40px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 6px 0 #2e7d32;
+            border-bottom: 4px solid #1b5e20;
+            width: 100%;
+        }
+
+        .play-again-btn:hover { transform: scale(1.02); background: #66bb6a; }
+        .play-again-btn:active { transform: translateY(5px); box-shadow: none; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 700px) {
+            .main-container { padding: 15px 12px 20px; border-radius: 30px; }
+            .welcome-title { font-size: 1.8rem; }
+            .welcome-icon { font-size: 3rem; }
+            .game-header { flex-direction: column; text-align: center; padding: 8px 12px; }
+            .header-stats { justify-content: center; }
+            .operation { font-size: 2.2rem; }
+            .options-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .option-btn { font-size: 1.5rem; padding: 10px 0; }
+            .animal-icon { font-size: 2rem; }
+            .drop-zone { min-width: 100px; min-height: 85px; }
+            .count-feedback { min-width: 80px; font-size: 0.9rem; }
+            .step-label { font-size: 0.9rem; }
+            .group-count-input { width: 55px; font-size: 1.2rem; }
+            .animal-draggable { font-size: 2rem; }
+            .animal-dropped { font-size: 1.8rem; }
+            .nav-btn { font-size: 0.75rem; padding: 6px 10px; min-width: 70px; }
+        }
+
+        @media (max-width: 450px) {
+            .main-container { padding: 10px 8px 15px; border-radius: 20px; }
+            .welcome-title { font-size: 1.5rem; }
+            .name-input-group { padding: 15px 12px; }
+            .name-input-group input { font-size: 1.2rem; padding: 10px 15px; }
+            .start-btn { font-size: 1.3rem; padding: 12px 30px; }
+            .nav-buttons { flex-direction: column; gap: 5px; }
+            .nav-btn { min-width: auto; font-size: 0.8rem; padding: 8px 12px; }
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+            .drop-zones { flex-direction: column; }
+            .drop-zone { min-width: auto; min-height: 70px; }
+            .operation { font-size: 1.8rem; }
+            .game-message { font-size: 1rem; min-height: 38px; padding: 6px 10px; }
+            .timer-display { font-size: 1rem; padding: 4px 10px; min-width: 60px; }
+            .lives-display { font-size: 1.2rem; }
+            .count-step .step-row { gap: 5px; }
+            .group-count-input { width: 50px; font-size: 1rem; padding: 6px 8px; }
+            .group-count-btn { font-size: 0.8rem; padding: 6px 14px; }
+            .count-feedback { min-width: 60px; font-size: 0.8rem; }
+            .step-icon { font-size: 1.4rem; }
+            .header-score { font-size: 0.9rem; padding: 3px 10px; }
+            .header-score .score-number-header { font-size: 0.9rem; padding: 0 6px; }
+        }
+
+        @media (max-width: 380px) {
+            .operation { font-size: 1.5rem; letter-spacing: 1px; }
+            .option-btn { font-size: 1.2rem; padding: 8px 0; }
+            .animal-icon { font-size: 1.6rem; }
+            .animal-draggable { font-size: 1.6rem; }
+            .animal-dropped { font-size: 1.4rem; }
+        }
+
+        /* ========== SOPORTE TÁCTIL ========== */
+        @media (hover: none) {
+            .animal-draggable:hover { transform: none; border-color: transparent; }
+            .option-btn:hover { transform: none; background: #e3f2fd; }
+            .nav-btn:hover { transform: none; }
+            .start-btn:hover { transform: none; background: #4CAF50; }
+            .play-again-btn:hover { transform: none; background: #4CAF50; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- ============================================ -->
+    <!-- PANTALLA DE INICIO -->
+    <!-- ============================================ -->
+    <div id="welcomeScreen">
+        <span class="welcome-icon">🌟</span>
+        <h1 class="welcome-title">¡Aventura Matemática!</h1>
+        <p class="welcome-subtitle">3 juegos para aprender a sumar 🎮</p>
+
+        <div class="name-input-group">
+            <label>✏️ Escribe tu nombre completo</label>
+            <input type="text" id="playerNameInput" placeholder="Ej: Juan Pérez" maxlength="30" autofocus>
+            <div class="error-msg" id="nameError"></div>
+            <button class="start-btn" id="startGameBtn">🚀 ¡Comenzar!</button>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA DE JUEGO -->
+    <!-- ============================================ -->
+    <div id="gameScreen">
+        <!-- Header con puntaje GLOBAL -->
+        <div class="game-header">
+            <div class="player-name">👤 <span id="displayName">---</span></div>
+            <div class="header-stats">
+                <div class="header-score">
+                    🏆 <span class="score-number-header" id="headerScoreDisplay">0</span>
+                </div>
+                <div class="lives-display" id="livesDisplay">
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                    <span class="life-heart">❤️</span>
+                </div>
+                <div class="timer-display" id="timerDisplay">⏱️ 5:00</div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <div class="nav-buttons">
+            <button class="nav-btn juego1 active" data-game="game1" onclick="switchGame('game1')">➕ Suma Rápida</button>
+            <button class="nav-btn juego2" data-game="game2" onclick="switchGame('game2')">🔢 Cuenta y Suma</button>
+            <button class="nav-btn juego3" data-game="game3" onclick="switchGame('game3')">🎯 Agrupa y Suma</button>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="game-message" id="gameMessage">🎯 ¡Elige un juego y aprende sumando!</div>
+
+        <!-- ============================================ -->
+        <!-- JUEGO 1: SUMA RÁPIDA -->
+        <!-- ============================================ -->
+        <div id="game1" class="game-screen active">
+            <div class="score-panel">
+                <span>🏆 Aciertos</span>
+                <span class="score-number" id="scoreDisplay1">0</span>
+            </div>
+
+            <div class="operation-box">
+                <div class="operation" id="operationDisplay">
+                    <span id="num1">3</span>
+                    <span class="operator"> + </span>
+                    <span id="num2">2</span>
+                    <span class="equals"> = </span>
+                    <span>?</span>
+                </div>
+            </div>
+
+            <div class="options-grid" id="optionsContainer"></div>
+            <button class="new-sum-btn" id="newSumBtn">✨ Nueva Suma ✨</button>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- JUEGO 2: CUENTA Y SUMA -->
+        <!-- ============================================ -->
+        <div id="game2" class="game-screen">
+            <div class="count-game-area">
+                <div class="score-mini">
+                    🏆 Puntaje: <span id="scoreDisplay2">0</span>
+                </div>
+
+                <div class="count-instruction" id="countInstruction">
+                    🧮 Cuenta los animalitos y escribe el número
+                </div>
+
+                <div class="animals-container" id="animalsContainer"></div>
+
+                <div class="count-input-group">
+                    <div class="count-row">
+                        <span class="count-label">🐶 Grupo 1:</span>
+                        <input type="number" class="count-input" id="countInput1" min="0" max="10" placeholder="?">
+                        <button class="count-check-btn" id="checkBtn1">✅ Verificar</button>
+                    </div>
+                    <div class="count-row">
+                        <span class="count-label">🐱 Grupo 2:</span>
+                        <input type="number" class="count-input" id="countInput2" min="0" max="10" placeholder="?">
+                        <button class="count-check-btn" id="checkBtn2">✅ Verificar</button>
+                    </div>
+                    <div class="count-row" id="sumRow" style="display:none;">
+                        <span class="count-label">➕ Suma:</span>
+                        <input type="number" class="count-input" id="sumInputCount" min="0" max="10" placeholder="?">
+                        <button class="count-check-btn" id="sumCheckBtn" style="background:#FF9800;">🎯 Sumar</button>
+                    </div>
+                </div>
+
+                <div class="count-result-area" id="countResultArea">
+                    <span class="result-emoji">🌟</span>
+                    <span class="result-text">¡Cuenta los animalitos!</span>
+                </div>
+
+                <div class="count-progress" id="countProgress">Paso 1: Cuenta el Grupo 1</div>
+                <button class="reset-count-btn" id="resetCountBtn">🔄 Nuevos Animalitos</button>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- JUEGO 3: AGRUPA Y SUMA -->
+        <!-- ============================================ -->
+        <div id="game3" class="game-screen">
+            <div class="group-game-area">
+                <div class="score-mini">
+                    🏆 Puntaje: <span id="scoreDisplay3">0</span>
+                </div>
+
+                <div class="group-instruction" id="groupInstruction">
+                    🎯 Arrastra cada animalito a su familia
+                </div>
+
+                <div class="animals-pool" id="animalsPool"></div>
+
+                <div class="drop-zones">
+                    <div class="drop-zone" id="dropZone1" data-type="🐶">
+                        <span class="zone-label z1">🐶 Familia 1</span>
+                        <span class="empty-message">Arrastra 🐶 aquí</span>
+                    </div>
+                    <div class="drop-zone" id="dropZone2" data-type="🐱">
+                        <span class="zone-label z2">🐱 Familia 2</span>
+                        <span class="empty-message">Arrastra 🐱 aquí</span>
+                    </div>
+                </div>
+
+                <!-- ÁREA DE CONTEO Y SUMA -->
+                <div class="group-sum-area" id="groupSumArea">
+                    
+                    <!-- PASO 2: CONTAR FAMILIA 1 -->
+                    <div class="count-step" id="stepCount1" style="display:none;">
+                        <div class="step-row">
+                            <span class="step-icon">🐶</span>
+                            <span class="step-label">Familia 1: ¿Cuántos 🐶 hay?</span>
+                            <input type="number" class="group-count-input" id="groupCountInput1" min="0" max="10" placeholder="?">
+                            <button class="group-count-btn" id="groupCountBtn1">✅ Verificar</button>
+                            <span class="count-feedback" id="countFeedback1"></span>
+                        </div>
+                        <div style="text-align:center; margin-top:5px; font-size:1.2rem; font-weight:bold; color:#0d47a1; display:none;" id="displayCount1">
+                            🐶 Familia 1: <span id="showCount1">0</span> animales
+                        </div>
+                    </div>
+
+                    <!-- PASO 3: CONTAR FAMILIA 2 -->
+                    <div class="count-step" id="stepCount2" style="display:none;">
+                        <div class="step-row">
+                            <span class="step-icon">🐱</span>
+                            <span class="step-label">Familia 2: ¿Cuántos 🐱 hay?</span>
+                            <input type="number" class="group-count-input" id="groupCountInput2" min="0" max="10" placeholder="?">
+                            <button class="group-count-btn" id="groupCountBtn2">✅ Verificar</button>
+                            <span class="count-feedback" id="countFeedback2"></span>
+                        </div>
+                        <div style="text-align:center; margin-top:5px; font-size:1.2rem; font-weight:bold; color:#e65100; display:none;" id="displayCount2">
+                            🐱 Familia 2: <span id="showCount2">0</span> animales
+                        </div>
+                    </div>
+
+                    <!-- PASO 4: SUMAR -->
+                    <div class="count-step" id="stepSum" style="display:none;">
+                        <div class="step-row">
+                            <span class="step-icon">🧮</span>
+                            <span class="step-label">
+                                <span id="sumDisplayG1">0</span> 🐶 + <span id="sumDisplayG2">0</span> 🐱 = ?
+                            </span>
+                            <input type="number" class="group-count-input" id="groupSumInputFinal" min="0" max="10" placeholder="?">
+                            <button class="group-count-btn" id="groupSumBtnFinal" style="background:#FF9800;">🎯 Verificar Suma</button>
+                            <span class="count-feedback" id="sumFeedback"></span>
+                        </div>
+                    </div>
+
+                    <!-- MENSAJE DE ESTADO -->
+                    <div class="group-result-message" id="groupResultMessage">
+                        🌟 <strong>Paso 1:</strong> Arrastra los animalitos a sus familias
+                    </div>
+                </div>
+
+                <button class="group-reset-btn" id="groupResetBtn">🔄 Nueva Ronda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA DE RESULTADOS -->
+    <!-- ============================================ -->
+    <div id="resultsScreen">
+        <div class="results-card">
+            <div class="result-icon" id="resultIcon">🏆</div>
+            <div class="result-title" id="resultTitle">¡Excelente Trabajo!</div>
+            <div class="result-detail" id="resultName">Jugador: <strong>---</strong></div>
+            <div class="result-score" id="resultScore">0</div>
+            <div class="result-detail" id="resultDetail">Sumas correctas</div>
+            <div class="result-stars" id="resultStars">⭐⭐⭐</div>
+            <div class="result-detail" id="resultTime">Tiempo: 0:00</div>
+            <button class="play-again-btn" id="playAgainBtn">🔄 Jugar de Nuevo</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ======================================================================
+    //  SISTEMA PRINCIPAL
+    // ======================================================================
+
+    // ============================
+    //  ELEMENTOS DEL DOM
+    // ============================
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const resultsScreen = document.getElementById('resultsScreen');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const nameError = document.getElementById('nameError');
+    const startBtn = document.getElementById('startGameBtn');
+    const displayName = document.getElementById('displayName');
+    const livesDisplay = document.getElementById('livesDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const gameMessage = document.getElementById('gameMessage');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const headerScoreDisplay = document.getElementById('headerScoreDisplay');
+    const scoreDisplay1 = document.getElementById('scoreDisplay1');
+    const scoreDisplay2 = document.getElementById('scoreDisplay2');
+    const scoreDisplay3 = document.getElementById('scoreDisplay3');
+
+    // ============================
+    //  ESTADO GLOBAL
+    // ============================
+    const globalState = {
+        playerName: '',
+        lives: 5,
+        maxLives: 5,
+        score: 0,
+        timeLeft: 300,
+        timerInterval: null,
+        isPlaying: false,
+        isGameOver: false,
+        currentGame: 'game1'
+    };
+
+    // ============================
+    //  FUNCIONES GLOBALES
+    // ============================
+
+    // ✅ ACTUALIZAR TODOS LOS CONTADORES DE PUNTAJE
+    function updateScoreDisplay() {
+        const score = globalState.score;
+        headerScoreDisplay.textContent = score;
+        scoreDisplay1.textContent = score;
+        scoreDisplay2.textContent = score;
+        scoreDisplay3.textContent = score;
+    }
+
+    function updateLivesDisplay() {
+        livesDisplay.innerHTML = '';
+        for (let i = 0; i < globalState.maxLives; i++) {
+            const heart = document.createElement('span');
+            heart.className = 'life-heart';
+            if (i >= globalState.lives) heart.classList.add('lost');
+            heart.textContent = '❤️';
+            livesDisplay.appendChild(heart);
+        }
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(globalState.timeLeft / 60);
+        const seconds = globalState.timeLeft % 60;
+        timerDisplay.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        if (globalState.timeLeft <= 60) timerDisplay.classList.add('warning');
+        else timerDisplay.classList.remove('warning');
+    }
+
+    function startTimer() {
+        if (globalState.timerInterval) clearInterval(globalState.timerInterval);
+        globalState.timerInterval = setInterval(() => {
+            globalState.timeLeft--;
+            updateTimerDisplay();
+            if (globalState.timeLeft <= 0) endGame(false);
+        }, 1000);
+    }
+
+    function loseLife(message) {
+        if (globalState.isGameOver) return;
+        globalState.lives--;
+        updateLivesDisplay();
+        setGameMessage(message, 'incorrect');
+        
+        if (globalState.lives <= 0) {
+            endGame(false);
+        }
+    }
+
+    function setGameMessage(msg, type = '') {
+        gameMessage.className = 'game-message';
+        if (type) gameMessage.classList.add(type);
+        gameMessage.innerHTML = msg;
+    }
+
+    function endGame(completed) {
+        if (globalState.isGameOver) return;
+        globalState.isGameOver = true;
+        globalState.isPlaying = false;
+        if (globalState.timerInterval) {
+            clearInterval(globalState.timerInterval);
+            globalState.timerInterval = null;
+        }
+
+        const totalTime = 300 - globalState.timeLeft;
+        const minutes = Math.floor(totalTime / 60);
+        const seconds = totalTime % 60;
+        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        document.getElementById('resultName').innerHTML = `Jugador: <strong>${globalState.playerName}</strong>`;
+        document.getElementById('resultTime').textContent = `⏱️ Tiempo: ${timeStr}`;
+
+        if (completed) {
+            document.getElementById('resultIcon').textContent = '🏆';
+            document.getElementById('resultTitle').textContent = '¡Felicidades! Completaste el desafío';
+            document.getElementById('resultDetail').textContent = 'Sumas correctas';
+            document.getElementById('resultScore').textContent = globalState.score;
+            let stars = '⭐';
+            if (globalState.score >= 5) stars = '⭐⭐⭐⭐⭐';
+            else if (globalState.score >= 4) stars = '⭐⭐⭐⭐';
+            else if (globalState.score >= 3) stars = '⭐⭐⭐';
+            else if (globalState.score >= 2) stars = '⭐⭐';
+            document.getElementById('resultStars').textContent = stars;
+        } else if (globalState.lives <= 0) {
+            document.getElementById('resultIcon').textContent = '😅';
+            document.getElementById('resultTitle').textContent = '¡Se acabaron las vidas!';
+            document.getElementById('resultDetail').textContent = 'Sumas correctas';
+            document.getElementById('resultScore').textContent = globalState.score;
+            document.getElementById('resultStars').textContent = '💪 ¡Sigue practicando!';
+        } else {
+            document.getElementById('resultIcon').textContent = '⏰';
+            document.getElementById('resultTitle').textContent = '¡Se acabó el tiempo!';
+            document.getElementById('resultDetail').textContent = 'Sumas correctas';
+            document.getElementById('resultScore').textContent = globalState.score;
+            document.getElementById('resultStars').textContent = '🌟 ¡Buen intento!';
+        }
+
+        gameScreen.classList.remove('active');
+        resultsScreen.classList.add('active');
+    }
+
+    function resetFullGame() {
+        if (globalState.timerInterval) {
+            clearInterval(globalState.timerInterval);
+            globalState.timerInterval = null;
+        }
+        resultsScreen.classList.remove('active');
+        welcomeScreen.classList.remove('hidden');
+        gameScreen.classList.remove('active');
+        playerNameInput.value = '';
+        playerNameInput.focus();
+        timerDisplay.classList.remove('warning');
+        globalState.isGameOver = false;
+        globalState.isPlaying = false;
+        globalState.lives = 5;
+        globalState.score = 0;
+        updateLivesDisplay();
+        updateScoreDisplay();
+    }
+
+    function switchGame(gameId) {
+        if (globalState.isGameOver) return;
+        globalState.currentGame = gameId;
+        document.querySelectorAll('.game-screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(gameId).classList.add('active');
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.nav-btn[data-game="${gameId}"]`).classList.add('active');
+        setGameMessage(`🎯 Juego activo: ${getGameName(gameId)}`);
+        updateScoreDisplay();
+    }
+
+    function getGameName(id) {
+        const names = { game1: 'Suma Rápida', game2: 'Cuenta y Suma', game3: 'Agrupa y Suma' };
+        return names[id] || id;
+    }
+
+    // ============================
+    //  INICIO DEL JUEGO
+    // ============================
+    function startGame() {
+        const name = playerNameInput.value.trim();
+        if (name.length < 3) {
+            nameError.textContent = '⚠️ Escribe tu nombre completo (mínimo 3 caracteres)';
+            return;
+        }
+        if (/^[0-9]+$/.test(name)) {
+            nameError.textContent = '⚠️ Escribe un nombre válido (no solo números)';
+            return;
+        }
+        nameError.textContent = '';
+        globalState.playerName = name;
+        displayName.textContent = name;
+        globalState.lives = 5;
+        globalState.score = 0;
+        globalState.timeLeft = 300;
+        globalState.isPlaying = true;
+        globalState.isGameOver = false;
+
+        updateLivesDisplay();
+        updateTimerDisplay();
+        updateScoreDisplay();
+        startTimer();
+
+        welcomeScreen.classList.add('hidden');
+        gameScreen.classList.add('active');
+        resultsScreen.classList.remove('active');
+
+        initGame1();
+        initCountGame();
+        initGroupGame();
+        switchGame('game1');
+        setGameMessage('🎮 ¡Elige un juego y comienza a sumar!');
+    }
+
+    // ======================================================================
+    //  JUEGO 1: SUMA RÁPIDA
+    // ======================================================================
+    function initGame1() {
+        const num1El = document.getElementById('num1');
+        const num2El = document.getElementById('num2');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const newSumBtn = document.getElementById('newSumBtn');
+
+        let num1 = 0, num2 = 0, correct = 0;
+        let canSelect = true;
+        const MAX = 10;
+
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function generateSum() {
+            const a = randomInt(1, MAX - 1);
+            const b = randomInt(1, MAX - a);
+            return { num1: a, num2: b, sum: a + b };
+        }
+
+        function generateOptions(correct) {
+            let opts = new Set([correct]);
+            while (opts.size < 4) {
+                const c = randomInt(0, MAX);
+                if (!opts.has(c)) opts.add(c);
+            }
+            let arr = Array.from(opts);
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            optionsContainer.innerHTML = '';
+            arr.forEach(v => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = v;
+                btn.dataset.value = v;
+                btn.addEventListener('click', (e) => {
+                    if (!canSelect || globalState.isGameOver) return;
+                    const val = parseInt(e.currentTarget.dataset.value);
+                    const isCorrect = val === correct;
+                    canSelect = false;
+                    document.querySelectorAll('.option-btn').forEach(b => {
+                        b.style.opacity = '0.6';
+                        b.style.cursor = 'default';
+                    });
+                    e.currentTarget.style.transform = 'scale(0.95)';
+                    e.currentTarget.style.border = '6px solid #f9d423';
+                    if (isCorrect) {
+                        globalState.score++;
+                        updateScoreDisplay();
+                        setGameMessage('🎉 ¡Correcto! +1 punto ⭐', 'correct');
+                        e.currentTarget.style.background = '#a5d6a7';
+                        e.currentTarget.style.borderColor = '#2e7d32';
+                    } else {
+                        setGameMessage(`😅 La respuesta era ${correct}`, 'incorrect');
+                        e.currentTarget.style.background = '#ef9a9a';
+                        e.currentTarget.style.borderColor = '#c62828';
+                        document.querySelectorAll('.option-btn').forEach(b => {
+                            if (parseInt(b.dataset.value) === correct) {
+                                b.style.background = '#a5d6a7';
+                                b.style.border = '6px solid #2e7d32';
+                            }
+                        });
+                        loseLife('Respuesta incorrecta');
+                    }
+                    setTimeout(() => {
+                        if (!globalState.isGameOver) refreshSum();
+                    }, 1200);
+                });
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function refreshSum() {
+            if (globalState.isGameOver) return;
+            const { num1: a, num2: b, sum } = generateSum();
+            num1 = a; num2 = b; correct = sum;
+            num1El.textContent = a;
+            num2El.textContent = b;
+            generateOptions(sum);
+            canSelect = true;
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.style.transform = '';
+                btn.style.border = '4px solid #1e3c5c';
+                btn.style.background = '#e3f2fd';
+            });
+            if (!globalState.isGameOver) {
+                setGameMessage('🤔 ¿Cuál es la suma?');
+            }
+        }
+
+        newSumBtn.addEventListener('click', () => {
+            if (!globalState.isGameOver) refreshSum();
+        });
+
+        refreshSum();
+    }
+
+    // ======================================================================
+    //  JUEGO 2: CUENTA Y SUMA
+    // ======================================================================
+    function initCountGame() {
+        const animalsContainer = document.getElementById('animalsContainer');
+        const countInput1 = document.getElementById('countInput1');
+        const countInput2 = document.getElementById('countInput2');
+        const sumInput = document.getElementById('sumInputCount');
+        const checkBtn1 = document.getElementById('checkBtn1');
+        const checkBtn2 = document.getElementById('checkBtn2');
+        const sumCheckBtn = document.getElementById('sumCheckBtn');
+        const resultArea = document.getElementById('countResultArea');
+        const progress = document.getElementById('countProgress');
+        const instruction = document.getElementById('countInstruction');
+        const resetBtn = document.getElementById('resetCountBtn');
+        const sumRow = document.getElementById('sumRow');
+
+        const ANIMALS = ['🐶', '🐱', '🐰', '🐻', '🐼', '🐨', '🦊', '🐮', '🐷', '🐵'];
+        let state = { count1: 0, count2: 0, c1Ok: false, c2Ok: false, sumOk: false, step: 1 };
+
+        function getRandomAnimals(count) {
+            let r = [];
+            for (let i = 0; i < count; i++) r.push(ANIMALS[Math.floor(Math.random() * ANIMALS.length)]);
+            return r;
+        }
+
+        function generateCountGame() {
+            if (globalState.isGameOver) return;
+            const c1 = Math.floor(Math.random() * 4) + 1;
+            const c2 = Math.floor(Math.random() * (10 - c1)) + 1;
+            state.count1 = c1;
+            state.count2 = c2;
+            state.c1Ok = false;
+            state.c2Ok = false;
+            state.sumOk = false;
+            state.step = 1;
+
+            const a1 = getRandomAnimals(c1);
+            const a2 = getRandomAnimals(c2);
+            animalsContainer.innerHTML = `
+                <div style="width:100%; text-align:center; margin-bottom:5px; font-size:1rem; color:#666;">
+                    <span style="background:#e3f2fd; padding:4px 12px; border-radius:15px;">🐶 Grupo 1</span>
+                    <span style="margin:0 8px;">➕</span>
+                    <span style="background:#fff3cd; padding:4px 12px; border-radius:15px;">🐱 Grupo 2</span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center; width:100%;">
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:#e3f2fd; border-radius:15px; min-height:60px; min-width:100px; justify-content:center; align-items:center;">
+                        ${a1.map(a => `<span class="animal-icon">${a}</span>`).join('')}
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:6px; padding:8px; background:#fff3cd; border-radius:15px; min-height:60px; min-width:100px; justify-content:center; align-items:center;">
+                        ${a2.map(a => `<span class="animal-icon">${a}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            countInput1.value = '';
+            countInput2.value = '';
+            sumInput.value = '';
+            countInput1.disabled = false;
+            countInput2.disabled = true;
+            sumInput.disabled = true;
+            checkBtn1.disabled = false;
+            checkBtn2.disabled = true;
+            sumCheckBtn.disabled = true;
+            sumRow.style.display = 'none';
+
+            resultArea.className = 'count-result-area';
+            resultArea.innerHTML = `<span class="result-emoji">🌟</span><span class="result-text">¡Cuenta los animalitos del Grupo 1!</span>`;
+            progress.textContent = 'Paso 1: Cuenta el Grupo 1 (🐶)';
+            instruction.innerHTML = '🧮 <strong>Paso 1:</strong> Cuenta los animalitos del Grupo 1';
+            countInput1.focus();
+        }
+
+        function checkGroup1() {
+            if (state.c1Ok || globalState.isGameOver) return;
+            const val = parseInt(countInput1.value);
+            
+            if (countInput1.value.trim() === '' || isNaN(val) || val < 0) {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">⚠️</span><span class="result-text">Escribe un número válido</span>`;
+                countInput1.value = '';
+                countInput1.focus();
+                return;
+            }
+            
+            if (val === state.count1) {
+                state.c1Ok = true;
+                resultArea.className = 'count-result-area correct';
+                resultArea.innerHTML = `<span class="result-emoji">✅</span><span class="result-text">¡Correcto! Hay ${state.count1} animalitos</span>`;
+                countInput1.disabled = true;
+                checkBtn1.disabled = true;
+                state.step = 2;
+                progress.textContent = 'Paso 2: Cuenta el Grupo 2 (🐱)';
+                instruction.innerHTML = '🧮 <strong>Paso 2:</strong> Cuenta los animalitos del Grupo 2';
+                countInput2.disabled = false;
+                checkBtn2.disabled = false;
+                countInput2.focus();
+            } else {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">😅</span><span class="result-text">¡Ups! Hay ${state.count1} animalitos. ¡Vuelve a contar!</span>`;
+                countInput1.value = '';
+                countInput1.focus();
+                loseLife('Contaste mal el Grupo 1');
+            }
+        }
+
+        function checkGroup2() {
+            if (state.c2Ok || globalState.isGameOver) return;
+            const val = parseInt(countInput2.value);
+            
+            if (countInput2.value.trim() === '' || isNaN(val) || val < 0) {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">⚠️</span><span class="result-text">Escribe un número válido</span>`;
+                countInput2.value = '';
+                countInput2.focus();
+                return;
+            }
+            
+            if (val === state.count2) {
+                state.c2Ok = true;
+                resultArea.className = 'count-result-area correct';
+                resultArea.innerHTML = `<span class="result-emoji">✅</span><span class="result-text">¡Correcto! Hay ${state.count2} animalitos</span>`;
+                countInput2.disabled = true;
+                checkBtn2.disabled = true;
+                state.step = 3;
+                progress.textContent = 'Paso 3: ¡Suma los dos grupos!';
+                instruction.innerHTML = `🧮 <strong>Paso 3:</strong> ${state.count1} + ${state.count2} = ?`;
+                sumRow.style.display = 'flex';
+                sumInput.disabled = false;
+                sumCheckBtn.disabled = false;
+                sumInput.focus();
+                resultArea.className = 'count-result-area';
+                resultArea.innerHTML = `<span class="result-emoji">🧮</span><span class="result-text">¡Ahora escribe la suma total!</span>`;
+            } else {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">😅</span><span class="result-text">¡Ups! Hay ${state.count2} animalitos. ¡Vuelve a contar!</span>`;
+                countInput2.value = '';
+                countInput2.focus();
+                loseLife('Contaste mal el Grupo 2');
+            }
+        }
+
+        function checkSumCount() {
+            if (state.sumOk || globalState.isGameOver) return;
+            const val = parseInt(sumInput.value);
+            const total = state.count1 + state.count2;
+            
+            if (sumInput.value.trim() === '' || isNaN(val) || val < 0) {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">⚠️</span><span class="result-text">Escribe un número válido</span>`;
+                sumInput.value = '';
+                sumInput.focus();
+                return;
+            }
+            
+            if (val === total) {
+                state.sumOk = true;
+                globalState.score++;
+                updateScoreDisplay();
+                resultArea.className = 'count-result-area correct';
+                resultArea.innerHTML = `
+                    <span class="result-emoji">🎉</span>
+                    <span class="result-text" style="font-size:1.5rem;">
+                        ${state.count1} + ${state.count2} = <strong style="color:#2e7d32;">${total}</strong> ✅
+                    </span>
+                    <div style="font-size:1rem;">¡Sumaste correctamente! +1 punto ⭐</div>
+                `;
+                sumInput.disabled = true;
+                sumCheckBtn.disabled = true;
+                progress.textContent = '🎉 ¡Completaste la suma!';
+                instruction.innerHTML = '🎉 <strong>¡Excelente trabajo!</strong>';
+                setGameMessage('🎉 ¡Suma correcta! +1 punto', 'correct');
+                setTimeout(() => {
+                    if (!globalState.isGameOver) generateCountGame();
+                }, 2000);
+            } else {
+                resultArea.className = 'count-result-area incorrect';
+                resultArea.innerHTML = `<span class="result-emoji">😅</span><span class="result-text">${state.count1} + ${state.count2} no es ${val}. ¡Intenta de nuevo!</span>`;
+                sumInput.value = '';
+                sumInput.focus();
+                loseLife('Sumaste incorrectamente');
+            }
+        }
+
+        resetBtn.addEventListener('click', () => { if (!globalState.isGameOver) generateCountGame(); });
+        checkBtn1.addEventListener('click', checkGroup1);
+        checkBtn2.addEventListener('click', checkGroup2);
+        sumCheckBtn.addEventListener('click', checkSumCount);
+        countInput1.addEventListener('keypress', e => { if (e.key === 'Enter') checkGroup1(); });
+        countInput2.addEventListener('keypress', e => { if (e.key === 'Enter') checkGroup2(); });
+        sumInput.addEventListener('keypress', e => { if (e.key === 'Enter') checkSumCount(); });
+
+        generateCountGame();
+    }
+
+    // ======================================================================
+    //  JUEGO 3: AGRUPA Y SUMA
+    // ======================================================================
+    function initGroupGame() {
+        // ============================
+        //  ELEMENTOS DEL DOM
+        // ============================
+        const pool = document.getElementById('animalsPool');
+        const drop1 = document.getElementById('dropZone1');
+        const drop2 = document.getElementById('dropZone2');
+        const instruction = document.getElementById('groupInstruction');
+        const resultMsg = document.getElementById('groupResultMessage');
+        const resetBtn = document.getElementById('groupResetBtn');
+
+        const countInput1 = document.getElementById('groupCountInput1');
+        const countInput2 = document.getElementById('groupCountInput2');
+        const sumInputFinal = document.getElementById('groupSumInputFinal');
+        const countBtn1 = document.getElementById('groupCountBtn1');
+        const countBtn2 = document.getElementById('groupCountBtn2');
+        const sumBtnFinal = document.getElementById('groupSumBtnFinal');
+        const feedback1 = document.getElementById('countFeedback1');
+        const feedback2 = document.getElementById('countFeedback2');
+        const sumFeedback = document.getElementById('sumFeedback');
+        const sumDisplayG1 = document.getElementById('sumDisplayG1');
+        const sumDisplayG2 = document.getElementById('sumDisplayG2');
+        const showCount1 = document.getElementById('showCount1');
+        const showCount2 = document.getElementById('showCount2');
+        const displayCount1 = document.getElementById('displayCount1');
+        const displayCount2 = document.getElementById('displayCount2');
+
+        const stepCount1 = document.getElementById('stepCount1');
+        const stepCount2 = document.getElementById('stepCount2');
+        const stepSum = document.getElementById('stepSum');
+
+        // ============================
+        //  VARIABLES DEL JUEGO
+        // ============================
+        let animals = [];
+        let group1 = [];
+        let group2 = [];
+        let totalCount1 = 0;
+        let totalCount2 = 0;
+        let isComplete = false;
+        let step = 0;
+        let touchDragIndex = null;
+
+        // ============================
+        //  PASO 1: GENERAR JUEGO
+        // ============================
+        function generateGroupGame() {
+            if (globalState.isGameOver) return;
+            
+            const count1 = Math.floor(Math.random() * 4) + 2;
+            const count2 = Math.floor(Math.random() * (10 - count1)) + 2;
+            const total = count1 + count2;
+
+            animals = [];
+            for (let i = 0; i < count1; i++) animals.push('🐶');
+            for (let i = 0; i < count2; i++) animals.push('🐱');
+
+            for (let i = animals.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [animals[i], animals[j]] = [animals[j], animals[i]];
+            }
+
+            group1 = [];
+            group2 = [];
+            totalCount1 = 0;
+            totalCount2 = 0;
+            isComplete = false;
+            step = 0;
+            touchDragIndex = null;
+
+            [drop1, drop2].forEach(zone => {
+                const dropped = zone.querySelectorAll('.animal-dropped');
+                dropped.forEach(el => el.remove());
+                const empty = zone.querySelector('.empty-message');
+                if (empty) empty.style.display = 'block';
+                zone.classList.remove('drag-over');
+            });
+
+            renderAnimals();
+
+            countInput1.value = '';
+            countInput2.value = '';
+            sumInputFinal.value = '';
+            feedback1.textContent = '';
+            feedback2.textContent = '';
+            sumFeedback.textContent = '';
+            showCount1.textContent = '0';
+            showCount2.textContent = '0';
+            displayCount1.style.display = 'none';
+            displayCount2.style.display = 'none';
+            sumDisplayG1.textContent = '0';
+            sumDisplayG2.textContent = '0';
+
+            countInput1.disabled = true;
+            countInput2.disabled = true;
+            sumInputFinal.disabled = true;
+            countBtn1.disabled = true;
+            countBtn2.disabled = true;
+            sumBtnFinal.disabled = true;
+
+            stepCount1.style.display = 'none';
+            stepCount2.style.display = 'none';
+            stepSum.style.display = 'none';
+
+            resultMsg.innerHTML = `🌟 <strong>Paso 1:</strong> Arrastra ${total} animalitos a sus familias (🐶 y 🐱)`;
+            resultMsg.style.background = '#f8f9fa';
+            resultMsg.style.color = '#1e3c5c';
+            instruction.innerHTML = '🎯 <strong>Paso 1:</strong> Arrastra cada animalito a su familia';
+
+            setGameMessage(`🎯 Paso 1: Agrupa ${total} animalitos`, '');
+        }
+
+        // ============================
+        //  RENDERIZAR ANIMALES
+        // ============================
+        function renderAnimals() {
+            pool.innerHTML = '';
+            animals.forEach((animal, index) => {
+                if (animal === null) return;
+                
+                const span = document.createElement('span');
+                span.className = 'animal-draggable';
+                span.textContent = animal;
+                span.draggable = true;
+                span.dataset.index = index;
+                span.dataset.animal = animal;
+                span.style.animationDelay = (Math.random() * 1.5) + 's';
+
+                span.addEventListener('dragstart', (e) => {
+                    if (globalState.isGameOver || isComplete || step > 0) {
+                        e.preventDefault();
+                        return;
+                    }
+                    span.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', index);
+                });
+
+                span.addEventListener('dragend', () => {
+                    span.classList.remove('dragging');
+                });
+
+                span.addEventListener('touchstart', (e) => {
+                    if (globalState.isGameOver || isComplete || step > 0) {
+                        e.preventDefault();
+                        return;
+                    }
+                    const touch = e.touches[0];
+                    touchDragIndex = index;
+                    span.classList.add('dragging');
+                    
+                    const clone = span.cloneNode(true);
+                    clone.id = 'dragClone';
+                    clone.style.position = 'fixed';
+                    clone.style.pointerEvents = 'none';
+                    clone.style.zIndex = '1000';
+                    clone.style.fontSize = '2.5rem';
+                    clone.style.opacity = '0.8';
+                    clone.style.transform = 'scale(1.2)';
+                    document.body.appendChild(clone);
+                    
+                    const rect = span.getBoundingClientRect();
+                    clone.style.left = (touch.clientX - 30) + 'px';
+                    clone.style.top = (touch.clientY - 30) + 'px';
+                    
+                    clone.dataset.offsetX = touch.clientX - rect.left;
+                    clone.dataset.offsetY = touch.clientY - rect.top;
+                }, { passive: true });
+
+                span.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const clone = document.getElementById('dragClone');
+                    if (!clone) return;
+                    
+                    const touch = e.touches[0];
+                    const offsetX = parseFloat(clone.dataset.offsetX) || 30;
+                    const offsetY = parseFloat(clone.dataset.offsetY) || 30;
+                    
+                    clone.style.left = (touch.clientX - offsetX) + 'px';
+                    clone.style.top = (touch.clientY - offsetY) + 'px';
+                    
+                    [drop1, drop2].forEach(zone => {
+                        const rect = zone.getBoundingClientRect();
+                        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                            zone.classList.add('drag-over');
+                        } else {
+                            zone.classList.remove('drag-over');
+                        }
+                    });
+                }, { passive: false });
+
+                span.addEventListener('touchend', (e) => {
+                    const clone = document.getElementById('dragClone');
+                    if (clone) clone.remove();
+                    span.classList.remove('dragging');
+                    
+                    const touch = e.changedTouches[0];
+                    let targetZone = null;
+                    
+                    [drop1, drop2].forEach(zone => {
+                        zone.classList.remove('drag-over');
+                        const rect = zone.getBoundingClientRect();
+                        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                            targetZone = zone;
+                        }
+                    });
+                    
+                    if (targetZone && touchDragIndex !== null) {
+                        handleDrop(targetZone, touchDragIndex);
+                    }
+                    touchDragIndex = null;
+                }, { passive: true });
+
+                pool.appendChild(span);
+            });
+        }
+
+        // ============================
+        //  MANEJAR DROP
+        // ============================
+        function handleDrop(zone, index) {
+            if (globalState.isGameOver || isComplete || step > 0) return;
+            if (isNaN(index) || index < 0 || index >= animals.length) return;
+
+            const animal = animals[index];
+            if (!animal) return;
+
+            const zoneType = zone.dataset.type;
+            if (animal !== zoneType) {
+                resultMsg.innerHTML = `😅 ¡${animal} no pertenece a esta familia!`;
+                resultMsg.style.background = '#ffcdd2';
+                resultMsg.style.color = '#b71c1c';
+                loseLife(`Pusiste ${animal} en la familia equivocada`);
+                return;
+            }
+
+            if (zoneType === '🐶') {
+                group1.push(animal);
+            } else {
+                group2.push(animal);
+            }
+            
+            animals[index] = null;
+
+            const element = document.querySelector(`.animal-draggable[data-index="${index}"]`);
+            if (element) element.remove();
+
+            const emptyMsg = zone.querySelector('.empty-message');
+            if (emptyMsg) emptyMsg.style.display = 'none';
+
+            const span = document.createElement('span');
+            span.className = 'animal-dropped';
+            span.textContent = animal;
+            zone.appendChild(span);
+
+            const remaining = animals.filter(a => a !== null).length;
+
+            if (remaining === 0) {
+                isComplete = true;
+                totalCount1 = group1.length;
+                totalCount2 = group2.length;
+
+                resultMsg.innerHTML = `
+                    ✅ <strong>Paso 1 completado!</strong><br>
+                    🐶 Familia 1: ${totalCount1} animales | 🐱 Familia 2: ${totalCount2} animales
+                `;
+                resultMsg.style.background = '#c8e6c9';
+                resultMsg.style.color = '#1e5a1e';
+                instruction.innerHTML = '🧮 <strong>Paso 2:</strong> ¿Cuántos animales hay en la Familia 1 (🐶)?';
+
+                step = 1;
+                stepCount1.style.display = 'block';
+                countInput1.disabled = false;
+                countBtn1.disabled = false;
+                countInput1.focus();
+                feedback1.textContent = '🔍 Escribe el número de 🐶';
+                feedback1.style.color = '#0d47a1';
+
+                setGameMessage('✅ Paso 1 completado. Ahora cuenta la Familia 1', 'correct');
+            }
+        }
+
+        // ============================
+        //  CONFIGURAR ZONAS DE DROP (Desktop)
+        // ============================
+        function setupDropZone(zone) {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const index = parseInt(e.dataTransfer.getData('text/plain'));
+                handleDrop(zone, index);
+            });
+        }
+
+        // ============================
+        //  PASO 2: CONTAR FAMILIA 1 (🐶)
+        // ============================
+        function checkCount1() {
+            if (step !== 1 || globalState.isGameOver) return;
+
+            const val = parseInt(countInput1.value);
+            
+            if (countInput1.value.trim() === '' || isNaN(val) || val < 0) {
+                feedback1.textContent = '⚠️ Escribe un número válido';
+                feedback1.style.color = '#c62828';
+                countInput1.value = '';
+                countInput1.focus();
+                return;
+            }
+
+            if (val === totalCount1) {
+                feedback1.innerHTML = `✅ ¡Correcto! Hay <strong>${totalCount1}</strong> 🐶 en la Familia 1`;
+                feedback1.style.color = '#2e7d32';
+                countInput1.disabled = true;
+                countBtn1.disabled = true;
+
+                showCount1.textContent = totalCount1;
+                displayCount1.style.display = 'block';
+
+                step = 2;
+                stepCount2.style.display = 'block';
+                countInput2.disabled = false;
+                countBtn2.disabled = false;
+                countInput2.focus();
+                feedback2.textContent = '🔍 Escribe el número de 🐱';
+                feedback2.style.color = '#e65100';
+
+                resultMsg.innerHTML = `
+                    ✅ Familia 1: ${totalCount1} 🐶<br>
+                    🧮 <strong>Paso 3:</strong> ¿Cuántos animales hay en la Familia 2 (🐱)?
+                `;
+                resultMsg.style.background = '#fff3cd';
+                resultMsg.style.color = '#e65100';
+                instruction.innerHTML = '🧮 <strong>Paso 3:</strong> ¿Cuántos 🐱 hay en la Familia 2?';
+
+                sumDisplayG1.textContent = totalCount1;
+
+                setGameMessage(`✅ Familia 1: ${totalCount1} 🐶. Ahora cuenta la Familia 2`, 'correct');
+            } else {
+                feedback1.textContent = `😅 ¡Ups! Hay ${totalCount1} 🐶. Vuelve a contar`;
+                feedback1.style.color = '#c62828';
+                countInput1.value = '';
+                countInput1.focus();
+                loseLife('Contaste mal la Familia 1 (🐶)');
+            }
+        }
+
+        // ============================
+        //  PASO 3: CONTAR FAMILIA 2 (🐱)
+        // ============================
+        function checkCount2() {
+            if (step !== 2 || globalState.isGameOver) return;
+
+            const val = parseInt(countInput2.value);
+            
+            if (countInput2.value.trim() === '' || isNaN(val) || val < 0) {
+                feedback2.textContent = '⚠️ Escribe un número válido';
+                feedback2.style.color = '#c62828';
+                countInput2.value = '';
+                countInput2.focus();
+                return;
+            }
+
+            if (val === totalCount2) {
+                feedback2.innerHTML = `✅ ¡Correcto! Hay <strong>${totalCount2}</strong> 🐱 en la Familia 2`;
+                feedback2.style.color = '#2e7d32';
+                countInput2.disabled = true;
+                countBtn2.disabled = true;
+
+                showCount2.textContent = totalCount2;
+                displayCount2.style.display = 'block';
+
+                step = 3;
+                stepSum.style.display = 'block';
+                sumInputFinal.disabled = false;
+                sumBtnFinal.disabled = false;
+                sumInputFinal.focus();
+
+                sumDisplayG1.textContent = totalCount1;
+                sumDisplayG2.textContent = totalCount2;
+
+                resultMsg.innerHTML = `
+                    ✅ Familia 1: ${totalCount1} 🐶 | Familia 2: ${totalCount2} 🐱<br>
+                    🧮 <strong>Paso 4:</strong> ${totalCount1} + ${totalCount2} = ?
+                `;
+                resultMsg.style.background = '#e3f2fd';
+                resultMsg.style.color = '#0d47a1';
+                instruction.innerHTML = `🧮 <strong>Paso 4:</strong> ${totalCount1} + ${totalCount2} = ?`;
+
+                sumFeedback.textContent = '🎯 Escribe el resultado de la suma';
+                sumFeedback.style.color = '#0d47a1';
+
+                setGameMessage(`🧮 Paso 4: ${totalCount1} + ${totalCount2} = ?`, '');
+            } else {
+                feedback2.textContent = `😅 ¡Ups! Hay ${totalCount2} 🐱. Vuelve a contar`;
+                feedback2.style.color = '#c62828';
+                countInput2.value = '';
+                countInput2.focus();
+                loseLife('Contaste mal la Familia 2 (🐱)');
+            }
+        }
+
+        // ============================
+        //  PASO 4: VERIFICAR SUMA
+        // ============================
+        function checkFinalSum() {
+            if (step !== 3 || globalState.isGameOver) return;
+
+            const val = parseInt(sumInputFinal.value);
+            const total = totalCount1 + totalCount2;
+
+            if (sumInputFinal.value.trim() === '' || isNaN(val) || val < 0) {
+                sumFeedback.textContent = '⚠️ Escribe un número válido';
+                sumFeedback.style.color = '#c62828';
+                sumInputFinal.value = '';
+                sumInputFinal.focus();
+                return;
+            }
+
+            if (val === total) {
+                globalState.score++;
+                updateScoreDisplay();
+                sumFeedback.innerHTML = `
+                    🎉🎉🎉 <strong style="color:#2e7d32;">¡CORRECTO!</strong><br>
+                    ${totalCount1} + ${totalCount2} = <strong style="color:#2e7d32; font-size:2rem;">${total}</strong>
+                `;
+                sumFeedback.style.color = '#1e5a1e';
+                sumInputFinal.disabled = true;
+                sumBtnFinal.disabled = true;
+
+                resultMsg.innerHTML = `
+                    🎉 <strong>¡FELICIDADES!</strong> Sumaste correctamente:<br>
+                    ${totalCount1} 🐶 + ${totalCount2} 🐱 = <strong style="color:#2e7d32; font-size:1.8rem;">${total}</strong> 🌟
+                `;
+                resultMsg.style.background = '#c8e6c9';
+                resultMsg.style.color = '#1e5a1e';
+                instruction.innerHTML = `🎉 ¡Excelente! ${totalCount1} + ${totalCount2} = ${total}`;
+
+                setGameMessage(`🎉 ¡Suma correcta! +1 punto ⭐`, 'correct');
+
+                setTimeout(() => {
+                    if (!globalState.isGameOver) {
+                        generateGroupGame();
+                    }
+                }, 2500);
+            } else {
+                sumFeedback.textContent = `😅 ${totalCount1} + ${totalCount2} no es ${val}. ¡Intenta de nuevo!`;
+                sumFeedback.style.color = '#c62828';
+                sumInputFinal.value = '';
+                sumInputFinal.focus();
+                loseLife('Sumaste incorrectamente');
+            }
+        }
+
+        // ============================
+        //  RESET DEL JUEGO
+        // ============================
+        function resetGroupGame() {
+            if (globalState.isGameOver) return;
+            generateGroupGame();
+        }
+
+        // ============================
+        //  CONFIGURAR EVENTOS
+        // ============================
+        setupDropZone(drop1);
+        setupDropZone(drop2);
+
+        countBtn1.addEventListener('click', checkCount1);
+        countBtn2.addEventListener('click', checkCount2);
+        sumBtnFinal.addEventListener('click', checkFinalSum);
+
+        countInput1.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkCount1(); });
+        countInput2.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkCount2(); });
+        sumInputFinal.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkFinalSum(); });
+
+        resetBtn.addEventListener('click', resetGroupGame);
+
+        generateGroupGame();
+        window.refreshGroupGame = generateGroupGame;
+    }
+
+    // ======================================================================
+    //  EVENT LISTENERS GLOBALES
+    // ======================================================================
+    startBtn.addEventListener('click', startGame);
+    playerNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') startGame(); });
+    playAgainBtn.addEventListener('click', resetFullGame);
+
+    // ======================================================================
+    //  INICIALIZACIÓN
+    // ======================================================================
+    window.addEventListener('load', () => {
+        playerNameInput.focus();
+    });
+</script>
+</body>
+</html>

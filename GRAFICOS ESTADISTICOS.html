@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🎯 Maestro del Gráfico Circular - MODO EXPERTO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        #startPage {
+            background: white;
+            border-radius: 30px;
+            padding: clamp(20px, 5vw, 50px);
+            max-width: 550px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+            margin: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #startPage .logo {
+            font-size: clamp(3em, 10vw, 4.5em);
+            margin-bottom: 5px;
+        }
+
+        #startPage h1 {
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        #startPage .subtitle {
+            color: #666;
+            font-size: clamp(0.9em, 2.5vw, 1.1em);
+            margin-bottom: 20px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: clamp(12px, 2vw, 18px) clamp(20px, 3vw, 35px);
+            border: 3px solid #764ba2;
+            border-radius: 15px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);
+        }
+
+        .mode-btn .icon {
+            font-size: clamp(1.5em, 4vw, 2.5em);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .mode-btn .title {
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.1em);
+            color: #333;
+        }
+
+        .mode-btn .desc {
+            font-size: clamp(0.7em, 1.5vw, 0.85em);
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .mode-btn.active .title {
+            color: white;
+        }
+
+        .mode-btn.active .desc {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        #startPage .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        #startPage label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: clamp(0.9em, 2vw, 1em);
+        }
+
+        #startPage input {
+            width: 100%;
+            padding: clamp(10px, 2vw, 14px) clamp(12px, 2.5vw, 18px);
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: clamp(0.9em, 2.5vw, 1.05em);
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        #startPage input:focus {
+            border-color: #764ba2;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(118, 75, 162, 0.15);
+            background: white;
+        }
+
+        #startPage input.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        #startPage .rules {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: clamp(12px, 2vw, 20px);
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        #startPage .rules h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: clamp(0.95em, 2.2vw, 1.1em);
+        }
+
+        #startPage .rules ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #startPage .rules ul li {
+            padding: 4px 0;
+            padding-left: 28px;
+            position: relative;
+            color: #444;
+            font-size: clamp(0.85em, 2vw, 1em);
+        }
+
+        #startPage .rules ul li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: clamp(12px, 2.5vw, 16px);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(1em, 3vw, 1.3em);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        #gamePage {
+            display: none;
+            background: white;
+            border-radius: clamp(15px, 3vw, 30px);
+            padding: clamp(12px, 2vw, 25px);
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease;
+            margin: 5px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: clamp(10px, 2vw, 20px);
+            flex-wrap: wrap;
+            gap: clamp(8px, 1.5vw, 15px);
+            padding-bottom: clamp(10px, 1.5vw, 15px);
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .game-header .player-info {
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1.5vw, 15px);
+        }
+
+        .game-header .player-info .avatar {
+            width: clamp(35px, 5vw, 45px);
+            height: clamp(35px, 5vw, 45px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.2em);
+            flex-shrink: 0;
+        }
+
+        .game-header .player-info .name {
+            font-weight: bold;
+            font-size: clamp(0.85em, 2vw, 1.1em);
+            color: #333;
+        }
+
+        .game-header .player-info .name span {
+            color: #764ba2;
+        }
+
+        .game-header .player-info .mode-badge {
+            background: #ff9800;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .game-header .player-info .mode-badge.expert {
+            background: #dc3545;
+        }
+
+        .timer-section {
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 1.5vw, 20px);
+            background: #f8f9fa;
+            padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 20px);
+            border-radius: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: clamp(1em, 2.5vw, 1.4em);
+            font-weight: bold;
+            color: #333;
+        }
+
+        .timer.warning {
+            color: #dc3545;
+            animation: blink 0.8s ease infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .lives {
+            display: flex;
+            gap: 2px;
+            font-size: clamp(1em, 2.5vw, 1.5em);
+        }
+
+        .lives .heart {
+            color: #dc3545;
+            transition: all 0.3s;
+        }
+
+        .lives .heart.lost {
+            color: #ddd;
+            transform: scale(0.8);
+        }
+
+        .score-display {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 15px);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .score-display .item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: bold;
+            font-size: clamp(0.75em, 1.8vw, 0.95em);
+        }
+
+        .score-display .item span {
+            color: #764ba2;
+            font-size: 1.1em;
+        }
+
+        .main-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(12px, 2vw, 25px);
+        }
+
+        @media (max-width: 900px) {
+            .main-board {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .game-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .timer-section {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            .score-display {
+                justify-content: center;
+            }
+        }
+
+        .chart-area {
+            background: #f8f9fa;
+            border-radius: clamp(12px, 2vw, 20px);
+            padding: clamp(12px, 2vw, 20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: clamp(300px, 50vh, 450px);
+        }
+
+        .chart-area h2 {
+            color: #333;
+            margin-bottom: clamp(8px, 1.5vw, 12px);
+            font-size: clamp(0.95em, 2.2vw, 1.2em);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: min(420px, 90vw);
+            margin: 0 auto;
+        }
+
+        #chartCanvas {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            max-width: 100%;
+        }
+
+        .chart-info {
+            margin-top: clamp(8px, 1.5vw, 12px);
+            display: flex;
+            gap: clamp(8px, 1.5vw, 15px);
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .info-card {
+            background: white;
+            padding: clamp(5px, 1vw, 8px) clamp(10px, 2vw, 16px);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            font-size: clamp(0.75em, 1.8vw, 0.9em);
+        }
+
+        .info-card .value {
+            color: #764ba2;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: clamp(8px, 1.2vw, 10px);
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: clamp(6px, 1vw, 10px) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: clamp(0.7em, 1.5vw, 0.85em);
+            color: #666;
+            margin-top: 3px;
+            width: 100%;
+        }
+
+        .status-indicator {
+            display: flex;
+            gap: clamp(8px, 1.5vw, 15px);
+            justify-content: center;
+            margin-top: 6px;
+            font-size: clamp(0.75em, 1.6vw, 0.9em);
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            padding: clamp(3px, 0.6vw, 4px) clamp(10px, 1.5vw, 14px);
+            border-radius: 20px;
+            background: white;
+            font-weight: bold;
+        }
+
+        .status-item .check {
+            color: #28a745;
+        }
+
+        .status-item .cross {
+            color: #dc3545;
+        }
+
+        .data-area {
+            background: #f8f9fa;
+            border-radius: clamp(12px, 2vw, 20px);
+            padding: clamp(12px, 2vw, 20px);
+        }
+
+        .data-area h2 {
+            color: #333;
+            margin-bottom: clamp(8px, 1.5vw, 12px);
+            font-size: clamp(0.95em, 2.2vw, 1.2em);
+        }
+
+        .problem-description {
+            background: white;
+            padding: clamp(10px, 1.5vw, 15px) clamp(12px, 2vw, 18px);
+            border-radius: 12px;
+            margin-bottom: clamp(10px, 1.5vw, 15px);
+            border-left: 4px solid #764ba2;
+            font-size: clamp(0.8em, 1.8vw, 0.95em);
+        }
+
+        .problem-description .title {
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.1em);
+            color: #764ba2;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .problem-description .context {
+            color: #555;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            margin-bottom: clamp(10px, 1.5vw, 15px);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: clamp(0.8em, 1.6vw, 0.95em);
+            min-width: 350px;
+        }
+
+        .data-table th {
+            background: #764ba2;
+            color: white;
+            padding: clamp(8px, 1vw, 12px) clamp(6px, 1vw, 10px);
+            font-size: clamp(0.75em, 1.4vw, 0.9em);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: clamp(8px, 1vw, 12px) clamp(6px, 1vw, 10px);
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table .fila-dato {
+            background: #fafafa;
+        }
+
+        .data-table .fila-total {
+            background: #e8eaf6;
+            font-weight: bold;
+            font-size: clamp(0.85em, 1.6vw, 1em);
+        }
+
+        .data-table .fila-total td {
+            padding: clamp(10px, 1.2vw, 14px) clamp(6px, 1vw, 10px);
+        }
+
+        .data-table .freq-value {
+            font-weight: bold;
+            color: #333;
+            font-size: clamp(1em, 1.8vw, 1.15em);
+        }
+
+        .data-table .category-name {
+            font-weight: bold;
+            color: #333;
+            font-size: clamp(0.95em, 1.6vw, 1.1em);
+        }
+
+        .data-table input {
+            width: clamp(70px, 12vw, 100px);
+            padding: clamp(8px, 1vw, 12px);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: clamp(1em, 1.8vw, 1.15em);
+            font-weight: bold;
+            transition: all 0.3s;
+            background: white;
+            min-width: 60px;
+        }
+
+        .data-table input:focus {
+            border-color: #764ba2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.15);
+        }
+
+        .data-table input:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
+
+        .data-table input.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .data-table input.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .data-table .total-value {
+            color: #764ba2;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .data-table .total-value.correct {
+            color: #28a745;
+        }
+
+        .data-table .total-value.incorrect {
+            color: #dc3545;
+        }
+
+        .summary-box {
+            background: white;
+            border-radius: 12px;
+            padding: clamp(10px, 1.5vw, 15px);
+            margin: clamp(10px, 1.5vw, 15px) 0;
+            border: 2px solid #ddd;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: clamp(5px, 1vw, 10px);
+        }
+
+        .summary-box .item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            font-size: clamp(0.85em, 1.6vw, 1em);
+        }
+
+        .summary-box .item .label {
+            color: #666;
+        }
+
+        .summary-box .item .value {
+            font-size: 1.15em;
+        }
+
+        .summary-box .item .value.correct {
+            color: #28a745;
+        }
+
+        .summary-box .item .value.incorrect {
+            color: #dc3545;
+        }
+
+        .actions {
+            display: flex;
+            gap: clamp(8px, 1vw, 12px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: clamp(10px, 1.2vw, 14px) clamp(18px, 2.5vw, 28px);
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(0.85em, 1.6vw, 1em);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1 1 auto;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-calculate {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-calculate:hover:not(:disabled) {
+            background: #e68900;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+        }
+
+        .feedback {
+            margin-top: clamp(10px, 1.5vw, 15px);
+            padding: clamp(10px, 1.5vw, 12px) clamp(12px, 2vw, 16px);
+            border-radius: 12px;
+            display: none;
+            font-weight: bold;
+            font-size: clamp(0.85em, 1.6vw, 1em);
+            text-align: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        .feedback.success {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .feedback.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .feedback.info {
+            display: block;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #17a2b8;
+        }
+
+        .feedback.life-lost {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        .feedback.calculated-ok {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .feedback.calculated-error {
+            display: block;
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ff9800;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .level-controls {
+            display: flex;
+            gap: clamp(5px, 0.8vw, 8px);
+            justify-content: center;
+            margin-bottom: clamp(8px, 1.5vw, 12px);
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            padding: clamp(6px, 0.8vw, 8px) clamp(14px, 1.8vw, 20px);
+            border: 2px solid #764ba2;
+            background: white;
+            border-radius: 50px;
+            font-weight: bold;
+            color: #764ba2;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: clamp(0.75em, 1.4vw, 0.9em);
+        }
+
+        .level-btn:hover:not(:disabled) {
+            background: #764ba2;
+            color: white;
+        }
+
+        .level-btn.active {
+            background: #764ba2;
+            color: white;
+        }
+
+        .level-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .chart-animate {
+            animation: pulse 0.8s ease;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #lifeLostModal,
+        #gameOverModal,
+        #timeUpModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+            padding: 15px;
+        }
+
+        #lifeLostModal.show,
+        #gameOverModal.show,
+        #timeUpModal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: clamp(20px, 4vw, 30px);
+            padding: clamp(20px, 4vw, 40px);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.5s ease;
+            margin: 10px;
+        }
+
+        .modal-content .big-icon {
+            font-size: clamp(3em, 8vw, 4em);
+            margin-bottom: 5px;
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.3em, 4vw, 2em);
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-content p {
+            color: #666;
+            font-size: clamp(0.9em, 2.2vw, 1.1em);
+            margin-bottom: 6px;
+        }
+
+        .modal-content .lives-info {
+            font-size: clamp(1.5em, 4vw, 2em);
+            margin: 10px 0;
+        }
+
+        .modal-content.game-over {
+            border-top: 6px solid #dc3545;
+        }
+
+        .btn-continue,
+        .btn-restart {
+            padding: clamp(10px, 2vw, 14px) clamp(25px, 5vw, 40px);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: clamp(0.9em, 2.2vw, 1.1em);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-continue:hover,
+        .btn-restart:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+        }
+
+        .btn-continue.danger {
+            background: #dc3545;
+        }
+
+        .btn-continue.danger:hover {
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.4);
+        }
+
+        .final-stats {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: clamp(12px, 2vw, 20px);
+            margin: 15px 0;
+        }
+
+        .final-stats .big {
+            font-size: clamp(2em, 6vw, 2.5em);
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .final-stats .label {
+            color: #666;
+            font-size: clamp(0.8em, 1.8vw, 0.9em);
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            #startPage {
+                padding: 15px;
+                margin: 5px;
+                border-radius: 20px;
+            }
+            #gamePage {
+                padding: 10px;
+                margin: 3px;
+                border-radius: 15px;
+            }
+            .data-table input {
+                width: 55px;
+                min-width: 45px;
+                font-size: 0.85em;
+                padding: 5px 3px;
+            }
+            .data-table th {
+                font-size: 0.65em;
+                padding: 5px 3px;
+            }
+            .data-table td {
+                padding: 5px 3px;
+                font-size: 0.75em;
+            }
+            .btn {
+                font-size: 0.7em;
+                padding: 6px 10px;
+                min-width: 55px;
+            }
+            .timer {
+                font-size: 0.9em;
+            }
+            .lives {
+                font-size: 0.9em;
+            }
+            .score-display .item {
+                font-size: 0.7em;
+            }
+            .summary-box .item {
+                font-size: 0.7em;
+            }
+            .info-card {
+                font-size: 0.65em;
+                padding: 4px 8px;
+            }
+            .status-item {
+                font-size: 0.7em;
+                padding: 2px 8px;
+            }
+            .problem-description {
+                font-size: 0.75em;
+                padding: 8px 10px;
+            }
+            .feedback {
+                font-size: 0.75em;
+                padding: 8px 10px;
+            }
+            .level-btn {
+                font-size: 0.65em;
+                padding: 3px 8px;
+            }
+            .modal-content {
+                padding: 15px;
+                margin: 5px;
+                border-radius: 20px;
+            }
+            .modal-content h2 {
+                font-size: 1.2em;
+            }
+            .modal-content p {
+                font-size: 0.85em;
+            }
+            .btn-continue,
+            .btn-restart {
+                font-size: 0.85em;
+                padding: 10px 20px;
+            }
+            .chart-area {
+                padding: 10px;
+                min-height: 200px;
+            }
+            .canvas-wrapper {
+                max-width: 100%;
+            }
+            .mode-selector {
+                flex-direction: column;
+            }
+            .mode-btn {
+                min-width: 100%;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .data-table input {
+                width: 65px;
+            }
+            .btn {
+                font-size: 0.8em;
+                padding: 8px 14px;
+            }
+            .main-board {
+                gap: 15px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            #gamePage {
+                max-width: 1400px;
+                padding: 30px;
+            }
+            .main-board {
+                gap: 30px;
+            }
+            .data-table input {
+                width: 110px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== PÁGINA DE INICIO ========== -->
+    <div id="startPage">
+        <div class="logo">🎯</div>
+        <h1>Maestro del Gráfico Circular</h1>
+        <p class="subtitle">📊 Aprende estadística jugando</p>
+
+        <div class="form-group">
+            <label>👤 Nombre completo del estudiante</label>
+            <input type="text" id="studentName" placeholder="Escribe tu nombre completo..." maxlength="50" autofocus>
+            <div id="nameError" style="color:#dc3545; font-size:0.9em; margin-top:5px; display:none;">⚠️ Por favor, escribe tu nombre completo</div>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="normal" onclick="selectMode('normal')">
+                <span class="icon">🎓</span>
+                <span class="title">Modo Normal</span>
+                <span class="desc">Con ayuda y pistas</span>
+            </button>
+            <button class="mode-btn" data-mode="expert" onclick="selectMode('expert')">
+                <span class="icon">🧠</span>
+                <span class="title">Modo Experto</span>
+                <span class="desc">Sin ayuda, solo tú</span>
+            </button>
+        </div>
+
+        <div class="rules" id="rulesText">
+            <h3>📋 Reglas del juego</h3>
+            <ul>
+                <li>Completa todos los campos de la tabla</li>
+                <li>Los <strong>porcentajes</strong> pueden tener decimales (ej: 43.33%)</li>
+                <li>La suma de <strong>grados</strong> debe ser <strong>360°</strong></li>
+                <li>La suma de <strong>porcentajes</strong> debe ser <strong>100%</strong></li>
+                <li>Tienes <strong>8 minutos</strong> para completar el desafío</li>
+                <li>Tienes <strong>5 vidas</strong> - Cada error te cuesta una vida</li>
+                <li>Usa <strong>"🧮 Calcular"</strong> para ver las sumas y corregir</li>
+                <li>Usa <strong>"✅ Verificar"</strong> para comprobar tu resultado final</li>
+            </ul>
+        </div>
+
+        <button class="btn-start" id="startBtn" onclick="startGame()">
+            🚀 Comenzar Juego
+        </button>
+    </div>
+
+    <!-- ========== JUEGO ========== -->
+    <div id="gamePage">
+        <div class="game-header">
+            <div class="player-info">
+                <div class="avatar" id="avatarDisplay">👤</div>
+                <div class="name">Estudiante: <span id="playerNameDisplay"></span>
+                    <span class="mode-badge" id="modeBadge">🎓 NORMAL</span>
+                </div>
+            </div>
+            <div class="timer-section">
+                <div class="timer" id="timerDisplay">
+                    <span class="time-icon">⏱️</span>
+                    <span id="timerMinutes">08</span>:<span id="timerSeconds">00</span>
+                </div>
+                <div class="lives" id="livesDisplay">
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                    <span class="heart">❤️</span>
+                </div>
+                <div class="score-display">
+                    <div class="item">⭐ <span id="scoreDisplay">0</span></div>
+                    <div class="item">✅ <span id="correctDisplay">0</span></div>
+                    <div class="item">📊 <span id="levelDisplay">1</span></div>
+                    <div class="item">📝 <span id="exerciseCounter">1/100</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-board">
+            <div class="chart-area">
+                <h2>📊 Tu Gráfico Circular</h2>
+                <div class="canvas-wrapper">
+                    <canvas id="chartCanvas" width="500" height="500"></canvas>
+                </div>
+                <div class="chart-info">
+                    <div class="info-card">📐 Grados usados: <span class="value" id="usedDegrees">0°</span></div>
+                    <div class="info-card">⚪ Restantes: <span class="value" id="remainingDegrees">360°</span></div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-info">
+                    <span>Progreso del gráfico</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-item">✅ Grados: <span id="degreeStatus" class="cross">✗</span></span>
+                    <span class="status-item">📊 %: <span id="percentStatus" class="cross">✗</span></span>
+                </div>
+            </div>
+
+            <div class="data-area">
+                <h2>📝 Datos y Cálculos</h2>
+
+                <div class="level-controls">
+                    <button class="level-btn active" data-level="1" onclick="loadLevel(1)">🌟 Nivel 1</button>
+                    <button class="level-btn" data-level="2" onclick="loadLevel(2)">🌟🌟 Nivel 2</button>
+                    <button class="level-btn" data-level="3" onclick="loadLevel(3)">🌟🌟🌟 Nivel 3</button>
+                </div>
+
+                <div class="problem-description" id="problemDesc">
+                    <span class="title" id="problemTitle">📋 Título del problema</span>
+                    <span id="problemText">Cargando problema...</span>
+                    <div class="context" id="problemContext"></div>
+                </div>
+
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Familia / Categoría</th>
+                                <th>Cantidad</th>
+                                <th>%</th>
+                                <th>Grados (°)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="summary-box" id="summaryBox">
+                    <div class="item">
+                        <span class="label">📊 Suma de %:</span>
+                        <span class="value" id="summaryPercent">0%</span>
+                    </div>
+                    <div class="item">
+                        <span class="label">📐 Suma de grados:</span>
+                        <span class="value" id="summaryDegrees">0°</span>
+                    </div>
+                    <div class="item">
+                        <span class="label">📌 Estado:</span>
+                        <span class="value" id="summaryStatus">⚠️ Sin calcular</span>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-calculate" onclick="calculateResults()">🧮 Calcular</button>
+                    <button class="btn btn-success" onclick="checkResults()">✅ Verificar</button>
+                    <button class="btn btn-warning" onclick="loadLevel(currentLevel)">🔄 Nueva Ronda</button>
+                    <button class="btn btn-secondary" id="hintBtn" onclick="showHint()">💡 Pista</button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODALES ========== -->
+    <div id="lifeLostModal">
+        <div class="modal-content">
+            <div class="big-icon">😅</div>
+            <h2>¡Has perdido una vida!</h2>
+            <p>Algunos cálculos no son correctos. Revisa tus operaciones.</p>
+            <div class="lives-info" id="livesLeftDisplay">❤️❤️❤️❤️</div>
+            <button class="btn-continue" onclick="continueAfterLifeLost()">🔄 Continuar</button>
+        </div>
+    </div>
+
+    <div id="gameOverModal">
+        <div class="modal-content game-over">
+            <div class="big-icon">💔</div>
+            <h2>¡GAME OVER!</h2>
+            <p>Has perdido todas tus vidas.</p>
+            <p style="font-size:0.9em; color:#888;">El juego se reiniciará automáticamente.</p>
+            <br>
+            <button class="btn-continue danger" onclick="restartGame()">🔄 Reiniciar Juego</button>
+        </div>
+    </div>
+
+    <div id="timeUpModal">
+        <div class="modal-content">
+            <div class="big-icon">⏰</div>
+            <h2>¡Tiempo terminado!</h2>
+            <p>Has completado el desafío estadístico.</p>
+            <div class="final-stats">
+                <div class="label">🏆 Puntuación final</div>
+                <div class="big" id="finalScore">0</div>
+                <div class="label">Gráficos completados correctamente</div>
+                <div style="font-size:1.5em; color:#28a745; font-weight:bold;" id="finalCorrect">0</div>
+                <div class="label">Ejercicios realizados</div>
+                <div style="font-size:1.2em; color:#764ba2; font-weight:bold;" id="finalExercises">0</div>
+            </div>
+            <button class="btn-restart" onclick="restartGame()">🔄 Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let currentLevel = 1;
+        let score = 0;
+        let correctCount = 0;
+        let exerciseCount = 0;
+        let categories = [];
+        let frequencies = [];
+        let total = 0;
+        let isCorrect = false;
+        let studentName = '';
+        let lives = 5;
+        let isGameActive = false;
+        let isWaitingForLifeLoss = false;
+        let usedProblems = new Set();
+        let percentValues = [];
+        let degreeValues = [];
+        let timeLeft = 480;
+        let timerInterval = null;
+        let gameMode = 'normal';
+
+        const canvas = document.getElementById('chartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // ============================================
+        // SELECCIÓN DE MODO
+        // ============================================
+        function selectMode(mode) {
+            gameMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            const rulesText = document.getElementById('rulesText');
+            if (mode === 'expert') {
+                rulesText.innerHTML = `
+                            <h3>🧠 MODO EXPERTO</h3>
+                            <ul>
+                                <li>📌 <strong>NO HAY PISTAS</strong> - Calcula todo por ti mismo</li>
+                                <li>📌 <strong>NO HAY AYUDA</strong> - Solo la máquina te dirá si estás bien</li>
+                                <li>Los <strong>porcentajes</strong> pueden tener decimales (ej: 43.33%)</li>
+                                <li>Completa todos los campos de la tabla</li>
+                                <li>La suma de <strong>grados</strong> debe ser <strong>360°</strong></li>
+                                <li>La suma de <strong>porcentajes</strong> debe ser <strong>100%</strong></li>
+                                <li>Tienes <strong>8 minutos</strong> para completar el desafío</li>
+                                <li>Tienes <strong>5 vidas</strong> - Cada error te cuesta una vida</li>
+                                <li>Usa <strong>"🧮 Calcular"</strong> para ver las sumas</li>
+                                <li>Usa <strong>"✅ Verificar"</strong> para comprobar tu resultado</li>
+                            </ul>
+                        `;
+            } else {
+                rulesText.innerHTML = `
+                            <h3>📋 Reglas del juego</h3>
+                            <ul>
+                                <li>Completa todos los campos de la tabla</li>
+                                <li>Los <strong>porcentajes</strong> pueden tener decimales (ej: 43.33%)</li>
+                                <li>La suma de <strong>grados</strong> debe ser <strong>360°</strong></li>
+                                <li>La suma de <strong>porcentajes</strong> debe ser <strong>100%</strong></li>
+                                <li>Tienes <strong>8 minutos</strong> para completar el desafío</li>
+                                <li>Tienes <strong>5 vidas</strong> - Cada error te cuesta una vida</li>
+                                <li>Usa <strong>"🧮 Calcular"</strong> para ver las sumas y corregir</li>
+                                <li>Usa <strong>"✅ Verificar"</strong> para comprobar tu resultado final</li>
+                            </ul>
+                        `;
+            }
+        }
+
+        // ============================================
+        // 100 EJERCICIOS
+        // ============================================
+        const allProblems = [];
+
+        const level1Problems = [{
+            title: '⚽ Deportes Favoritos',
+            context: 'Estudiantes votaron por su deporte favorito:',
+            data: [
+                { category: 'Fútbol', value: 12 },
+                { category: 'Baloncesto', value: 8 },
+                { category: 'Natación', value: 5 }
+            ]
+        }, {
+            title: '🍕 Sabores de Pizza Favoritos',
+            context: 'Estudiantes votaron por su sabor de pizza favorito:',
+            data: [
+                { category: 'Pepperoni', value: 8 },
+                { category: 'Hawaiana', value: 6 },
+                { category: 'Vegetariana', value: 4 }
+            ]
+        }, {
+            title: '🍦 Sabores de Helado Más Pedidos',
+            context: 'Una heladería registró los sabores más vendidos:',
+            data: [
+                { category: 'Vainilla', value: 10 },
+                { category: 'Chocolate', value: 7 },
+                { category: 'Fresa', value: 5 }
+            ]
+        }, {
+            title: '🍔 Hamburguesas Preferidas',
+            context: 'Los clientes eligieron su hamburguesa favorita:',
+            data: [
+                { category: 'Clásica', value: 12 },
+                { category: 'Con Queso', value: 8 },
+                { category: 'Vegetariana', value: 4 }
+            ]
+        }, {
+            title: '🎨 Colores Favoritos',
+            context: 'Estudiantes eligieron su color favorito:',
+            data: [
+                { category: 'Rojo', value: 10 },
+                { category: 'Azul', value: 7 },
+                { category: 'Verde', value: 5 }
+            ]
+        }, {
+            title: '🎵 Géneros Musicales',
+            context: 'Estudiantes votaron por su género musical favorito:',
+            data: [
+                { category: 'Pop', value: 11 },
+                { category: 'Rock', value: 7 },
+                { category: 'Clásica', value: 4 }
+            ]
+        }, {
+            title: '🎸 Instrumentos Musicales',
+            context: 'Estudiantes votaron por su instrumento favorito:',
+            data: [
+                { category: 'Guitarra', value: 10 },
+                { category: 'Piano', value: 6 },
+                { category: 'Batería', value: 4 }
+            ]
+        }, {
+            title: '🐱 Animales Domésticos',
+            context: 'Personas votaron por su mascota favorita:',
+            data: [
+                { category: 'Perros', value: 14 },
+                { category: 'Gatos', value: 8 },
+                { category: 'Peces', value: 3 }
+            ]
+        }, {
+            title: '📚 Materias Escolares',
+            context: 'Estudiantes votaron por su materia favorita:',
+            data: [
+                { category: 'Matemáticas', value: 10 },
+                { category: 'Ciencias', value: 8 },
+                { category: 'Historia', value: 4 }
+            ]
+        }, {
+            title: '🎮 Videojuegos Favoritos',
+            context: 'Estudiantes votaron por su juego favorito:',
+            data: [
+                { category: 'Aventura', value: 10 },
+                { category: 'Deportes', value: 7 },
+                { category: 'Estrategia', value: 4 }
+            ]
+        }];
+
+        const level2Problems = [{
+            title: '🏀 Deportes de Equipo',
+            context: 'Estudiantes votaron por su deporte de equipo favorito:',
+            data: [
+                { category: 'Fútbol', value: 12 },
+                { category: 'Baloncesto', value: 8 },
+                { category: 'Voleibol', value: 6 },
+                { category: 'Handball', value: 4 }
+            ]
+        }, {
+            title: '🎵 Géneros Musicales',
+            context: 'Encuesta musical en una escuela:',
+            data: [
+                { category: 'Rock', value: 10 },
+                { category: 'Pop', value: 8 },
+                { category: 'Reggaetón', value: 6 },
+                { category: 'Clásica', value: 3 }
+            ]
+        }, {
+            title: '🍦 Sabores de Helado',
+            context: 'Heladería registró sabores más vendidos en verano:',
+            data: [
+                { category: 'Vainilla', value: 11 },
+                { category: 'Chocolate', value: 9 },
+                { category: 'Fresa', value: 5 },
+                { category: 'Menta', value: 3 }
+            ]
+        }, {
+            title: '🎨 Colores en Arte',
+            context: 'Visitantes votaron por su color favorito:',
+            data: [
+                { category: 'Azul', value: 10 },
+                { category: 'Rojo', value: 8 },
+                { category: 'Verde', value: 6 },
+                { category: 'Amarillo', value: 4 }
+            ]
+        }, {
+            title: '📚 Libros en Biblioteca',
+            context: 'Lectores votaron por su género favorito:',
+            data: [
+                { category: 'Novela', value: 11 },
+                { category: 'Poesía', value: 7 },
+                { category: 'Ciencia', value: 5 },
+                { category: 'Historia', value: 3 }
+            ]
+        }, {
+            title: '🎮 Consolas de Videojuegos',
+            context: 'Gamers votaron por su consola favorita:',
+            data: [
+                { category: 'PlayStation', value: 13 },
+                { category: 'Nintendo', value: 10 },
+                { category: 'Xbox', value: 7 }
+            ]
+        }];
+
+        const level3Problems = [{
+            title: '🌍 Países para Visitar',
+            context: 'Viajeros votaron por su país favorito:',
+            data: [
+                { category: 'Italia', value: 14 },
+                { category: 'Francia', value: 12 },
+                { category: 'Japón', value: 10 },
+                { category: 'Australia', value: 6 },
+                { category: 'Brasil', value: 4 }
+            ]
+        }, {
+            title: '🏔️ Deportes de Aventura',
+            context: 'Amantes de la aventura votaron por su deporte favorito:',
+            data: [
+                { category: 'Escalada', value: 12 },
+                { category: 'Paracaidismo', value: 10 },
+                { category: 'Buceo', value: 8 },
+                { category: 'Rafting', value: 5 },
+                { category: 'Esquí', value: 3 }
+            ]
+        }, {
+            title: '🎮 Videojuegos por Género',
+            context: 'Gamers votaron por su género favorito:',
+            data: [
+                { category: 'RPG', value: 12 },
+                { category: 'Shooter', value: 10 },
+                { category: 'Estrategia', value: 8 },
+                { category: 'Deportes', value: 6 },
+                { category: 'Aventura', value: 4 }
+            ]
+        }, {
+            title: '🍝 Comidas Internacionales',
+            context: 'Comensales votaron por su comida internacional favorita:',
+            data: [
+                { category: 'Italiana', value: 13 },
+                { category: 'Mexicana', value: 11 },
+                { category: 'Japonesa', value: 9 },
+                { category: 'India', value: 5 },
+                { category: 'Francesa', value: 3 }
+            ]
+        }, {
+            title: '🎨 Artistas Famosos',
+            context: 'Amantes del arte votaron por su artista favorito:',
+            data: [
+                { category: 'Da Vinci', value: 12 },
+                { category: 'Picasso', value: 10 },
+                { category: 'Van Gogh', value: 8 },
+                { category: 'Miguel Ángel', value: 6 },
+                { category: 'Rembrandt', value: 4 }
+            ]
+        }];
+
+        function buildAllProblems() {
+            const all = [];
+            level1Problems.forEach(p => all.push({ ...p,
+                level: 1 }));
+            level2Problems.forEach(p => all.push({ ...p,
+                level: 2 }));
+            level3Problems.forEach(p => all.push({ ...p,
+                level: 3 }));
+            return all;
+        }
+
+        const ALL_PROBLEMS = buildAllProblems();
+
+        const COLORS = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+            '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F',
+            '#BB8FCE', '#85C1E9', '#F8C471', '#82E0AA',
+            '#F1948A', '#82CCDD', '#D7BDE2', '#F9E79F'
+        ];
+
+        // ============================================
+        // FUNCIONES DE INICIO
+        // ============================================
+
+        function startGame() {
+            const nameInput = document.getElementById('studentName');
+            const nameError = document.getElementById('nameError');
+            studentName = nameInput.value.trim();
+
+            if (studentName === '') {
+                nameError.style.display = 'block';
+                nameInput.classList.add('error');
+                nameInput.focus();
+                return;
+            }
+
+            nameError.style.display = 'none';
+            nameInput.classList.remove('error');
+
+            lives = 5;
+            exerciseCount = 0;
+            isGameActive = true;
+            isWaitingForLifeLoss = false;
+            usedProblems = new Set();
+            score = 0;
+            correctCount = 0;
+            isCorrect = false;
+            timeLeft = 480;
+
+            document.getElementById('startPage').style.display = 'none';
+            document.getElementById('gamePage').style.display = 'block';
+
+            document.getElementById('playerNameDisplay').textContent = studentName;
+            document.getElementById('avatarDisplay').textContent = studentName.charAt(0).toUpperCase();
+
+            const badge = document.getElementById('modeBadge');
+            if (gameMode === 'expert') {
+                badge.textContent = '🧠 EXPERTO';
+                badge.className = 'mode-badge expert';
+                document.getElementById('hintBtn').style.display = 'none';
+            } else {
+                badge.textContent = '🎓 NORMAL';
+                badge.className = 'mode-badge';
+                document.getElementById('hintBtn').style.display = 'flex';
+            }
+
+            updateLivesDisplay();
+            updateScoreDisplay();
+
+            loadLevel(1);
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            startTimer();
+        }
+
+        function startTimer() {
+            timeLeft = 480;
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 60) {
+                    document.getElementById('timerDisplay').classList.add('warning');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('timerSeconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        function updateLivesDisplay() {
+            const hearts = document.querySelectorAll('.lives .heart');
+            hearts.forEach((heart, index) => {
+                if (index < lives) {
+                    heart.classList.remove('lost');
+                    heart.textContent = '❤️';
+                } else {
+                    heart.classList.add('lost');
+                    heart.textContent = '🖤';
+                }
+            });
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('correctDisplay').textContent = correctCount;
+            const totalExercises = ALL_PROBLEMS.length;
+            const currentExercise = Math.min(exerciseCount, totalExercises);
+            document.getElementById('exerciseCounter').textContent = `${currentExercise}/${totalExercises}`;
+        }
+
+        function getRandomProblem(level) {
+            const available = ALL_PROBLEMS.filter(p => p.level === level && !usedProblems.has(p.title + p.data.map(d => d
+                .value).join(',')));
+
+            if (available.length === 0) {
+                const allLevelProblems = ALL_PROBLEMS.filter(p => p.level === level);
+                usedProblems.clear();
+                if (allLevelProblems.length === 0) return null;
+                const random = allLevelProblems[Math.floor(Math.random() * allLevelProblems.length)];
+                usedProblems.add(random.title + random.data.map(d => d.value).join(','));
+                return random;
+            }
+
+            const randomIndex = Math.floor(Math.random() * available.length);
+            const selected = available[randomIndex];
+            usedProblems.add(selected.title + selected.data.map(d => d.value).join(','));
+            return selected;
+        }
+
+        function loadLevel(level) {
+            if (!isGameActive || isWaitingForLifeLoss) return;
+
+            currentLevel = level;
+            isCorrect = false;
+            exerciseCount++;
+
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.level) === level);
+            });
+
+            const problem = getRandomProblem(level);
+
+            if (!problem) {
+                if (level > 1) {
+                    loadLevel(level - 1);
+                } else {
+                    restartGame();
+                }
+                return;
+            }
+
+            categories = problem.data.map(d => d.category);
+            frequencies = problem.data.map(d => d.value);
+            total = frequencies.reduce((a, b) => a + b, 0);
+
+            percentValues = new Array(categories.length).fill(0);
+            degreeValues = new Array(categories.length).fill(0);
+
+            document.getElementById('problemTitle').textContent = problem.title;
+            document.getElementById('problemText').textContent = `📊 Total de elementos: ${total}.`;
+            document.getElementById('problemContext').textContent = problem.context;
+
+            document.querySelectorAll('.data-table input').forEach(input => {
+                input.disabled = false;
+                input.value = '';
+                input.className = '';
+            });
+
+            generateTable();
+            drawChart();
+            updateStats();
+            resetSummary();
+
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+
+            document.getElementById('levelDisplay').textContent = level;
+            document.getElementById('degreeStatus').textContent = '✗';
+            document.getElementById('degreeStatus').className = 'cross';
+            document.getElementById('percentStatus').textContent = '✗';
+            document.getElementById('percentStatus').className = 'cross';
+
+            updateScoreDisplay();
+
+            document.querySelectorAll('.level-btn').forEach(btn => btn.disabled = false);
+            document.querySelectorAll('.actions .btn').forEach(btn => btn.disabled = false);
+        }
+
+        function generateTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+
+            let html = '';
+
+            for (let i = 0; i < categories.length; i++) {
+                html += `
+                            <tr class="fila-dato">
+                                <td class="category-name">${categories[i]}</td>
+                                <td class="freq-value">${frequencies[i]}</td>
+                                <td>
+                                    <input type="number" class="percent-input" id="percent_${i}" 
+                                           placeholder="Escribe el %" step="0.01" min="0" max="100"
+                                           oninput="updateValue(${i}, 'percent', this.value)">
+                                </td>
+                                <td>
+                                    <input type="number" class="degree-input" id="degree_${i}" 
+                                           placeholder="Escribe los °" step="1" min="0" max="360"
+                                           oninput="updateValue(${i}, 'degree', this.value)">
+                                </td>
+                            </tr>
+                        `;
+            }
+
+            html += `
+                        <tr class="fila-total">
+                            <td><strong>📊 TOTAL</strong></td>
+                            <td><strong>${total}</strong></td>
+                            <td><span class="total-value" id="totalPercentDisplay">0%</span></td>
+                            <td><span class="total-value" id="totalDegreesDisplay">0°</span></td>
+                        </tr>
+                    `;
+
+            tbody.innerHTML = html;
+        }
+
+        function updateValue(index, type, value) {
+            if (!isGameActive || isWaitingForLifeLoss) return;
+
+            const numValue = parseFloat(value);
+
+            if (!isNaN(numValue) && numValue >= 0 && numValue <= (type === 'percent' ? 100 : 360)) {
+                if (type === 'percent') {
+                    percentValues[index] = parseFloat(numValue.toFixed(2));
+                } else if (type === 'degree') {
+                    degreeValues[index] = Math.round(numValue);
+                }
+            } else {
+                if (type === 'percent') {
+                    percentValues[index] = 0;
+                } else if (type === 'degree') {
+                    degreeValues[index] = 0;
+                }
+                const input = document.getElementById(`${type === 'percent' ? 'percent' : 'degree'}_${index}`);
+                if (input && isNaN(numValue)) {
+                    input.value = '';
+                }
+            }
+
+            const percentInput = document.getElementById(`percent_${index}`);
+            const degreeInput = document.getElementById(`degree_${index}`);
+            if (percentInput) percentInput.className = '';
+            if (degreeInput) degreeInput.className = '';
+
+            updateStats();
+            drawChart();
+            updateStatusIndicators();
+            resetSummary();
+        }
+
+        function updateStats() {
+            let totalDegrees = 0;
+            let totalPercent = 0;
+
+            for (let i = 0; i < percentValues.length; i++) {
+                totalPercent += percentValues[i] || 0;
+            }
+            for (let i = 0; i < degreeValues.length; i++) {
+                totalDegrees += degreeValues[i] || 0;
+            }
+
+            document.getElementById('totalDegreesDisplay').textContent = totalDegrees.toFixed(0) + '°';
+            document.getElementById('totalPercentDisplay').textContent = totalPercent.toFixed(2) + '%';
+            document.getElementById('usedDegrees').textContent = totalDegrees.toFixed(0) + '°';
+            document.getElementById('remainingDegrees').textContent = Math.max(0, 360 - totalDegrees).toFixed(0) + '°';
+
+            const progress = Math.min((totalDegrees / 360) * 100, 100);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress.toFixed(0) + '%';
+
+            updateStatusIndicators();
+        }
+
+        function updateStatusIndicators() {
+            let totalDegrees = 0;
+            let totalPercent = 0;
+
+            for (let i = 0; i < percentValues.length; i++) {
+                totalPercent += percentValues[i] || 0;
+            }
+            for (let i = 0; i < degreeValues.length; i++) {
+                totalDegrees += degreeValues[i] || 0;
+            }
+
+            const degreeStatus = document.getElementById('degreeStatus');
+            if (Math.abs(totalDegrees - 360) < 1 && totalDegrees > 0) {
+                degreeStatus.textContent = '✓';
+                degreeStatus.className = 'check';
+            } else {
+                degreeStatus.textContent = '✗';
+                degreeStatus.className = 'cross';
+            }
+
+            const percentStatus = document.getElementById('percentStatus');
+            if (Math.abs(totalPercent - 100) < 0.5 && totalPercent > 0) {
+                percentStatus.textContent = '✓';
+                percentStatus.className = 'check';
+            } else {
+                percentStatus.textContent = '✗';
+                percentStatus.className = 'cross';
+            }
+        }
+
+        function resetSummary() {
+            document.getElementById('summaryPercent').textContent = '0%';
+            document.getElementById('summaryPercent').className = 'value';
+            document.getElementById('summaryDegrees').textContent = '0°';
+            document.getElementById('summaryDegrees').className = 'value';
+            document.getElementById('summaryStatus').textContent = '⚠️ Sin calcular';
+            document.getElementById('summaryStatus').className = 'value';
+        }
+
+        // ============================================
+        // BOTÓN CALCULAR
+        // ============================================
+        function calculateResults() {
+            if (!isGameActive || isWaitingForLifeLoss) return;
+
+            const feedback = document.getElementById('feedback');
+
+            let totalDegrees = 0;
+            let totalPercent = 0;
+            let allFilled = true;
+            let hasValues = false;
+
+            for (let i = 0; i < percentValues.length; i++) {
+                const val = percentValues[i] || 0;
+                if (val === 0) {
+                    allFilled = false;
+                } else {
+                    totalPercent += val;
+                    hasValues = true;
+                }
+            }
+
+            for (let i = 0; i < degreeValues.length; i++) {
+                const val = degreeValues[i] || 0;
+                if (val === 0) {
+                    allFilled = false;
+                } else {
+                    totalDegrees += val;
+                    hasValues = true;
+                }
+            }
+
+            if (!hasValues) {
+                feedback.className = 'feedback info show';
+                feedback.innerHTML = '📝 Escribe los números en cada input, luego presiona "Calcular" para ver las sumas.';
+                return;
+            }
+
+            if (!allFilled) {
+                feedback.className = 'feedback info show';
+                feedback.innerHTML = '⚠️ Completa TODOS los campos antes de calcular.';
+                for (let i = 0; i < percentValues.length; i++) {
+                    const input = document.getElementById(`percent_${i}`);
+                    if (input && (percentValues[i] === 0 || isNaN(percentValues[i]))) {
+                        input.className = 'incorrect';
+                    }
+                }
+                for (let i = 0; i < degreeValues.length; i++) {
+                    const input = document.getElementById(`degree_${i}`);
+                    if (input && (degreeValues[i] === 0 || isNaN(degreeValues[i]))) {
+                        input.className = 'incorrect';
+                    }
+                }
+                return;
+            }
+
+            const percentSumCorrect = Math.abs(totalPercent - 100) < 0.5;
+            const degreeSumCorrect = Math.abs(totalDegrees - 360) < 1;
+
+            const summaryPercent = document.getElementById('summaryPercent');
+            const summaryDegrees = document.getElementById('summaryDegrees');
+            const summaryStatus = document.getElementById('summaryStatus');
+
+            summaryPercent.textContent = totalPercent.toFixed(2) + '%';
+            summaryPercent.className = 'value ' + (percentSumCorrect ? 'correct' : 'incorrect');
+
+            summaryDegrees.textContent = totalDegrees.toFixed(0) + '°';
+            summaryDegrees.className = 'value ' + (degreeSumCorrect ? 'correct' : 'incorrect');
+
+            let feedbackMsg = '';
+
+            if (percentSumCorrect && degreeSumCorrect) {
+                summaryStatus.textContent = '✅ ¡Sumas correctas! Puedes verificar';
+                summaryStatus.className = 'value correct';
+                feedback.className = 'feedback calculated-ok show';
+                feedbackMsg = '🎯 <strong>¡FELICITACIONES!</strong> Tus sumas son correctas:<br><br>' +
+                    '📊 <strong>Suma de %:</strong> ' + totalPercent.toFixed(2) + '% (debe ser 100%) ✅<br>' +
+                    '📐 <strong>Suma de grados:</strong> ' + totalDegrees.toFixed(0) + '° (debe ser 360°) ✅<br><br>' +
+                    '✅ Ahora presiona <strong>"Verificar"</strong> para validar tu resultado final.';
+            } else {
+                let errors = [];
+                if (!percentSumCorrect) {
+                    errors.push('📊 Porcentajes: ' + totalPercent.toFixed(2) + '% (debe ser 100%)');
+                }
+                if (!degreeSumCorrect) {
+                    errors.push('📐 Grados: ' + totalDegrees.toFixed(0) + '° (debe ser 360°)');
+                }
+                summaryStatus.textContent = '❌ Error: ' + errors.join(' | ');
+                summaryStatus.className = 'value incorrect';
+                feedback.className = 'feedback calculated-error show';
+                feedbackMsg = '❌ <strong>¡SUMAS INCORRECTAS!</strong><br><br>' +
+                    errors.join('<br>') +
+                    '<br><br>💡 <strong>Corrige tus cálculos</strong> y vuelve a presionar "Calcular".';
+            }
+
+            feedback.innerHTML = feedbackMsg;
+
+            for (let i = 0; i < percentValues.length; i++) {
+                const input = document.getElementById(`percent_${i}`);
+                if (input) {
+                    const val = percentValues[i] || 0;
+                    const expected = (frequencies[i] / total) * 100;
+                    if (val > 0 && Math.abs(val - expected) < 1.5) {
+                        input.className = 'correct';
+                    } else if (val > 0) {
+                        input.className = 'incorrect';
+                    }
+                }
+            }
+
+            for (let i = 0; i < degreeValues.length; i++) {
+                const input = document.getElementById(`degree_${i}`);
+                if (input) {
+                    const val = degreeValues[i] || 0;
+                    const expected = (frequencies[i] / total) * 360;
+                    if (val > 0 && Math.abs(val - expected) < 1.5) {
+                        input.className = 'correct';
+                    } else if (val > 0) {
+                        input.className = 'incorrect';
+                    }
+                }
+            }
+
+            updateStats();
+            updateStatusIndicators();
+            drawChart();
+        }
+
+        // ============================================
+        // BOTÓN VERIFICAR
+        // ============================================
+        function checkResults() {
+            if (!isGameActive || isWaitingForLifeLoss) return;
+
+            const feedback = document.getElementById('feedback');
+
+            let totalDegrees = 0;
+            let totalPercent = 0;
+            let allFilled = true;
+
+            for (let i = 0; i < percentValues.length; i++) {
+                const val = percentValues[i] || 0;
+                if (val <= 0) {
+                    allFilled = false;
+                    const input = document.getElementById(`percent_${i}`);
+                    if (input) input.className = 'incorrect';
+                } else {
+                    totalPercent += val;
+                }
+            }
+
+            for (let i = 0; i < degreeValues.length; i++) {
+                const val = degreeValues[i] || 0;
+                if (val <= 0) {
+                    allFilled = false;
+                    const input = document.getElementById(`degree_${i}`);
+                    if (input) input.className = 'incorrect';
+                } else {
+                    totalDegrees += val;
+                }
+            }
+
+            if (!allFilled) {
+                feedback.className = 'feedback error show';
+                feedback.innerHTML = '⚠️ ¡Completa TODOS los campos! Escribe un número en cada input.';
+                return;
+            }
+
+            const degreeDiff = Math.abs(totalDegrees - 360);
+            const percentDiff = Math.abs(totalPercent - 100);
+
+            let allCorrect = true;
+            let errors = [];
+
+            for (let i = 0; i < percentValues.length; i++) {
+                const val = percentValues[i] || 0;
+                const expected = (frequencies[i] / total) * 100;
+                const input = document.getElementById(`percent_${i}`);
+                if (Math.abs(val - expected) > 1.5) {
+                    allCorrect = false;
+                    if (input) input.className = 'incorrect';
+                    if (gameMode === 'normal') {
+                        errors.push(`${categories[i]}: esperaba ${expected.toFixed(2)}%`);
+                    }
+                } else {
+                    if (input) input.className = 'correct';
+                }
+            }
+
+            for (let i = 0; i < degreeValues.length; i++) {
+                const val = degreeValues[i] || 0;
+                const expected = (frequencies[i] / total) * 360;
+                const input = document.getElementById(`degree_${i}`);
+                if (Math.abs(val - expected) > 1.5) {
+                    allCorrect = false;
+                    if (input) input.className = 'incorrect';
+                } else {
+                    if (input) input.className = 'correct';
+                }
+            }
+
+            if (degreeDiff >= 1 || percentDiff >= 0.5) {
+                allCorrect = false;
+            }
+
+            if (allCorrect) {
+                feedback.className = 'feedback success show';
+                feedback.innerHTML = '🎉 ¡FELICITACIONES! Has calculado correctamente TODOS los porcentajes y grados. ¡El gráfico circular es perfecto! 🌟';
+
+                if (!isCorrect) {
+                    const points = 10 + (currentLevel * 5);
+                    if (gameMode === 'expert') {
+                        score += points + 5;
+                    } else {
+                        score += points;
+                    }
+                    correctCount++;
+                    updateScoreDisplay();
+                    isCorrect = true;
+
+                    canvas.classList.add('chart-animate');
+                    setTimeout(() => canvas.classList.remove('chart-animate'), 1000);
+
+                    setTimeout(() => {
+                        if (isGameActive && !isWaitingForLifeLoss) {
+                            if (exerciseCount >= ALL_PROBLEMS.length) {
+                                feedback.className = 'feedback success show';
+                                feedback.innerHTML =
+                                    '🏆 ¡INCREÍBLE! Has completado todos los ejercicios. ¡Eres un verdadero maestro de los gráficos circulares! 🎉';
+                                return;
+                            }
+                            loadLevel(currentLevel);
+                        }
+                    }, 2000);
+                }
+            } else {
+                lives--;
+                updateLivesDisplay();
+
+                let errorMsg = '';
+                if (degreeDiff >= 1) {
+                    errorMsg += `📐 La suma de grados es ${totalDegrees.toFixed(0)}° y debe ser 360°. `;
+                }
+                if (percentDiff >= 0.5) {
+                    errorMsg += `📊 La suma de porcentajes es ${totalPercent.toFixed(2)}% y debe ser 100%. `;
+                }
+
+                if (gameMode === 'normal' && errors.length > 0 && errors.length <= 3) {
+                    errorMsg += `<br>❌ Revisa: ${errors.join(', ')}`;
+                } else if (gameMode === 'normal' && errors.length > 3) {
+                    errorMsg += `<br>❌ Tienes ${errors.length} valores incorrectos. Revisa todos los cálculos.`;
+                } else if (gameMode === 'expert') {
+                    errorMsg += `<br>🔍 Revisa tus cálculos. ¡Tú puedes!`;
+                }
+
+                feedback.className = 'feedback life-lost show';
+                feedback.innerHTML =
+                    `💔 <strong>¡ERROR!</strong> ${errorMsg}<br>Te queda${lives > 1 ? 'n' : ''} <strong>${lives}</strong> vida${lives > 1 ? 's' : ''}.`;
+
+                if (lives <= 0) {
+                    isGameActive = false;
+                    document.getElementById('gameOverModal').classList.add('show');
+                    return;
+                }
+
+                isWaitingForLifeLoss = true;
+                document.getElementById('livesLeftDisplay').textContent = '❤️'.repeat(lives) + '🖤'.repeat(5 - lives);
+                document.getElementById('lifeLostModal').classList.add('show');
+            }
+
+            updateStats();
+            updateStatusIndicators();
+            drawChart();
+        }
+
+        function continueAfterLifeLost() {
+            document.getElementById('lifeLostModal').classList.remove('show');
+            isWaitingForLifeLoss = false;
+            loadLevel(currentLevel);
+        }
+
+        function showHint() {
+            if (!isGameActive || isWaitingForLifeLoss) return;
+
+            if (gameMode === 'expert') {
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback info show';
+                feedback.innerHTML = '🧠 <strong>MODO EXPERTO:</strong> No hay pistas. ¡Confía en tu cálculo!';
+                return;
+            }
+
+            const feedback = document.getElementById('feedback');
+
+            feedback.className = 'feedback info show';
+            feedback.innerHTML = `
+                        💡 <strong>Pista:</strong> 
+                        <br><br>
+                        📌 <strong>Paso 1:</strong> Lee la encuesta y los datos.
+                        <br>
+                        📌 <strong>Paso 2:</strong> En cada categoría escribe el porcentaje y los grados correspondientes.
+                        <br>
+                        📌 <strong>Paso 3:</strong> Revisa que la suma de todos los porcentajes sea <strong>100%</strong> y la suma de todos los grados sea <strong>360°</strong>.
+                        <br><br>
+                        <span style="font-size:0.9em;">📌 Recuerda: Para calcular el % de una categoría, divide su cantidad entre el total y multiplica por 100.</span>
+                        <br>
+                        <span style="font-size:0.9em;">📌 Para calcular los grados, divide su cantidad entre el total y multiplica por 360.</span>
+                        <br>
+                        <span style="font-size:0.9em; color:#dc3545;">⚠️ Cada error te cuesta una vida. ¡Tienes ${lives} vidas!</span>
+                        <br>
+                        <span style="font-size:0.9em; color:#ff9800;">💡 Usa el botón "Calcular" para ver las sumas y corregir antes de "Verificar".</span>
+                    `;
+        }
+
+        // ============================================
+        // DIBUJAR GRÁFICO
+        // ============================================
+        function drawChart() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 30;
+
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * 2 * Math.PI - Math.PI / 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+                ctx.strokeStyle = 'rgba(200,200,200,0.3)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            const degrees = [];
+            let hasData = false;
+
+            for (let i = 0; i < degreeValues.length; i++) {
+                const val = degreeValues[i] || 0;
+                if (val > 0) {
+                    degrees.push(val);
+                    hasData = true;
+                } else {
+                    degrees.push(0);
+                }
+            }
+
+            if (hasData) {
+                let startAngle = -Math.PI / 2;
+                const totalDegrees = degrees.reduce((a, b) => a + b, 0);
+                const scaleFactor = totalDegrees > 0 ? 360 / totalDegrees : 1;
+
+                for (let i = 0; i < degrees.length; i++) {
+                    if (degrees[i] > 0) {
+                        const adjustedDegrees = degrees[i] * scaleFactor;
+                        const angle = (adjustedDegrees / 360) * 2 * Math.PI;
+                        const endAngle = startAngle + angle;
+
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                        ctx.closePath();
+                        ctx.fillStyle = COLORS[i % COLORS.length];
+                        ctx.fill();
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 2.5;
+                        ctx.stroke();
+
+                        const midAngle = startAngle + angle / 2;
+                        const labelRadius = radius * 0.65;
+                        const labelX = centerX + labelRadius * Math.cos(midAngle);
+                        const labelY = centerY + labelRadius * Math.sin(midAngle);
+
+                        const percent = ((adjustedDegrees / 360) * 100);
+                        if (percent > 2) {
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 14px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                            ctx.shadowBlur = 6;
+                            ctx.fillText(percent.toFixed(1) + '%', labelX, labelY);
+                            ctx.shadowBlur = 0;
+
+                            if (percent > 5) {
+                                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                                ctx.font = '10px Arial';
+                                ctx.shadowBlur = 4;
+                                const shortLabel = categories[i].length > 12 ? categories[i].substring(0, 10) + '…' :
+                                    categories[i];
+                                ctx.fillText(shortLabel, labelX, labelY + 20);
+                                ctx.shadowBlur = 0;
+                            }
+                        }
+
+                        startAngle = endAngle;
+                    }
+                }
+            } else {
+                ctx.fillStyle = '#999';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('📝 Ingresa los grados', centerX, centerY - 12);
+                ctx.font = '13px Arial';
+                ctx.fillText('para construir el gráfico', centerX, centerY + 22);
+            }
+
+            drawLegend(degrees);
+        }
+
+        function drawLegend(degrees) {
+            const hasData = degrees.some(d => d > 0);
+            if (!hasData) return;
+
+            const legendX = 15;
+            const legendY = 15;
+            const itemHeight = 22;
+
+            const items = [];
+            const totalDegrees = degrees.reduce((a, b) => a + b, 0);
+            const scaleFactor = totalDegrees > 0 ? 360 / totalDegrees : 1;
+
+            for (let i = 0; i < degrees.length && i < 6; i++) {
+                if (degrees[i] > 0) {
+                    const adjustedDegrees = degrees[i] * scaleFactor;
+                    const percent = ((adjustedDegrees / 360) * 100);
+                    items.push({
+                        label: categories[i],
+                        color: COLORS[i % COLORS.length],
+                        percent: percent
+                    });
+                }
+            }
+
+            if (items.length === 0) return;
+
+            ctx.font = '11px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            const legendHeight = items.length * itemHeight + 15;
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.shadowColor = 'rgba(0,0,0,0.1)';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.roundRect(legendX, legendY, 175, legendHeight, 8);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            items.forEach((item, index) => {
+                const y = legendY + 10 + index * itemHeight;
+
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                ctx.roundRect(legendX + 8, y - 5, 12, 12, 3);
+                ctx.fill();
+
+                ctx.fillStyle = '#333';
+                const shortLabel = item.label.length > 15 ? item.label.substring(0, 13) + '…' : item.label;
+                const label = `${shortLabel}: ${item.percent.toFixed(1)}%`;
+                ctx.fillText(label, legendX + 26, y);
+            });
+        }
+
+        function endGame() {
+            isGameActive = false;
+
+            document.querySelectorAll('.level-btn').forEach(btn => btn.disabled = true);
+            document.querySelectorAll('.data-table input').forEach(input => input.disabled = true);
+            document.querySelectorAll('.actions .btn').forEach(btn => btn.disabled = true);
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalCorrect').textContent = correctCount;
+            document.getElementById('finalExercises').textContent = exerciseCount;
+            document.getElementById('timeUpModal').classList.add('show');
+        }
+
+        function restartGame() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('show');
+            });
+
+            document.getElementById('timeUpModal').classList.remove('show');
+            document.getElementById('gameOverModal').classList.remove('show');
+            document.getElementById('lifeLostModal').classList.remove('show');
+
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('startPage').style.display = 'block';
+
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentName').focus();
+
+            score = 0;
+            correctCount = 0;
+            exerciseCount = 0;
+            lives = 5;
+            timeLeft = 480;
+            isGameActive = false;
+            isWaitingForLifeLoss = false;
+            usedProblems = new Set();
+            percentValues = [];
+            degreeValues = [];
+
+            document.getElementById('scoreDisplay').textContent = '0';
+            document.getElementById('correctDisplay').textContent = '0';
+            document.getElementById('exerciseCounter').textContent = '0/100';
+            document.getElementById('timerDisplay').classList.remove('warning');
+            updateLivesDisplay();
+
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            document.querySelectorAll('.level-btn').forEach(btn => btn.disabled = false);
+            document.querySelectorAll('.actions .btn').forEach(btn => btn.disabled = false);
+            resetSummary();
+            document.getElementById('hintBtn').style.display = 'flex';
+        }
+
+        // ============================================
+        // POLYFILL PARA roundRect
+        // ============================================
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (r > w / 2) r = w / 2;
+                if (r > h / 2) r = h / 2;
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        document.getElementById('studentName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startGame();
+            }
+        });
+
+        console.log('🎯 ¡Bienvenido a "Maestro del Gráfico Circular"!');
+        console.log('📊 Los porcentajes aceptan decimales (ej: 43.33%)');
+        console.log('🎓 Modo Normal: Con ayuda y pistas');
+        console.log('🧠 Modo Experto: Sin ayuda, solo tú y tus cálculos');
+        console.log('💡 Usa "Calcular" para ver las sumas y corregir errores.');
+        console.log('✅ Usa "Verificar" solo cuando estés seguro de tus resultados.');
+        console.log('❤️ Tienes 5 vidas. ¡Cada error te cuesta una vida!');
+        console.log('⏱️ Tienes 8 minutos para completar el desafío!');
+    </script>
+</body>
+</html>
