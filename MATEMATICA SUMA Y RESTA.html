@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🌟 Juego Matemático - 2º Grado</title>
+    <style>
+        /* ---------- ESTILOS GENERALES ---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', cursive, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #f9d423 0%, #ff4e50 100%);
+            padding: 16px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            padding: 30px 25px 40px;
+            text-align: center;
+            border: 4px solid #fff8e7;
+            transition: all 0.2s ease;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 2.8rem);
+            color: #2c3e50;
+            text-shadow: 3px 3px 0 #f1c40f;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* ---------- PANTALLA DE INICIO ---------- */
+        #inicio p {
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            color: #2c3e50;
+            margin: 20px 0 10px;
+        }
+
+        #inicio input {
+            width: 85%;
+            max-width: 400px;
+            padding: 18px 20px;
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            border: 4px solid #f1c40f;
+            border-radius: 60px;
+            outline: none;
+            text-align: center;
+            background: #fffef7;
+            transition: 0.2s;
+            font-family: inherit;
+            -webkit-appearance: none;
+        }
+
+        #inicio input:focus {
+            border-color: #e67e22;
+            box-shadow: 0 0 0 6px rgba(241, 196, 15, 0.3);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 24px;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: bold;
+            border: none;
+            border-radius: 60px;
+            background: #f1c40f;
+            color: #2c3e50;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #d4a800, 0 8px 20px rgba(0,0,0,0.2);
+            transition: all 0.08s linear;
+            font-family: inherit;
+            margin: 8px 4px;
+            letter-spacing: 1px;
+            min-width: 120px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #d4a800;
+        }
+
+        .btn:hover {
+            background: #f7dc6f;
+        }
+
+        .btn-verde {
+            background: #2ecc71;
+            box-shadow: 0 6px 0 #27ae60;
+            color: white;
+        }
+        .btn-verde:hover {
+            background: #58d68d;
+        }
+        .btn-verde:active {
+            box-shadow: 0 2px 0 #27ae60;
+        }
+
+        .btn-rojo {
+            background: #e74c3c;
+            box-shadow: 0 6px 0 #c0392b;
+            color: white;
+        }
+        .btn-rojo:hover {
+            background: #ec7063;
+        }
+        .btn-rojo:active {
+            box-shadow: 0 2px 0 #c0392b;
+        }
+
+        .btn-azul {
+            background: #3498db;
+            box-shadow: 0 6px 0 #2980b9;
+            color: white;
+        }
+        .btn-azul:hover {
+            background: #5dade2;
+        }
+        .btn-azul:active {
+            box-shadow: 0 2px 0 #2980b9;
+        }
+
+        .btn-naranja {
+            background: #e67e22;
+            box-shadow: 0 6px 0 #d35400;
+            color: white;
+        }
+        .btn-naranja:hover {
+            background: #eb984e;
+        }
+        .btn-naranja:active {
+            box-shadow: 0 2px 0 #d35400;
+        }
+
+        .btn-morado {
+            background: #8e44ad;
+            box-shadow: 0 6px 0 #6c3483;
+            color: white;
+        }
+        .btn-morado:hover {
+            background: #af7ac5;
+        }
+        .btn-morado:active {
+            box-shadow: 0 2px 0 #6c3483;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        /* ---------- PANTALLA DE JUEGO ---------- */
+        #info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff8e7;
+            padding: 12px 16px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            border: 3px solid #f1c40f;
+            font-size: clamp(0.9rem, 3vw, 1.3rem);
+            font-weight: bold;
+            color: #2c3e50;
+            gap: 8px;
+        }
+
+        #info span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        #vidasDisplay {
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            letter-spacing: 2px;
+        }
+
+        #tiempoDisplay {
+            background: #2c3e50;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            font-family: 'Courier New', monospace;
+        }
+
+        #progreso {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            background: #ecf0f1;
+            padding: 4px 14px;
+            border-radius: 40px;
+        }
+
+        #modoDisplay {
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            background: #d5dbdb;
+            padding: 2px 12px;
+            border-radius: 40px;
+        }
+
+        #problema {
+            background: #ffffffdd;
+            padding: 20px 15px 25px;
+            border-radius: 50px;
+            border: 4px dashed #f1c40f;
+            margin: 10px 0 20px;
+        }
+
+        #operacion {
+            font-size: clamp(1.4rem, 4.5vw, 2.4rem);
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 8px 0 12px;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        #operacionNumerica {
+            font-size: clamp(2.2rem, 7vw, 3.6rem);
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 8px 0 20px;
+            letter-spacing: 2px;
+            display: none; /* oculto por defecto, se muestra solo en modos no-real */
+        }
+
+        #respuestaInput {
+            width: 70%;
+            max-width: 300px;
+            padding: 16px 15px;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            text-align: center;
+            border: 5px solid #bdc3c7;
+            border-radius: 60px;
+            outline: none;
+            background: #fefefe;
+            font-family: inherit;
+            transition: 0.2s;
+            margin: 0 auto 15px;
+            display: block;
+            -webkit-appearance: none;
+        }
+
+        #respuestaInput:focus {
+            border-color: #f1c40f;
+            box-shadow: 0 0 0 6px rgba(241, 196, 15, 0.25);
+        }
+
+        #respuestaInput::placeholder {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            color: #bdc3c7;
+        }
+
+        /* ---------- FEEDBACK ---------- */
+        #feedback {
+            padding: 16px 10px;
+            margin: 10px 0;
+            border-radius: 50px;
+            background: #ffffffdd;
+            border: 4px solid #ecf0f1;
+            display: none;
+        }
+
+        #feedback h1 {
+            font-size: clamp(2.8rem, 10vw, 4.8rem);
+            margin: 8px 0;
+            text-shadow: 2px 2px 0 #ccc;
+        }
+
+        #feedback p {
+            font-size: clamp(1.4rem, 4vw, 2.2rem);
+            color: #2c3e50;
+            margin-top: 5px;
+        }
+
+        .feedback-correcto h1 {
+            color: #27ae60;
+        }
+        .feedback-incorrecto h1 {
+            color: #e74c3c;
+        }
+
+        /* ---------- PANTALLA FINAL ---------- */
+        #final {
+            padding: 16px 10px;
+        }
+
+        #final h1 {
+            font-size: clamp(2.4rem, 8vw, 3.2rem);
+            margin-bottom: 15px;
+        }
+
+        #resultadoFinal {
+            font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 40px;
+            text-align: left;
+            white-space: pre-wrap;
+            line-height: 2;
+            margin: 20px 0 25px;
+            border: 3px solid #bdc3c7;
+            font-family: inherit;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 400px) {
+            .container {
+                padding: 16px 12px 25px;
+                border-radius: 40px 40px 30px 30px;
+            }
+            .btn {
+                padding: 14px 16px;
+                font-size: 1.1rem;
+                min-width: 90px;
+                margin: 4px 2px;
+            }
+            #info {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                border-radius: 30px;
+                gap: 4px;
+            }
+            #vidasDisplay {
+                font-size: 1.4rem;
+            }
+            #tiempoDisplay {
+                font-size: 1.2rem;
+                padding: 2px 10px;
+            }
+            #progreso {
+                font-size: 0.8rem;
+                padding: 2px 10px;
+            }
+            #problema {
+                padding: 15px 10px 20px;
+            }
+            #respuestaInput {
+                width: 85%;
+                padding: 14px 10px;
+                font-size: 1.6rem;
+            }
+            #feedback h1 {
+                font-size: 2.4rem;
+            }
+            #feedback p {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (min-width: 401px) and (max-width: 768px) {
+            .container {
+                padding: 24px 20px 30px;
+            }
+            .btn {
+                padding: 16px 20px;
+                font-size: 1.3rem;
+                min-width: 100px;
+            }
+            #info {
+                font-size: 1rem;
+                padding: 10px 14px;
+            }
+            #operacion {
+                font-size: 1.8rem;
+            }
+            #operacionNumerica {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .container {
+                padding: 30px 30px 40px;
+            }
+            .btn {
+                padding: 18px 32px;
+                font-size: 1.6rem;
+            }
+            #respuestaInput {
+                padding: 18px 15px;
+            }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 16px 20px 20px;
+                max-width: 90vw;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+            #inicio input {
+                padding: 12px 16px;
+                font-size: 1.2rem;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 1rem;
+                min-width: 80px;
+                margin: 4px 3px;
+            }
+            #info {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+                margin-bottom: 12px;
+            }
+            #problema {
+                padding: 12px 10px 16px;
+                margin: 8px 0;
+            }
+            #operacion {
+                font-size: 1.4rem;
+                margin: 4px 0 8px;
+            }
+            #operacionNumerica {
+                font-size: 2rem;
+                margin: 4px 0 12px;
+            }
+            #respuestaInput {
+                padding: 10px 12px;
+                font-size: 1.6rem;
+                width: 60%;
+            }
+            #feedback h1 {
+                font-size: 2.2rem;
+            }
+            #feedback p {
+                font-size: 1.2rem;
+            }
+            #final h1 {
+                font-size: 1.8rem;
+            }
+            #resultadoFinal {
+                padding: 12px;
+                font-size: 1rem;
+                margin: 12px 0;
+            }
+            .btn-group {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ========== PANTALLA DE INICIO ========== -->
+    <div id="inicio">
+        <h1>🧮 ¡Matemágico!</h1>
+        <p>✏️ Escribe tu nombre completo</p>
+        <input type="text" id="nombreInput" placeholder="Ej: Ana Martínez" autofocus>
+        <br>
+        <div class="btn-group">
+            <button class="btn btn-azul" id="btnMixto">🎲 Sumas y Restas</button>
+            <button class="btn btn-naranja" id="btnSoloSumas">➕ Solo Sumas</button>
+            <button class="btn btn-morado" id="btnVidaReal">🌍 Vida Real</button>
+        </div>
+        <p style="font-size:clamp(0.8rem, 2.5vw, 1rem); color:#555; margin-top:12px;">⭐ 100 problemas · 5 vidas · 5 minutos</p>
+    </div>
+
+    <!-- ========== PANTALLA DE JUEGO ========== -->
+    <div id="juego" style="display:none;">
+        <div id="info">
+            <span id="nombreDisplay">👤 Nombre</span>
+            <span id="modoDisplay">🎲 Mixto</span>
+            <span id="vidasDisplay">❤️❤️❤️❤️❤️</span>
+            <span id="tiempoDisplay">05:00</span>
+            <span id="progreso">1/100</span>
+        </div>
+
+        <div id="problema">
+            <div id="operacion">34 + 27 = ?</div>
+            <div id="operacionNumerica"></div>
+            <input type="text" id="respuestaInput" placeholder="Escribe la operación" inputmode="text" autocomplete="off">
+            <button class="btn btn-verde" id="btnResponder">✅ Responder</button>
+        </div>
+
+        <div id="feedback">
+            <!-- Se inyecta la retroalimentación -->
+        </div>
+    </div>
+
+    <!-- ========== PANTALLA FINAL ========== -->
+    <div id="final" style="display:none;">
+        <h1>🏁 ¡Juego terminado!</h1>
+        <div id="resultadoFinal"></div>
+        <div class="btn-group">
+            <button class="btn" id="btnReiniciar">🔄 Jugar de nuevo</button>
+            <button class="btn btn-rojo" id="btnNuevosProblemas">✨ Nuevos 100 problemas</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ---------- ELEMENTOS DOM ----------
+        const inicioDiv = document.getElementById('inicio');
+        const juegoDiv = document.getElementById('juego');
+        const finalDiv = document.getElementById('final');
+
+        const nombreInput = document.getElementById('nombreInput');
+        const btnMixto = document.getElementById('btnMixto');
+        const btnSoloSumas = document.getElementById('btnSoloSumas');
+        const btnVidaReal = document.getElementById('btnVidaReal');
+
+        const nombreDisplay = document.getElementById('nombreDisplay');
+        const modoDisplay = document.getElementById('modoDisplay');
+        const vidasDisplay = document.getElementById('vidasDisplay');
+        const tiempoDisplay = document.getElementById('tiempoDisplay');
+        const progreso = document.getElementById('progreso');
+        const operacion = document.getElementById('operacion');
+        const operacionNumerica = document.getElementById('operacionNumerica');
+        const respuestaInput = document.getElementById('respuestaInput');
+        const btnResponder = document.getElementById('btnResponder');
+        const feedbackDiv = document.getElementById('feedback');
+
+        const resultadoFinal = document.getElementById('resultadoFinal');
+        const btnReiniciar = document.getElementById('btnReiniciar');
+        const btnNuevosProblemas = document.getElementById('btnNuevosProblemas');
+
+        // ---------- VARIABLES DE ESTADO ----------
+        let nombre = '';
+        let vidas = 5;
+        let tiempoRestante = 300;
+        let problemas = [];
+        let indiceActual = 0;
+        let aciertos = 0;
+        let fallos = 0;
+        let juegoActivo = false;
+        let esperandoFeedback = false;
+        let temporizador = null;
+        let modoActual = 'mixed'; // 'mixed', 'addition', 'real'
+
+        // ---------- FUNCIONES AUXILIARES ----------
+        function formatearTiempo(segundos) {
+            const min = Math.floor(segundos / 60);
+            const sec = segundos % 60;
+            return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+        }
+
+        function actualizarVistas() {
+            const corazonesLlenos = '❤️'.repeat(Math.max(0, vidas));
+            const corazonesVacios = '🖤'.repeat(Math.max(0, 5 - vidas));
+            vidasDisplay.textContent = corazonesLlenos + corazonesVacios;
+            tiempoDisplay.textContent = formatearTiempo(tiempoRestante);
+            const total = problemas.length;
+            const actual = Math.min(indiceActual + 1, total);
+            progreso.textContent = `${actual}/${total}`;
+
+            if (modoActual === 'mixed') modoDisplay.textContent = '🎲 Mixto';
+            else if (modoActual === 'addition') modoDisplay.textContent = '➕ Solo Sumas';
+            else if (modoActual === 'real') modoDisplay.textContent = '🌍 Vida Real';
+        }
+
+        // ---------- GENERADORES DE PROBLEMAS ----------
+        function generarProblemasMixed(cantidad) {
+            const nuevos = [];
+            for (let i = 0; i < cantidad; i++) {
+                let a, b, operador, resultado;
+                const esSuma = Math.random() < 0.5;
+                if (esSuma) {
+                    a = Math.floor(Math.random() * 101);
+                    b = Math.floor(Math.random() * (101 - a));
+                    resultado = a + b;
+                    operador = '+';
+                } else {
+                    a = Math.floor(Math.random() * 101);
+                    b = Math.floor(Math.random() * (a + 1));
+                    resultado = a - b;
+                    operador = '-';
+                }
+                nuevos.push({ a, b, operador, resultado, texto: null });
+            }
+            return nuevos;
+        }
+
+        function generarProblemasAddition(cantidad) {
+            const nuevos = [];
+            for (let i = 0; i < cantidad; i++) {
+                const a = Math.floor(Math.random() * 101);
+                const b = Math.floor(Math.random() * (101 - a));
+                const resultado = a + b;
+                nuevos.push({ a, b, operador: '+', resultado, texto: null });
+            }
+            return nuevos;
+        }
+
+        function generarProblemasReal(cantidad) {
+            const objetos = [
+                { singular: 'manzana', plural: 'manzanas' },
+                { singular: 'naranja', plural: 'naranjas' },
+                { singular: 'plátano', plural: 'plátanos' },
+                { singular: 'fresa', plural: 'fresas' },
+                { singular: 'uva', plural: 'uvas' },
+                { singular: 'pera', plural: 'peras' },
+                { singular: 'sandía', plural: 'sandías' },
+                { singular: 'melón', plural: 'melones' },
+                { singular: 'cereza', plural: 'cerezas' },
+                { singular: 'mango', plural: 'mangos' },
+                { singular: 'caramelo', plural: 'caramelos' },
+                { singular: 'galleta', plural: 'galletas' },
+                { singular: 'lápiz', plural: 'lápices' },
+                { singular: 'libro', plural: 'libros' },
+                { singular: 'juguete', plural: 'juguetes' },
+                { singular: 'globo', plural: 'globos' },
+                { singular: 'pelota', plural: 'pelotas' },
+                { singular: 'muñeca', plural: 'muñecas' },
+                { singular: 'carrito', plural: 'carritos' },
+                { singular: 'rompecabezas', plural: 'rompecabezas' },
+                { singular: 'peso', plural: 'pesos' },
+                { singular: 'niño', plural: 'niños' },
+                { singular: 'niña', plural: 'niñas' },
+                { singular: 'perro', plural: 'perros' },
+                { singular: 'gato', plural: 'gatos' },
+                { singular: 'pájaro', plural: 'pájaros' },
+            ];
+
+            const plantillasSuma = [
+                'Tienes {a} {obj1} y te regalan {b} {obj1p}. ¿Cuántos {obj1p} tienes ahora?',
+                'En una bolsa hay {a} {obj1} y en otra hay {b} {obj1p}. ¿Cuántos {obj1p} hay en total?',
+                'Compraste {a} {obj1} y {b} {obj2p}. ¿Cuántas cosas compraste en total?',
+                'En el parque hay {a} niños y {b} niñas. ¿Cuántos niños hay en total?',
+                'Juan tiene {a} {obj1} y María tiene {b} {obj1p}. ¿Cuántos {obj1p} tienen entre los dos?',
+                'En la frutería hay {a} manzanas y {b} naranjas. ¿Cuántas frutas hay en total?',
+                'Tienes {a} globos rojos y {b} globos azules. ¿Cuántos globos tienes en total?',
+                'En tu estuche hay {a} lápices y {b} bolígrafos. ¿Cuántos útiles hay?',
+            ];
+
+            const plantillasResta = [
+                'Tenías {a} {obj1} y te comiste {b}. ¿Cuántos {obj1p} te quedan?',
+                'En un cine hay {a} personas y se van {b}. ¿Cuántas personas quedan?',
+                'Había {a} galletas y te comiste {b}. ¿Cuántas galletas sobran?',
+                'Tenías {a} pesos y gastaste {b}. ¿Cuánto dinero te queda?',
+                'Ana tenía {a} {obj1} y prestó {b}. ¿Cuántos {obj1p} le quedan?',
+                'En la caja había {a} juguetes y regalaste {b}. ¿Cuántos juguetes quedan?',
+                'Había {a} pájaros en el árbol y volaron {b}. ¿Cuántos pájaros quedan?',
+                'Tienes {a} caramelos y compartes {b} con tu amigo. ¿Cuántos te sobran?',
+            ];
+
+            const nuevos = [];
+            for (let i = 0; i < cantidad; i++) {
+                const esSuma = Math.random() < 0.5;
+                let a, b, resultado, operador, texto;
+
+                if (esSuma) {
+                    a = Math.floor(Math.random() * 101);
+                    b = Math.floor(Math.random() * (101 - a));
+                    resultado = a + b;
+                    operador = '+';
+                    const plantilla = plantillasSuma[Math.floor(Math.random() * plantillasSuma.length)];
+                    let obj1 = objetos[Math.floor(Math.random() * objetos.length)];
+                    let obj2 = null;
+                    if (plantilla.includes('{obj2p}') || plantilla.includes('{obj2}')) {
+                        obj2 = objetos[Math.floor(Math.random() * objetos.length)];
+                        while (obj2 === obj1) obj2 = objetos[Math.floor(Math.random() * objetos.length)];
+                    }
+                    texto = plantilla
+                        .replace(/{a}/g, a)
+                        .replace(/{b}/g, b)
+                        .replace(/{obj1}/g, obj1.singular)
+                        .replace(/{obj1p}/g, obj1.plural);
+                    if (obj2) {
+                        texto = texto
+                            .replace(/{obj2}/g, obj2.singular)
+                            .replace(/{obj2p}/g, obj2.plural);
+                    } else {
+                        texto = texto
+                            .replace(/{obj2}/g, obj1.singular)
+                            .replace(/{obj2p}/g, obj1.plural);
+                    }
+                } else {
+                    a = Math.floor(Math.random() * 101);
+                    b = Math.floor(Math.random() * (a + 1));
+                    resultado = a - b;
+                    operador = '-';
+                    const plantilla = plantillasResta[Math.floor(Math.random() * plantillasResta.length)];
+                    let obj1 = objetos[Math.floor(Math.random() * objetos.length)];
+                    texto = plantilla
+                        .replace(/{a}/g, a)
+                        .replace(/{b}/g, b)
+                        .replace(/{obj1}/g, obj1.singular)
+                        .replace(/{obj1p}/g, obj1.plural)
+                        .replace(/{obj2}/g, obj1.singular)
+                        .replace(/{obj2p}/g, obj1.plural);
+                }
+
+                nuevos.push({ a, b, operador, resultado, texto });
+            }
+            return nuevos;
+        }
+
+        // ---------- MOSTRAR PROBLEMA ----------
+        function mostrarProblema() {
+            if (!juegoActivo) return;
+
+            if (indiceActual >= problemas.length || vidas <= 0 || tiempoRestante <= 0) {
+                terminarJuego();
+                return;
+            }
+
+            const p = problemas[indiceActual];
+
+            // Configurar según modo
+            if (modoActual === 'real') {
+                // Mostrar solo el enunciado, ocultar operación numérica
+                operacion.textContent = p.texto;
+                operacionNumerica.style.display = 'none';
+                operacionNumerica.textContent = '';
+                // Cambiar placeholder y tipo de input
+                respuestaInput.type = 'text';
+                respuestaInput.placeholder = 'Ej: 34 + 27  (o escribe el resultado)';
+                respuestaInput.inputMode = 'text';
+            } else {
+                // Modos mixto o solo sumas: mostrar operación numérica
+                operacion.textContent = `${p.a} ${p.operador} ${p.b} = ?`;
+                operacionNumerica.style.display = 'none';
+                respuestaInput.type = 'number';
+                respuestaInput.placeholder = 'Escribe el resultado';
+                respuestaInput.inputMode = 'numeric';
+            }
+
+            actualizarVistas();
+            respuestaInput.value = '';
+            respuestaInput.focus();
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.innerHTML = '';
+            document.getElementById('problema').style.display = 'block';
+            esperandoFeedback = false;
+        }
+
+        // ---------- FUNCIÓN PARA PARSEAR OPERACIÓN INGRESADA ----------
+        function parsearOperacion(texto) {
+            // Eliminar espacios y convertir a minúsculas (no necesario)
+            const limpio = texto.replace(/\s/g, '');
+            // Buscar patrón: número, operador (+ o -), número
+            const regex = /^(\d+)([+\-])(\d+)$/;
+            const match = limpio.match(regex);
+            if (match) {
+                const num1 = parseInt(match[1], 10);
+                const op = match[2];
+                const num2 = parseInt(match[3], 10);
+                return { num1, op, num2, valido: true };
+            }
+            return { valido: false };
+        }
+
+        // ---------- RESPONDER ----------
+        function manejarRespuesta() {
+            if (!juegoActivo || esperandoFeedback) return;
+
+            const inputVal = respuestaInput.value.trim();
+            if (inputVal === '') {
+                alert('✏️ Escribe la operación o el resultado.');
+                return;
+            }
+
+            const p = problemas[indiceActual];
+            let correcto = false;
+
+            if (modoActual === 'real') {
+                // Intentar parsear como operación completa
+                const parsed = parsearOperacion(inputVal);
+                if (parsed.valido) {
+                    // Comparar números y operador
+                    if (parsed.num1 === p.a && parsed.op === p.operador && parsed.num2 === p.b) {
+                        correcto = true;
+                    } else {
+                        // También aceptar si el número ingresado es el resultado correcto (por si solo escribe el resultado)
+                        const num = parseInt(inputVal, 10);
+                        if (!isNaN(num) && num === p.resultado) {
+                            correcto = true;
+                        }
+                    }
+                } else {
+                    // Si no es operación, intentar como número
+                    const num = parseInt(inputVal, 10);
+                    if (!isNaN(num) && num === p.resultado) {
+                        correcto = true;
+                    }
+                }
+            } else {
+                // Modos mixto o solo sumas: solo número
+                const num = parseInt(inputVal, 10);
+                if (!isNaN(num) && num === p.resultado) {
+                    correcto = true;
+                }
+            }
+
+            // Ocultar problema y mostrar feedback
+            document.getElementById('problema').style.display = 'none';
+            feedbackDiv.style.display = 'block';
+            esperandoFeedback = true;
+
+            if (correcto) {
+                aciertos++;
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-correcto">
+                        <h1>🎉 ¡BIEN CORRECTO!</h1>
+                        <p style="font-size:clamp(1.2rem, 4vw, 1.8rem);">⭐ Sigue así</p>
+                    </div>
+                `;
+            } else {
+                fallos++;
+                vidas--;
+                actualizarVistas();
+                // Mostrar la operación correcta
+                const operacionCorrecta = `${p.a} ${p.operador} ${p.b} = ${p.resultado}`;
+                feedbackDiv.innerHTML = `
+                    <div class="feedback-incorrecto">
+                        <h1>😅 ¡UPS!</h1>
+                        <p>La respuesta correcta era: <strong style="font-size:clamp(1.8rem, 5vw, 2.8rem);">${operacionCorrecta}</strong></p>
+                    </div>
+                `;
+            }
+
+            setTimeout(() => {
+                if (!juegoActivo) return;
+                indiceActual++;
+                if (indiceActual >= problemas.length || vidas <= 0 || tiempoRestante <= 0) {
+                    terminarJuego();
+                } else {
+                    mostrarProblema();
+                }
+            }, 2000);
+        }
+
+        // ---------- TEMPORIZADOR ----------
+        function iniciarTemporizador() {
+            if (temporizador) clearInterval(temporizador);
+            temporizador = setInterval(() => {
+                tiempoRestante--;
+                actualizarVistas();
+                if (tiempoRestante <= 0) {
+                    clearInterval(temporizador);
+                    temporizador = null;
+                    terminarJuego();
+                }
+            }, 1000);
+        }
+
+        // ---------- TERMINAR JUEGO ----------
+        function terminarJuego() {
+            if (!juegoActivo) return;
+            juegoActivo = false;
+            if (temporizador) {
+                clearInterval(temporizador);
+                temporizador = null;
+            }
+
+            juegoDiv.style.display = 'none';
+            finalDiv.style.display = 'block';
+
+            let motivo = '';
+            if (vidas <= 0) motivo = '💔 Te quedaste sin vidas.';
+            else if (tiempoRestante <= 0) motivo = '⏰ Se acabó el tiempo.';
+            else if (indiceActual >= problemas.length) motivo = '🎉 ¡Completaste los 100 problemas!';
+            else motivo = '⏹️ Juego terminado.';
+
+            const totalIntentos = aciertos + fallos;
+            const porcentaje = totalIntentos > 0 ? Math.round((aciertos / totalIntentos) * 100) : 0;
+
+            let mensaje = `${motivo}\n\n`;
+            mensaje += `👤 Nombre: ${nombre}\n`;
+            mensaje += `✅ Aciertos: ${aciertos}\n`;
+            mensaje += `❌ Fallos: ${fallos}\n`;
+            mensaje += `❤️ Vidas restantes: ${vidas}\n`;
+            mensaje += `📊 Progreso: ${indiceActual} de ${problemas.length} problemas\n`;
+            mensaje += `🎯 Porcentaje de aciertos: ${porcentaje}%\n`;
+            mensaje += `⏱️ Tiempo usado: ${formatearTiempo(300 - tiempoRestante)}`;
+
+            resultadoFinal.textContent = mensaje;
+        }
+
+        // ---------- INICIAR JUEGO ----------
+        function iniciarJuego(nuevosProblemas = true, modo = 'mixed') {
+            nombre = nombreInput.value.trim();
+            if (nombre === '') {
+                alert('✏️ Por favor, escribe tu nombre completo.');
+                return;
+            }
+
+            modoActual = modo;
+            vidas = 5;
+            tiempoRestante = 300;
+            indiceActual = 0;
+            aciertos = 0;
+            fallos = 0;
+            esperandoFeedback = false;
+            if (temporizador) {
+                clearInterval(temporizador);
+                temporizador = null;
+            }
+
+            if (nuevosProblemas) {
+                if (modo === 'mixed') problemas = generarProblemasMixed(100);
+                else if (modo === 'addition') problemas = generarProblemasAddition(100);
+                else if (modo === 'real') problemas = generarProblemasReal(100);
+            } else {
+                if (problemas.length === 0) {
+                    if (modo === 'mixed') problemas = generarProblemasMixed(100);
+                    else if (modo === 'addition') problemas = generarProblemasAddition(100);
+                    else if (modo === 'real') problemas = generarProblemasReal(100);
+                }
+            }
+
+            inicioDiv.style.display = 'none';
+            finalDiv.style.display = 'none';
+            juegoDiv.style.display = 'block';
+
+            nombreDisplay.textContent = `👤 ${nombre}`;
+            actualizarVistas();
+            juegoActivo = true;
+
+            mostrarProblema();
+            iniciarTemporizador();
+        }
+
+        // ---------- EVENTOS DE BOTONES DE INICIO ----------
+        btnMixto.addEventListener('click', () => iniciarJuego(true, 'mixed'));
+        btnSoloSumas.addEventListener('click', () => iniciarJuego(true, 'addition'));
+        btnVidaReal.addEventListener('click', () => iniciarJuego(true, 'real'));
+
+        nombreInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') btnMixto.click();
+        });
+
+        btnResponder.addEventListener('click', manejarRespuesta);
+        respuestaInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') btnResponder.click();
+        });
+
+        // ---------- REINICIAR ----------
+        btnReiniciar.addEventListener('click', () => {
+            const nombreActual = nombreInput.value.trim();
+            if (nombreActual === '') {
+                finalDiv.style.display = 'none';
+                inicioDiv.style.display = 'block';
+                nombreInput.focus();
+                return;
+            }
+            nombre = nombreActual;
+            if (problemas.length === 0) {
+                if (modoActual === 'mixed') problemas = generarProblemasMixed(100);
+                else if (modoActual === 'addition') problemas = generarProblemasAddition(100);
+                else if (modoActual === 'real') problemas = generarProblemasReal(100);
+            }
+            iniciarJuego(false, modoActual);
+        });
+
+        btnNuevosProblemas.addEventListener('click', () => {
+            const nombreActual = nombreInput.value.trim();
+            if (nombreActual === '') {
+                finalDiv.style.display = 'none';
+                inicioDiv.style.display = 'block';
+                nombreInput.focus();
+                return;
+            }
+            nombre = nombreActual;
+            iniciarJuego(true, modoActual);
+        });
+
+        nombreInput.focus();
+    })();
+</script>
+</body>
+</html>
