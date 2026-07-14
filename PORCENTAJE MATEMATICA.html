@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Porcentaje en el Mercado · 3 niveles</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1d3e2f 0%, #2a5e3f 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        .game-wrapper {
+            max-width: 880px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            border-radius: 2.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .card {
+            background: #f4f9f0;
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            box-shadow: inset 0 2px 6px rgba(255,255,255,0.3), 0 12px 24px rgba(0,0,0,0.3);
+        }
+        .hidden {
+            display: none !important;
+        }
+        h1, h2 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #1a3d2a;
+        }
+        #welcomeScreen {
+            text-align: center;
+            padding: 1.5rem 0.5rem;
+        }
+        #welcomeScreen h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #1f6d3c, #0f3d22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        #welcomeScreen p {
+            color: #1f4a2e;
+            font-size: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .input-group input {
+            flex: 1 1 240px;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 60px;
+            background: white;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            border: 2px solid #b8d5c0;
+            transition: 0.2s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #1f7a3e;
+            box-shadow: 0 0 0 3px rgba(31, 122, 62, 0.3);
+        }
+        .btn {
+            background: #237a42;
+            border: none;
+            padding: 0.8rem 2.2rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 0 #0f4626;
+            transform: translateY(-2px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn:hover {
+            background: #2e9c52;
+            transform: translateY(0px);
+            box-shadow: 0 4px 0 #0f4626;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0f4626;
+        }
+        .btn-secondary {
+            background: #d68a2c;
+            box-shadow: 0 6px 0 #a3631a;
+        }
+        .btn-secondary:hover {
+            background: #eaa03a;
+        }
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem 1rem;
+            background: #dcefe0;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 1.8rem;
+        }
+        .stat {
+            background: white;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #154226;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .stat span {
+            font-size: 1.4rem;
+            min-width: 2rem;
+        }
+        .lives i {
+            color: #c0392b;
+            font-size: 1.4rem;
+            margin-right: 2px;
+        }
+        .progress-level {
+            background: #b8dcc8;
+            border-radius: 40px;
+            padding: 0.2rem 1.2rem;
+            font-weight: 700;
+        }
+        .question-box {
+            background: white;
+            border-radius: 2rem;
+            padding: 2rem 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+        }
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0a2f1a;
+            line-height: 1.4;
+        }
+        .question-context {
+            font-size: 1rem;
+            color: #1f5a36;
+            background: #e3f2e8;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.8rem;
+            margin: 1.8rem 0 0.5rem;
+        }
+        .option-btn {
+            background: #eef7f0;
+            border: 2px solid #b8d5c0;
+            padding: 1rem 0.5rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #0f3a1f;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #9bb8a3;
+            transform: translateY(-2px);
+            text-align: center;
+        }
+        .option-btn:hover {
+            background: #d8ede0;
+            transform: translateY(0px);
+            box-shadow: 0 2px 0 #9bb8a3;
+        }
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #9bb8a3;
+        }
+        .option-btn.correct-fb {
+            background: #27ae60;
+            border-color: #1e8449;
+            color: white;
+            box-shadow: 0 4px 0 #1a6e3a;
+        }
+        .option-btn.wrong-fb {
+            background: #e74c3c;
+            border-color: #b03a2e;
+            color: white;
+            box-shadow: 0 4px 0 #8a2c22;
+        }
+        .option-btn.disabled-btn {
+            opacity: 0.6;
+            pointer-events: none;
+            filter: grayscale(0.3);
+        }
+        .feedback-area {
+            margin-top: 1.2rem;
+            padding: 0.6rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            background: #e3f2e8;
+            min-height: 3.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .bottom-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+        #endScreen {
+            text-align: center;
+            padding: 1.8rem 0.5rem;
+        }
+        #endScreen h2 {
+            font-size: 2.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .final-stats {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+        }
+        .final-stat-item {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        @media (max-width: 600px) {
+            .card { padding: 1.2rem; }
+            .question-text { font-size: 1.2rem; }
+            .options-grid { grid-template-columns: 1fr 1fr; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+            .stat { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-wrapper">
+  <div class="card">
+
+    <!-- BIENVENIDA -->
+    <div id="welcomeScreen">
+      <h1>🛒 Porcentaje en el Mercado</h1>
+      <p>🧺 100 problemas · 3 niveles · 5 vidas · 8 minutos por pregunta</p>
+      <div class="input-group">
+        <input type="text" id="playerNameInput" placeholder="Nombre completo del estudiante" autocomplete="off">
+        <button class="btn" id="startGameBtn">▶ Ingresar</button>
+      </div>
+      <div style="color:#a93226; font-weight:500; min-height:2rem;" id="nameError"></div>
+      <div style="margin-top:1rem; font-size:0.9rem; color:#1f5a36;">🥬 Ofertas, descuentos, precios por kilo, promociones y más.</div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="gameScreen" class="hidden">
+      <div class="top-bar">
+        <div class="stat"><span>👤</span> <span id="displayName">---</span></div>
+        <div class="stat lives"><span>❤️</span> <span id="livesDisplay">5</span></div>
+        <div class="stat"><span>⏳</span> <span id="timerDisplay">8:00</span></div>
+        <div class="progress-level"><span>🏆 Nivel </span><span id="levelDisplay">1</span></div>
+        <div class="stat"><span>📌</span> <span id="questionCounter">1/100</span></div>
+      </div>
+
+      <div class="question-box">
+        <div class="question-context" id="contextTag">🥦 Oferta del día</div>
+        <div class="question-text" id="questionText">Cargando problema...</div>
+        <div class="options-grid" id="optionsContainer"></div>
+        <div class="feedback-area" id="feedbackArea">💡 Elige una opción</div>
+      </div>
+      <div class="bottom-actions">
+        <button class="btn btn-secondary" id="nextQuestionBtn" disabled>➡ Siguiente</button>
+      </div>
+    </div>
+
+    <!-- FINAL -->
+    <div id="endScreen" class="hidden">
+      <h2 id="endTitle">⏰ Tiempo agotado</h2>
+      <div class="final-stats">
+        <div class="final-stat-item">✅ Aciertos: <span id="finalCorrect">0</span></div>
+        <div class="final-stat-item">❌ Fallos: <span id="finalWrong">0</span></div>
+        <div class="final-stat-item">🏅 Nivel alcanzado: <span id="finalLevel">1</span></div>
+        <div class="final-stat-item">❤️ Vidas restantes: <span id="finalLives">0</span></div>
+      </div>
+      <button class="btn" id="restartBtn">🔄 Jugar de nuevo</button>
+      <div style="margin-top:1rem; color:#1a472a;">Gracias por jugar, <span id="finalName">---</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // ----- CONFIG -----
+    const TOTAL_QUESTIONS = 100;
+    const MAX_LIVES = 5;
+    const TIME_LIMIT_SEC = 480; // 8 minutos
+
+    let playerName = '';
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let lives = MAX_LIVES;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let level = 1;
+    let timer = TIME_LIMIT_SEC;
+    let timerInterval = null;
+    let gameActive = false;
+    let isAnswered = false;
+    let correctAnswer = '';
+
+    // DOM
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const endScreen = document.getElementById('endScreen');
+    const nameInput = document.getElementById('playerNameInput');
+    const startBtn = document.getElementById('startGameBtn');
+    const nameError = document.getElementById('nameError');
+    const displayName = document.getElementById('displayName');
+    const livesDisplay = document.getElementById('livesDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const levelDisplay = document.getElementById('levelDisplay');
+    const questionCounter = document.getElementById('questionCounter');
+    const contextTag = document.getElementById('contextTag');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const feedbackArea = document.getElementById('feedbackArea');
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    const finalCorrect = document.getElementById('finalCorrect');
+    const finalWrong = document.getElementById('finalWrong');
+    const finalLevel = document.getElementById('finalLevel');
+    const finalLives = document.getElementById('finalLives');
+    const finalName = document.getElementById('finalName');
+    const endTitle = document.getElementById('endTitle');
+    const restartBtn = document.getElementById('restartBtn');
+
+    // ----- GENERADOR DE 100 PREGUNTAS (3 niveles, cálculos precisos) -----
+    function generateAllQuestions() {
+      const qs = [];
+      for (let i = 0; i < TOTAL_QUESTIONS; i++) {
+        let question, answer, options, context;
+        let level = 1;
+        if (i >= 20 && i < 40) level = 2;
+        else if (i >= 40) level = 3;
+
+        const contextos = [
+          '🥬 Frutería "El Fresco"', '🧺 Mercado Central', '🛒 Supermercado "Ahorro"', 
+          '🍞 Panadería "El Trigal"', '🥩 Carnicería "Don Pepe"', '🐟 Pescadería "Mar Azul"',
+          '🌽 Verdulería "La Cosecha"', '🧀 Bodega "Don Lucho"', '🚗 Concesionario "Auto Perú"',
+          '👕 Tienda "Moda Joven"', '📱 Elektra Center', '💊 Farmacia "Salud Total"'
+        ];
+        const ctx = contextos[Math.floor(Math.random() * contextos.length)];
+
+        if (level === 1) {
+          const tipo = i % 4;
+          if (tipo === 0) {
+            let total = (Math.floor(Math.random() * 20) + 5) * 5;
+            let pct = [10, 20, 25, 30, 50][Math.floor(Math.random() * 5)];
+            let resultado = (total * pct / 100);
+            resultado = Number.isInteger(resultado) ? resultado : +resultado.toFixed(1);
+            question = `En ${ctx} hay ${total} productos en oferta. El ${pct}% son frutas. ¿Cuántas frutas hay en oferta?`;
+            answer = resultado.toString();
+            context = `🍎 ${ctx} · oferta de frutas`;
+          } else if (tipo === 1) {
+            let precio = (Math.floor(Math.random() * 15) + 5) * 5;
+            let desc = [10, 15, 20, 25][Math.floor(Math.random() * 4)];
+            let final = +(precio * (1 - desc/100));
+            final = Number.isInteger(final) ? final : +final.toFixed(1);
+            question = `Un cliente compra un producto que cuesta S/ ${precio} y tiene ${desc}% de descuento. ¿Cuánto paga?`;
+            answer = final.toString();
+            context = `💰 ${ctx} · descuento simple`;
+          } else if (tipo === 2) {
+            let parte = (Math.floor(Math.random() * 10) + 2) * 5;
+            let total = parte * 2 + (Math.floor(Math.random() * 10) + 5) * 5;
+            let pct = Math.round(parte / total * 100);
+            if (pct > 100) pct = 100;
+            question = `En ${ctx} hay ${total} productos, de los cuales ${parte} son importados. ¿Qué porcentaje son importados?`;
+            answer = pct.toString();
+            context = `📊 ${ctx} · porcentaje de importados`;
+          } else {
+            let precio = (Math.floor(Math.random() * 20) + 5) * 5;
+            let aumento = [10, 15, 20][Math.floor(Math.random() * 3)];
+            let nuevo = +(precio * (1 + aumento/100));
+            nuevo = Number.isInteger(nuevo) ? nuevo : +nuevo.toFixed(1);
+            question = `El precio del pan en ${ctx} era S/ ${precio} y subió ${aumento}%. ¿Cuál es el nuevo precio?`;
+            answer = nuevo.toString();
+            context = `🍞 ${ctx} · aumento de precio`;
+          }
+        } else if (level === 2) {
+          const tipo = i % 4;
+          if (tipo === 0) {
+            let total = Math.floor(Math.random() * 80) + 40;
+            let pct = [15, 35, 45, 60, 75][Math.floor(Math.random() * 5)];
+            let resultado = +(total * pct / 100);
+            resultado = Number.isInteger(resultado) ? resultado : +resultado.toFixed(1);
+            question = `En ${ctx} hay ${total} coches en el concesionario. El ${pct}% son de color blanco. ¿Cuántos coches blancos hay?`;
+            answer = resultado.toString();
+            context = `🚗 ${ctx} · concesionario`;
+          } else if (tipo === 1) {
+            let precio = Math.floor(Math.random() * 200) + 80;
+            let desc = [20, 30, 40, 50][Math.floor(Math.random() * 4)];
+            let final = +(precio * (1 - desc/100));
+            final = Number.isInteger(final) ? final : +final.toFixed(1);
+            question = `En ${ctx} una licuadora cuesta S/ ${precio} y tiene ${desc}% de descuento. ¿Cuánto se paga?`;
+            answer = final.toString();
+            context = `🔌 ${ctx} · oferta de electrodomésticos`;
+          } else if (tipo === 2) {
+            let parte = Math.floor(Math.random() * 60) + 20;
+            let total = parte + Math.floor(Math.random() * 80) + 30;
+            let pct = +(parte / total * 100);
+            pct = Number.isInteger(pct) ? pct : +pct.toFixed(1);
+            if (pct > 100) pct = 100;
+            question = `De ${total} clientes en ${ctx}, ${parte} pagaron con tarjeta. ¿Qué porcentaje pagó con tarjeta?`;
+            answer = pct.toString();
+            context = `💳 ${ctx} · medios de pago`;
+          } else {
+            let precio = Math.floor(Math.random() * 200) + 100;
+            let aumento = [25, 35, 45][Math.floor(Math.random() * 3)];
+            let nuevo = +(precio * (1 + aumento/100));
+            nuevo = Number.isInteger(nuevo) ? nuevo : +nuevo.toFixed(1);
+            question = `En ${ctx}, el kilo de carne costaba S/ ${precio} y subió ${aumento}%. ¿Cuánto cuesta ahora?`;
+            answer = nuevo.toString();
+            context = `🥩 ${ctx} · precio de carnes`;
+          }
+        } else {
+          const tipo = i % 5;
+          if (tipo === 0) {
+            let total = Math.floor(Math.random() * 150) + 80;
+            let pct1 = [35, 40, 45][Math.floor(Math.random() * 3)];
+            let pct2 = [5, 10, 15][Math.floor(Math.random() * 3)];
+            let res1 = +(total * pct1 / 100);
+            let res2 = +(total * pct2 / 100);
+            res1 = Number.isInteger(res1) ? res1 : +res1.toFixed(1);
+            res2 = Number.isInteger(res2) ? res2 : +res2.toFixed(1);
+            question = `Un concesionario tiene ${total} coches. El ${pct1}% son blancos y el ${pct2}% son rojos. ¿Cuántos coches blancos hay?`;
+            answer = res1.toString();
+            context = `🚗 ${ctx} · concesionario (blancos)`;
+          } else if (tipo === 1) {
+            let precio = Math.floor(Math.random() * 400) + 150;
+            let desc1 = [10, 20][Math.floor(Math.random() * 2)];
+            let desc2 = [5, 10, 15][Math.floor(Math.random() * 3)];
+            let inter = +(precio * (1 - desc1/100));
+            let final = +(inter * (1 - desc2/100));
+            final = Number.isInteger(final) ? final : +final.toFixed(1);
+            question = `En ${ctx}, un televisor cuesta S/ ${precio}. Primero tiene ${desc1}% de descuento y luego otro ${desc2}% adicional. ¿Cuánto cuesta al final?`;
+            answer = final.toString();
+            context = `📺 ${ctx} · descuentos sucesivos`;
+          } else if (tipo === 2) {
+            let costo = Math.floor(Math.random() * 200) + 60;
+            let ganancia = Math.floor(Math.random() * 80) + 30;
+            let venta = costo + ganancia;
+            let pct = +(ganancia / costo * 100);
+            pct = Number.isInteger(pct) ? pct : +pct.toFixed(1);
+            if (pct > 200) pct = 200;
+            question = `En ${ctx}, un producto costó S/ ${costo} y se vendió en S/ ${venta}. ¿Qué porcentaje de ganancia obtuvo el vendedor?`;
+            answer = pct.toString();
+            context = `💰 ${ctx} · ganancia en venta`;
+          } else if (tipo === 3) {
+            let precioA = Math.floor(Math.random() * 300) + 120;
+            let precioB = Math.floor(Math.random() * 150) + 40;
+            let diff = Math.abs(precioA - precioB);
+            let pct = +(diff / Math.max(precioA, precioB) * 100);
+            pct = Number.isInteger(pct) ? pct : +pct.toFixed(1);
+            if (pct > 100) pct = 100;
+            question = `En ${ctx}, el producto A cuesta S/ ${precioA} y el B cuesta S/ ${precioB}. ¿En qué porcentaje es más barato B que A?`;
+            answer = pct.toString();
+            context = `🏷️ ${ctx} · comparación de precios`;
+          } else {
+            let total = Math.floor(Math.random() * 300) + 100;
+            let pct1 = [30, 40, 50][Math.floor(Math.random() * 3)];
+            let pct2 = [20, 30, 40][Math.floor(Math.random() * 3)];
+            let primero = +(total * pct1 / 100);
+            let resultado = +(primero * pct2 / 100);
+            resultado = Number.isInteger(resultado) ? resultado : +resultado.toFixed(1);
+            question = `En ${ctx} hay ${total} clientes. El ${pct1}% compró frutas, y de esos, el ${pct2}% compró manzanas. ¿Cuántos clientes compraron manzanas?`;
+            answer = resultado.toString();
+            context = `🍎 ${ctx} · porcentaje de porcentaje`;
+          }
+        }
+
+        if (answer === undefined || answer === '' || isNaN(parseFloat(answer))) {
+          answer = '0';
+        }
+
+        let correctNum = parseFloat(answer);
+        let wrongs = new Set();
+        let attempts = 0;
+        while (wrongs.size < 3 && attempts < 100) {
+          let offset = (Math.random() * 0.4 + 0.05) * (Math.abs(correctNum) + 1);
+          if (Math.random() > 0.5) offset = -offset;
+          let candidate = +(correctNum + offset);
+          candidate = Number.isInteger(candidate) ? candidate : +candidate.toFixed(1);
+          if (candidate < 0) candidate = Math.abs(candidate) + 0.5;
+          if (candidate !== correctNum && !wrongs.has(candidate.toString())) {
+            wrongs.add(candidate.toString());
+          }
+          attempts++;
+        }
+        let fallbacks = ['0', '1', '2', '5', '8', '10', '12', '15', '18', '20', '25', '30', '35', '40', '45', '50', '60', '70', '80', '90', '100', '120', '150', '200'];
+        let idx = 0;
+        while (wrongs.size < 3) {
+          let fb = fallbacks[idx % fallbacks.length];
+          if (fb !== answer && !wrongs.has(fb)) wrongs.add(fb);
+          idx++;
+        }
+        options = shuffle([answer, ...Array.from(wrongs)]);
+
+        qs.push({
+          id: i,
+          question: question,
+          answer: answer,
+          options: options,
+          context: context || '🏪 Oferta del mercado',
+          level: level
+        });
+      }
+      return qs;
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // ----- FUNCIONES DEL TEMPORIZADOR (reinicio por pregunta) -----
+    function resetTimer() {
+      clearInterval(timerInterval);
+      if (!gameActive) return;
+      timer = TIME_LIMIT_SEC;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timer--;
+        updateTimerDisplay();
+        if (timer <= 0) {
+          clearInterval(timerInterval);
+          endGame(false, '⏰ ¡Se acabó el tiempo en esta pregunta!');
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(timer / 60);
+      const secs = timer % 60;
+      timerDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // ----- INICIALIZAR JUEGO -----
+    function initGame() {
+      currentQuestions = generateAllQuestions();
+      let level1 = currentQuestions.filter(q => q.level === 1);
+      let level2 = currentQuestions.filter(q => q.level === 2);
+      let level3 = currentQuestions.filter(q => q.level === 3);
+      level1 = shuffle(level1);
+      level2 = shuffle(level2);
+      level3 = shuffle(level3);
+      currentQuestions = [...level1.slice(0, 20), ...level2.slice(0, 20), ...level3.slice(0, 60)];
+      currentQuestions.forEach((q, idx) => q.id = idx);
+      
+      currentIndex = 0;
+      lives = MAX_LIVES;
+      correctCount = 0;
+      wrongCount = 0;
+      level = 1;
+      gameActive = true;
+      isAnswered = false;
+      updateUIStats();
+      loadQuestion(); // esta función reiniciará el temporizador
+    }
+
+    function loadQuestion() {
+      if (!gameActive || currentIndex >= currentQuestions.length) {
+        endGame(true, '¡Completaste los 100 problemas! 🎉');
+        return;
+      }
+
+      const q = currentQuestions[currentIndex];
+      if (currentIndex < 20) level = 1;
+      else if (currentIndex < 40) level = 2;
+      else level = 3;
+
+      contextTag.textContent = q.context || '🏪 Oferta del mercado';
+      questionText.textContent = q.question;
+      questionCounter.textContent = `${currentIndex+1}/${currentQuestions.length}`;
+      levelDisplay.textContent = level;
+
+      optionsContainer.innerHTML = '';
+      const optValues = q.options;
+      optValues.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = opt;
+        btn.dataset.value = opt;
+        btn.addEventListener('click', onOptionClick);
+        optionsContainer.appendChild(btn);
+      });
+
+      feedbackArea.innerHTML = '💡 Elige una opción';
+      nextBtn.disabled = true;
+      isAnswered = false;
+      correctAnswer = q.answer;
+
+      // Reiniciar el temporizador a 8 minutos para esta pregunta
+      resetTimer();
+    }
+
+    function onOptionClick(e) {
+      if (!gameActive || isAnswered) return;
+      const btn = e.currentTarget;
+      const selected = btn.dataset.value;
+      const isCorrect = (selected === correctAnswer);
+
+      const allOptions = document.querySelectorAll('.option-btn');
+      allOptions.forEach(b => b.classList.add('disabled-btn'));
+
+      if (isCorrect) {
+        btn.classList.add('correct-fb');
+        feedbackArea.innerHTML = '✅ ¡Correcto! +1 acierto';
+        correctCount++;
+      } else {
+        btn.classList.add('wrong-fb');
+        lives--;
+        wrongCount++;
+        feedbackArea.innerHTML = `❌ Incorrecto. Respuesta correcta: ${correctAnswer}`;
+        allOptions.forEach(b => {
+          if (b.dataset.value === correctAnswer) b.classList.add('correct-fb');
+        });
+        if (lives <= 0) {
+          endGame(false, '💔 Te quedaste sin vidas');
+          return;
+        }
+      }
+
+      isAnswered = true;
+      updateUIStats();
+      nextBtn.disabled = false;
+    }
+
+    function nextQuestion() {
+      if (!gameActive) return;
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length) {
+        endGame(true, '¡Completaste todos los problemas! 🏆');
+        return;
+      }
+      loadQuestion(); // al cargar la siguiente, se reinicia el timer
+    }
+
+    function updateUIStats() {
+      livesDisplay.textContent = lives;
+      levelDisplay.textContent = level;
+      updateTimerDisplay();
+    }
+
+    function endGame(win, message) {
+      if (!gameActive) return;
+      gameActive = false;
+      clearInterval(timerInterval);
+      gameScreen.classList.add('hidden');
+      endScreen.classList.remove('hidden');
+
+      finalCorrect.textContent = correctCount;
+      finalWrong.textContent = wrongCount;
+      finalLevel.textContent = level;
+      finalLives.textContent = lives;
+      finalName.textContent = playerName;
+      endTitle.textContent = message;
+    }
+
+    function resetGame() {
+      clearInterval(timerInterval);
+      gameActive = false;
+      endScreen.classList.add('hidden');
+      gameScreen.classList.add('hidden');
+      welcomeScreen.classList.remove('hidden');
+      nameInput.value = '';
+      nameError.textContent = '';
+    }
+
+    // ----- EVENTOS -----
+    startBtn.addEventListener('click', function() {
+      const name = nameInput.value.trim();
+      if (name.length < 2) {
+        nameError.textContent = '⚠️ Ingresa tu nombre completo (mínimo 2 caracteres)';
+        return;
+      }
+      nameError.textContent = '';
+      playerName = name;
+      displayName.textContent = playerName;
+      welcomeScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      endScreen.classList.add('hidden');
+      initGame();
+    });
+
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') startBtn.click();
+    });
+
+    nextBtn.addEventListener('click', nextQuestion);
+    restartBtn.addEventListener('click', resetGame);
+
+    document.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.option-btn')) e.preventDefault();
+    });
+  })();
+</script>
+</body>
+</html>
