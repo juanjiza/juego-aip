@@ -441,7 +441,7 @@
         <span class="heart" id="heart5">❤️</span>
       </div>
       <span class="counter-problems" id="problemCounter">1 / 16</span>
-      <div class="timer-box" id="timerDisplay">30s</div>
+      <div class="timer-box" id="timerDisplay">5:00</div>
     </div>
 
     <div class="level-progress">
@@ -463,7 +463,7 @@
           <button class="btn btn-success hidden" id="nextBtn">👉 Siguiente</button>
         </div>
       </div>
-      <div id="feedback" class="feedback">⏱️ Tienes 30 segundos por problema</div>
+      <div id="feedback" class="feedback">⏱️ Tienes 5 minutos por problema</div>
     </div>
   </div>
 
@@ -643,8 +643,8 @@
     let gameActive = false;
     let currentProblem = null;
     let timerInterval = null;
-    let timeLeft = 30;
-    const MAX_TIME = 30;
+    let timeLeft = 300;               // 5 minutos = 300 segundos
+    const MAX_TIME = 300;             // 5 minutos
     let waitingForNext = false;
     let levelCorrect = 0;
     let levelTotal = 16;
@@ -654,6 +654,13 @@
     // ================================================================
     // FUNCIONES
     // ================================================================
+
+    // Formato mm:ss
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
 
     // Inicializar niveles mezclados (cada nivel se mezcla por separado)
     function initShuffledLevels() {
@@ -723,7 +730,7 @@
       problemContext.textContent = `📌 ${currentProblem.ctx}`;
       answerInput.value = '';
       feedbackDiv.className = 'feedback';
-      feedbackDiv.textContent = `⏱️ Tienes ${MAX_TIME} segundos`;
+      feedbackDiv.textContent = '⏱️ Tienes 5 minutos para resolver';
       nextBtn.classList.add('hidden');
       updateLevelUI();
       setInputEnabled(true);
@@ -733,12 +740,12 @@
     function startTimer() {
       clearInterval(timerInterval);
       timeLeft = MAX_TIME;
-      timerDisplay.textContent = `${timeLeft}s`;
+      timerDisplay.textContent = formatTime(timeLeft);
       timerDisplay.classList.remove('warning');
       timerInterval = setInterval(() => {
         timeLeft--;
-        timerDisplay.textContent = `${timeLeft}s`;
-        if (timeLeft <= 5) {
+        timerDisplay.textContent = formatTime(timeLeft);
+        if (timeLeft <= 30) { // aviso visual cuando quedan 30 segundos o menos
           timerDisplay.classList.add('warning');
         }
         if (timeLeft <= 0) {
@@ -922,7 +929,7 @@
       setInputEnabled(true);
       showProblem();
       feedbackDiv.className = 'feedback';
-      feedbackDiv.textContent = '⏱️ Tienes 30 segundos por problema';
+      feedbackDiv.textContent = '⏱️ Tienes 5 minutos por problema';
       setTimeout(() => answerInput.focus(), 100);
     }
 
@@ -957,7 +964,7 @@
       setInputEnabled(true);
       showProblem();
       feedbackDiv.className = 'feedback';
-      feedbackDiv.textContent = '⏱️ Tienes 30 segundos por problema';
+      feedbackDiv.textContent = '⏱️ Tienes 5 minutos por problema';
       setTimeout(() => answerInput.focus(), 100);
     }
 
