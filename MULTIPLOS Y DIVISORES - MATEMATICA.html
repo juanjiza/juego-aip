@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <title>🌟 Múltiplos y Divisores - Ruleta & Carreras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+            padding: clamp(8px, 2vw, 20px);
+            overflow-x: hidden;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            min-height: 550px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border-radius: clamp(30px, 6vw, 50px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.20), 0 8px 20px rgba(0, 0, 0, 0.06);
+            padding: clamp(20px, 4vw, 35px);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        .bg-shapes {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .bg-shapes span {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.08;
+            font-size: clamp(60px, 15vw, 140px);
+        }
+        .bg-shapes span:nth-child(1) {
+            top: -30px;
+            right: -30px;
+            color: #FF6B6B;
+        }
+        .bg-shapes span:nth-child(2) {
+            bottom: -20px;
+            left: -20px;
+            color: #4ECDC4;
+        }
+        .bg-shapes span:nth-child(3) {
+            top: 40%;
+            left: -40px;
+            color: #FFE66D;
+        }
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            animation: fadeSlide 0.5s ease forwards;
+            width: 100%;
+        }
+        .screen.active {
+            display: flex;
+        }
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        #loginScreen {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .logo-icon {
+            font-size: clamp(48px, 12vw, 72px);
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+        .game-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(24px, 5vw, 36px);
+            background: linear-gradient(135deg, #FF6B6B, #ee5a24, #f0932b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+            margin-bottom: 2px;
+        }
+        .game-subtitle {
+            font-size: clamp(16px, 2.5vw, 20px);
+            font-weight: 700;
+            color: #2d3436;
+            background: rgba(255, 230, 109, 0.30);
+            padding: 4px 18px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .mascot-login {
+            font-size: clamp(60px, 14vw, 80px);
+            margin: 4px 0 8px;
+            animation: wave 2.5s ease-in-out infinite;
+        }
+        @keyframes wave {
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+        .input-group {
+            width: 100%;
+            max-width: 400px;
+            margin: 6px auto 12px;
+        }
+        .input-group label {
+            display: block;
+            font-size: clamp(16px, 2vw, 20px);
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 4px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: clamp(14px, 2.5vw, 18px) clamp(16px, 3vw, 24px);
+            font-size: clamp(18px, 2.5vw, 22px);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            border: 3px solid #dfe6e9;
+            border-radius: 60px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+            text-align: center;
+            color: #2d3436;
+        }
+        .input-group input:focus {
+            border-color: #FF6B6B;
+            box-shadow: 0 0 0 6px rgba(255, 107, 107, 0.20);
+            transform: scale(1.02);
+        }
+        .input-group input::placeholder {
+            color: #b2bec3;
+            font-weight: 600;
+            font-size: clamp(14px, 1.8vw, 18px);
+        }
+        .error-msg {
+            color: #e74c3c;
+            font-weight: 700;
+            font-size: clamp(14px, 1.6vw, 17px);
+            margin-top: 6px;
+            min-height: 26px;
+            background: rgba(231, 76, 60, 0.10);
+            padding: 4px 16px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        .mode-selector {
+            width: 100%;
+            max-width: 520px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: clamp(6px, 1.2vw, 12px);
+            margin: 12px 0 8px;
+        }
+        .mode-btn {
+            padding: clamp(8px, 1.2vw, 14px) clamp(4px, 0.8vw, 10px);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: clamp(10px, 1.3vw, 16px);
+            border: 3px solid #dfe6e9;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2d3436;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            min-height: 50px;
+            text-align: center;
+        }
+        .mode-btn:hover {
+            transform: scale(1.04);
+            border-color: #b2bec3;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        .mode-btn:active {
+            transform: scale(0.95);
+        }
+        .mode-btn.classic {
+            background: #ffeaa7;
+            border-color: #fdcb6e;
+        }
+        .mode-btn.tf {
+            background: #a29bfe;
+            border-color: #6c5ce7;
+            color: white;
+        }
+        .mode-btn.ruleta {
+            background: #fd79a8;
+            border-color: #e84393;
+            color: white;
+        }
+        .mode-btn.car {
+            background: #55efc4;
+            border-color: #00b894;
+            color: #006644;
+        }
+        .mode-btn .icon {
+            font-size: clamp(18px, 2.5vw, 28px);
+        }
+        .mode-btn .label {
+            font-size: clamp(8px, 1vw, 12px);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .mode-btn .label small {
+            font-weight: 600;
+            font-size: 0.7em;
+            opacity: 0.8;
+            display: block;
+        }
+        .rules-box {
+            background: rgba(78, 205, 196, 0.12);
+            border-radius: 20px;
+            padding: 10px 16px;
+            margin: 6px 0 12px;
+            max-width: 520px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: clamp(8px, 2vw, 20px);
+            flex-wrap: wrap;
+            border: 2px dashed rgba(78, 205, 196, 0.30);
+        }
+        .rules-box span {
+            font-weight: 700;
+            font-size: clamp(12px, 1.5vw, 16px);
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .rules-box span i {
+            font-style: normal;
+            font-size: clamp(16px, 2vw, 22px);
+        }
+        #gameScreen {
+            padding: 0;
+            width: 100%;
+        }
+        .game-header {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px 12px;
+            padding: 0 0 10px 0;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+        }
+        .player-name-display {
+            font-weight: 800;
+            font-size: clamp(14px, 1.8vw, 18px);
+            color: #2d3436;
+            background: rgba(255, 230, 109, 0.30);
+            padding: 2px 14px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .player-name-display span {
+            color: #FF6B6B;
+        }
+        .stats {
+            display: flex;
+            align-items: center;
+            gap: clamp(6px, 1.2vw, 14px);
+            flex-wrap: wrap;
+        }
+        .lives-display {
+            display: flex;
+            gap: 2px;
+            font-size: clamp(18px, 3vw, 26px);
+            line-height: 1;
+        }
+        .lives-display .heart {
+            transition: all 0.3s ease;
+        }
+        .lives-display .heart.lost {
+            opacity: 0.2;
+            transform: scale(0.7);
+            filter: grayscale(1);
+        }
+        .timer-display {
+            font-weight: 800;
+            font-size: clamp(16px, 2.2vw, 22px);
+            color: #2d3436;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 12px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-variant-numeric: tabular-nums;
+            min-width: 65px;
+            justify-content: center;
+        }
+        .timer-display.warning {
+            color: #e74c3c;
+            animation: pulse 0.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+        .score-display {
+            font-weight: 800;
+            font-size: clamp(15px, 2vw, 20px);
+            color: #f0932b;
+            background: rgba(240, 147, 43, 0.15);
+            padding: 2px 12px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .progress-wrap {
+            width: 100%;
+            margin: 10px 0 8px;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4ECDC4, #44bd9e, #FFE66D);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+        }
+        .question-counter {
+            font-size: clamp(13px, 1.5vw, 16px);
+            font-weight: 700;
+            color: #636e72;
+            text-align: center;
+            margin: -4px 0 8px;
+        }
+
+        /* RULETA */
+        #ruletaZone {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 2px 0 0px;
+        }
+        .ruleta-wrapper {
+            position: relative;
+            width: min(340px, 72vw);
+            height: min(340px, 72vw);
+            margin: 0 auto 0px;
+        }
+        .ruleta-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 0 0 6px rgba(255, 255, 255, 0.6);
+            transition: transform 4.5s cubic-bezier(0.25, 0.1, 0.15, 1);
+            cursor: pointer;
+            will-change: transform;
+            display: block;
+        }
+        .ruleta-aguja {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 32px solid #e74c3c;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            pointer-events: none;
+        }
+        .ruleta-aguja::after {
+            content: '';
+            position: absolute;
+            top: -42px;
+            left: -8px;
+            width: 16px;
+            height: 16px;
+            background: #e74c3c;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px white, 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .ruleta-btn {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            border: none;
+            padding: clamp(14px, 2.5vw, 20px) clamp(28px, 5vw, 44px);
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(18px, 2.8vw, 26px);
+            color: white;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 24px rgba(232, 67, 147, 0.45);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 2;
+        }
+        .ruleta-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 14px 32px rgba(232, 67, 147, 0.55);
+        }
+        .ruleta-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .ruleta-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .ruleta-btn .spin-icon {
+            display: inline-block;
+            transition: transform 0.8s ease;
+        }
+        .ruleta-btn.spinning .spin-icon {
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .ruleta-pregunta-box {
+            width: 100%;
+            background: rgba(253, 121, 168, 0.10);
+            border: 3px dashed #e84393;
+            border-radius: 24px;
+            padding: clamp(12px, 1.8vw, 18px);
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(16px, 2.5vw, 22px);
+            font-weight: 700;
+            color: #2d3436;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .ruleta-pregunta-box .highlight {
+            color: #e84393;
+        }
+
+        /* CARRERAS */
+        #carZone {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 6px 0 10px;
+        }
+        .car-game-info {
+            width: 100%;
+            background: rgba(85, 239, 196, 0.15);
+            border: 2px solid #00b894;
+            border-radius: 16px;
+            padding: 10px 16px;
+            text-align: center;
+            font-weight: 700;
+            font-size: clamp(16px, 2vw, 22px);
+            color: #006644;
+            margin-bottom: 10px;
+        }
+        .car-game-info span {
+            background: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin: 0 4px;
+        }
+        .car-canvas-wrapper {
+            width: 100%;
+            max-width: 650px;
+            aspect-ratio: 6/3;
+            background: #2d3436;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 4px solid #00b894;
+            position: relative;
+            touch-action: none;
+        }
+        #carCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #2d3436;
+        }
+        .car-controls {
+            display: flex;
+            gap: 16px;
+            margin: 12px 0 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .car-control-btn {
+            padding: 12px 24px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            border: 3px solid #00b894;
+            border-radius: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #006644;
+            min-width: 70px;
+        }
+        .car-control-btn:hover {
+            background: #55efc4;
+            transform: scale(1.05);
+        }
+        .car-control-btn:active {
+            transform: scale(0.95);
+        }
+        .car-control-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .car-feedback {
+            width: 100%;
+            min-height: clamp(40px, 5vw, 56px);
+            margin-top: 8px;
+            padding: clamp(6px, 1.2vw, 12px) clamp(10px, 1.5vw, 16px);
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: clamp(14px, 1.6vw, 18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.02);
+            border: 2px solid transparent;
+        }
+        .car-feedback.correct {
+            background: rgba(85, 239, 196, 0.20);
+            border-color: #55efc4;
+            color: #006644;
+        }
+        .car-feedback.wrong {
+            background: rgba(250, 177, 160, 0.20);
+            border-color: #fab1a0;
+            color: #a93226;
+        }
+        .car-feedback .fb-icon {
+            font-size: clamp(20px, 2.5vw, 28px);
+        }
+
+        /* PREGUNTA */
+        .question-card {
+            width: 100%;
+            background: white;
+            border-radius: clamp(24px, 4vw, 32px);
+            padding: clamp(14px, 2vw, 20px) clamp(12px, 1.8vw, 18px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+            border: 2px solid rgba(0, 0, 0, 0.04);
+            margin-bottom: 12px;
+            min-height: 160px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .question-card.visible {
+            display: flex;
+        }
+        .question-type-badge {
+            font-size: clamp(12px, 1.4vw, 15px);
+            font-weight: 700;
+            background: rgba(78, 205, 196, 0.15);
+            color: #4ECDC4;
+            padding: 2px 16px;
+            border-radius: 30px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .question-text {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(18px, 2.8vw, 26px);
+            color: #2d3436;
+            text-align: center;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+        .question-text .highlight {
+            color: #FF6B6B;
+            font-size: clamp(22px, 3.5vw, 32px);
+        }
+        .question-text .highlight-divisor {
+            color: #4ECDC4;
+            font-size: clamp(22px, 3.5vw, 32px);
+        }
+        .options-grid {
+            width: 100%;
+            display: grid;
+            gap: clamp(8px, 1.5vw, 14px);
+            margin-top: 4px;
+        }
+        .options-grid.two-cols {
+            grid-template-columns: 1fr 1fr;
+        }
+        .options-grid.four-cols {
+            grid-template-columns: 1fr 1fr;
+        }
+        .option-btn {
+            padding: clamp(10px, 1.8vw, 16px) clamp(6px, 1.2vw, 12px);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: clamp(16px, 2.2vw, 22px);
+            border: 3px solid #dfe6e9;
+            border-radius: clamp(14px, 2vw, 20px);
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #2d3436;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            min-height: clamp(44px, 6vw, 60px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.03);
+            border-color: #b2bec3;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .option-btn.correct {
+            background: #55efc4;
+            border-color: #00b894;
+            color: #006644;
+            transform: scale(1.04);
+            box-shadow: 0 0 0 6px rgba(85, 239, 196, 0.35);
+            animation: popCorrect 0.4s ease;
+        }
+        @keyframes popCorrect {
+            0% {
+                transform: scale(0.9);
+            }
+            40% {
+                transform: scale(1.12);
+            }
+            100% {
+                transform: scale(1.04);
+            }
+        }
+        .option-btn.wrong {
+            background: #fab1a0;
+            border-color: #e74c3c;
+            color: #a93226;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-10px);
+            }
+            40% {
+                transform: translateX(10px);
+            }
+            60% {
+                transform: translateX(-6px);
+            }
+            80% {
+                transform: translateX(6px);
+            }
+        }
+        .option-btn.reveal-correct {
+            background: #55efc4;
+            border-color: #00b894;
+            color: #006644;
+        }
+        .option-btn.reveal-wrong {
+            background: #fab1a0;
+            border-color: #e74c3c;
+            color: #a93226;
+            opacity: 0.5;
+        }
+        .feedback-area {
+            width: 100%;
+            min-height: clamp(40px, 5vw, 56px);
+            margin-top: 8px;
+            padding: clamp(6px, 1.2vw, 12px) clamp(10px, 1.5vw, 16px);
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: clamp(14px, 1.6vw, 18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.02);
+            border: 2px solid transparent;
+        }
+        .feedback-area.correct {
+            background: rgba(85, 239, 196, 0.20);
+            border-color: #55efc4;
+            color: #006644;
+        }
+        .feedback-area.wrong {
+            background: rgba(250, 177, 160, 0.20);
+            border-color: #fab1a0;
+            color: #a93226;
+        }
+        .feedback-area .fb-icon {
+            font-size: clamp(20px, 2.5vw, 28px);
+        }
+
+        #gameOverScreen {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .gameover-icon {
+            font-size: clamp(60px, 14vw, 80px);
+            margin-bottom: 2px;
+        }
+        .gameover-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(28px, 5vw, 40px);
+            color: #2d3436;
+            margin-bottom: 2px;
+        }
+        .gameover-title.win {
+            background: linear-gradient(135deg, #FF6B6B, #f0932b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gameover-title.lose {
+            color: #636e72;
+        }
+        .gameover-stats {
+            display: flex;
+            justify-content: center;
+            gap: clamp(12px, 2.5vw, 28px);
+            flex-wrap: wrap;
+            margin: 12px 0 16px;
+        }
+        .stat-item {
+            background: white;
+            padding: clamp(10px, 1.8vw, 16px) clamp(16px, 2.5vw, 24px);
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            min-width: 70px;
+        }
+        .stat-item .stat-number {
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(28px, 4.5vw, 38px);
+            color: #2d3436;
+            display: block;
+        }
+        .stat-item .stat-label {
+            font-weight: 700;
+            font-size: clamp(13px, 1.4vw, 16px);
+            color: #636e72;
+        }
+        .stat-item .stat-number.gold {
+            color: #f0932b;
+        }
+        .stat-item .stat-number.green {
+            color: #00b894;
+        }
+        .stat-item .stat-number.red {
+            color: #e74c3c;
+        }
+        .stars-rating {
+            font-size: clamp(36px, 6vw, 52px);
+            letter-spacing: 4px;
+            margin: 4px 0 10px;
+        }
+        .gameover-msg {
+            font-size: clamp(17px, 2vw, 21px);
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 10px;
+            padding: 0 8px;
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #4ECDC4, #44bd9e);
+            border: none;
+            padding: clamp(14px, 2.5vw, 18px) clamp(30px, 6vw, 46px);
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(19px, 3vw, 24px);
+            color: white;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 24px rgba(78, 205, 196, 0.40);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 14px 32px rgba(78, 205, 196, 0.50);
+        }
+        .btn-secondary:active {
+            transform: scale(0.96);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 3px solid #dfe6e9;
+            padding: clamp(12px, 2vw, 16px) clamp(28px, 5vw, 40px);
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(18px, 2.5vw, 22px);
+            color: #2d3436;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-outline:hover {
+            border-color: #FF6B6B;
+            color: #FF6B6B;
+            transform: scale(1.03);
+        }
+        .confetti-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .mode-selector {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .mode-btn {
+                min-height: 44px;
+                padding: 6px 4px;
+                border-radius: 12px;
+            }
+            .mode-btn .icon {
+                font-size: 18px;
+            }
+            .mode-btn .label {
+                font-size: 10px;
+            }
+            .ruleta-wrapper {
+                width: min(240px, 60vw);
+                height: min(240px, 60vw);
+            }
+            .ruleta-btn {
+                margin-top: 22px;
+                margin-bottom: 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            .game-container {
+                padding: 14px 10px 18px;
+                border-radius: 24px;
+                min-height: 420px;
+            }
+            .mode-selector {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px;
+            }
+            .mode-btn {
+                min-height: 38px;
+                padding: 4px 3px;
+                border-radius: 10px;
+                font-size: 9px;
+            }
+            .mode-btn .icon {
+                font-size: 14px;
+            }
+            .mode-btn .label {
+                font-size: 8px;
+            }
+            .options-grid {
+                gap: 6px;
+            }
+            .options-grid.two-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+            .options-grid.four-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+            .option-btn {
+                font-size: 14px;
+                min-height: 40px;
+                padding: 8px 4px;
+            }
+            .question-text {
+                font-size: 17px;
+            }
+            .question-text .highlight,
+            .question-text .highlight-divisor {
+                font-size: 20px;
+            }
+            .game-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 4px;
+            }
+            .stats {
+                justify-content: space-around;
+            }
+            .player-name-display {
+                justify-content: center;
+            }
+            .rules-box {
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+            }
+            .ruleta-wrapper {
+                width: min(200px, 55vw);
+                height: min(200px, 55vw);
+            }
+            .ruleta-aguja {
+                border-left-width: 10px;
+                border-right-width: 10px;
+                border-top-width: 22px;
+                top: -6px;
+            }
+            .ruleta-aguja::after {
+                width: 10px;
+                height: 10px;
+                top: -30px;
+                left: -5px;
+            }
+            .car-control-btn {
+                padding: 8px 14px;
+                font-size: 14px;
+                min-width: 50px;
+            }
+            .ruleta-btn {
+                margin-top: 18px;
+                margin-bottom: 8px;
+                padding: clamp(10px, 2vw, 14px) clamp(20px, 4vw, 30px);
+                font-size: clamp(16px, 2.5vw, 20px);
+            }
+            .ruleta-pregunta-box {
+                margin-top: 8px;
+            }
+        }
+        @media (min-width: 768px) {
+            .game-container {
+                padding: 40px 45px;
+            }
+            .mode-selector {
+                gap: 16px;
+            }
+            .options-grid {
+                gap: 16px;
+            }
+            .options-grid.four-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+            .ruleta-wrapper {
+                width: min(360px, 35vw);
+                height: min(360px, 35vw);
+            }
+            .ruleta-btn {
+                margin-top: 32px;
+                margin-bottom: 16px;
+            }
+            .ruleta-pregunta-box {
+                margin-top: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container" id="app">
+        <div class="bg-shapes">
+            <span>✦</span><span>★</span><span>✧</span>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="screen active" id="loginScreen">
+            <div class="logo-icon">🧮</div>
+            <h1 class="game-title">¡Múltiplos y Divisores!</h1>
+            <div class="game-subtitle">🌟 4 formas de aprender 🌟</div>
+            <div class="mascot-login">🦊</div>
+            <div class="input-group">
+                <label>✏️ Escribe tu nombre completo</label>
+                <input type="text" id="nameInput" placeholder="Ej: Sofía Martínez" maxlength="50" autocomplete="off" />
+                <div class="error-msg" id="loginError"></div>
+            </div>
+            <div class="mode-selector">
+                <button class="mode-btn classic" data-level="1" data-mode="classic"><span class="icon">🎯</span><span class="label">Clásico <small>N1</small></span></button>
+                <button class="mode-btn classic" data-level="2" data-mode="classic"><span class="icon">🎯</span><span class="label">Clásico <small>N2</small></span></button>
+                <button class="mode-btn tf" data-level="1" data-mode="tf"><span class="icon">🤔</span><span class="label">V/F <small>N1</small></span></button>
+                <button class="mode-btn tf" data-level="2" data-mode="tf"><span class="icon">🤔</span><span class="label">V/F <small>N2</small></span></button>
+                <button class="mode-btn ruleta" data-level="1" data-mode="ruleta"><span class="icon">🎰</span><span class="label">Ruleta <small>N1</small></span></button>
+                <button class="mode-btn ruleta" data-level="2" data-mode="ruleta"><span class="icon">🎰</span><span class="label">Ruleta <small>N2</small></span></button>
+                <button class="mode-btn car" data-level="1" data-mode="car"><span class="icon">🚗</span><span class="label">Carreras <small>N1</small></span></button>
+                <button class="mode-btn car" data-level="2" data-mode="car"><span class="icon">🚗</span><span class="label">Carreras <small>N2</small></span></button>
+            </div>
+            <div class="rules-box">
+                <span><i>❤️</i> 5 vidas</span>
+                <span id="timerRule"><i>⏱️</i> 8 min / pregunta</span>
+                <span><i>🏆</i> 10 preguntas</span>
+                <span><i>📚</i> 200 preguntas totales</span>
+            </div>
+        </div>
+
+        <!-- JUEGO -->
+        <div class="screen" id="gameScreen">
+            <div class="game-header">
+                <div class="player-name-display">👤 <span id="playerNameDisplay">---</span></div>
+                <div class="stats">
+                    <div class="lives-display" id="livesDisplay">
+                        <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+                    </div>
+                    <div class="timer-display" id="timerDisplay">⏱️ 8:00</div>
+                    <div class="score-display">⭐ <span id="scoreDisplay">0</span></div>
+                </div>
+            </div>
+            <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+            <div class="question-counter" id="questionCounter">Pregunta 1 de 10</div>
+
+            <!-- RULETA -->
+            <div id="ruletaZone">
+                <div class="ruleta-wrapper">
+                    <canvas id="ruletaCanvas" width="400" height="400"></canvas>
+                    <div class="ruleta-aguja"></div>
+                </div>
+                <button class="ruleta-btn" id="spinBtn"><span class="spin-icon">🎰</span> ¡GIRAR RULETA!</button>
+                <div class="ruleta-pregunta-box" id="ruletaPreguntaBox">🎲 Haz clic en "GIRAR RULETA"</div>
+            </div>
+
+            <!-- CARRERAS -->
+            <div id="carZone">
+                <div class="car-game-info">🚗 <span id="carConsigna">Múltiplos de 3</span> — Pasa sobre los números correctos</div>
+                <div class="car-canvas-wrapper"><canvas id="carCanvas" width="650" height="320"></canvas></div>
+                <div class="car-controls">
+                    <button class="car-control-btn" id="carUp">⬆</button>
+                    <button class="car-control-btn" id="carDown">⬇</button>
+                    <button class="car-control-btn" id="carLeft">⬅</button>
+                    <button class="car-control-btn" id="carRight">➡</button>
+                </div>
+                <div class="car-feedback" id="carFeedback"><span class="fb-icon">🚗</span><span>Conduce sobre los números correctos</span></div>
+            </div>
+
+            <!-- PREGUNTA -->
+            <div class="question-card" id="questionCard">
+                <div class="question-type-badge" id="questionTypeBadge">❓</div>
+                <div class="question-text" id="questionText">Cargando...</div>
+                <div class="options-grid four-cols" id="optionsGrid">
+                    <button class="option-btn" data-index="0">---</button>
+                    <button class="option-btn" data-index="1">---</button>
+                    <button class="option-btn" data-index="2">---</button>
+                    <button class="option-btn" data-index="3">---</button>
+                </div>
+                <div class="feedback-area" id="feedbackArea"><span class="fb-icon">💡</span><span>Selecciona una opción</span></div>
+            </div>
+        </div>
+
+        <!-- GAME OVER -->
+        <div class="screen" id="gameOverScreen">
+            <div class="gameover-icon" id="gameoverIcon">🏁</div>
+            <h2 class="gameover-title" id="gameoverTitle">¡Fin del juego!</h2>
+            <div class="stars-rating" id="starsRating">⭐⭐⭐</div>
+            <div class="gameover-msg" id="gameoverMsg">¡Buen trabajo!</div>
+            <div class="gameover-stats">
+                <div class="stat-item"><span class="stat-number gold" id="finalScore">0</span><span class="stat-label">⭐ Puntos</span></div>
+                <div class="stat-item"><span class="stat-number green" id="finalCorrect">0</span><span class="stat-label">✅ Correctas</span></div>
+                <div class="stat-item"><span class="stat-number red" id="finalWrong">0</span><span class="stat-label">❌ Incorrectas</span></div>
+            </div>
+            <button class="btn-secondary" id="playAgainBtn">🔄 Jugar de nuevo</button>
+            <button class="btn-outline" id="homeBtn">🏠 Inicio</button>
+        </div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+        // ================================================================
+        //  JUEGO COMPLETO - RULETA CON CENTRO DIBUJADO EN CANVAS
+        // ================================================================
+
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const loginScreen = $('#loginScreen');
+        const gameScreen = $('#gameScreen');
+        const gameOverScreen = $('#gameOverScreen');
+        const nameInput = $('#nameInput');
+        const loginError = $('#loginError');
+        const modeBtns = $$('.mode-btn');
+
+        const playerNameDisplay = $('#playerNameDisplay');
+        const livesDisplay = $('#livesDisplay');
+        const timerDisplay = $('#timerDisplay');
+        const scoreDisplay = $('#scoreDisplay');
+        const progressBar = $('#progressBar');
+        const questionCounter = $('#questionCounter');
+        const questionTypeBadge = $('#questionTypeBadge');
+        const questionText = $('#questionText');
+        const optionsGrid = $('#optionsGrid');
+        const feedbackArea = $('#feedbackArea');
+        const timerRule = $('#timerRule');
+        const questionCard = $('#questionCard');
+
+        const ruletaZone = $('#ruletaZone');
+        const ruletaCanvas = $('#ruletaCanvas');
+        const spinBtn = $('#spinBtn');
+        const ruletaPreguntaBox = $('#ruletaPreguntaBox');
+
+        const carZone = $('#carZone');
+        const carCanvas = $('#carCanvas');
+        const carConsigna = $('#carConsigna');
+        const carFeedback = $('#carFeedback');
+        const carUp = $('#carUp');
+        const carDown = $('#carDown');
+        const carLeft = $('#carLeft');
+        const carRight = $('#carRight');
+
+        const gameoverIcon = $('#gameoverIcon');
+        const gameoverTitle = $('#gameoverTitle');
+        const starsRating = $('#starsRating');
+        const gameoverMsg = $('#gameoverMsg');
+        const finalScore = $('#finalScore');
+        const finalCorrect = $('#finalCorrect');
+        const finalWrong = $('#finalWrong');
+        const playAgainBtn = $('#playAgainBtn');
+        const homeBtn = $('#homeBtn');
+        const confettiContainer = $('#confettiContainer');
+
+        // --- ESTADO ---
+        const state = {
+            playerName: '',
+            lives: 5,
+            maxLives: 5,
+            score: 0,
+            correctCount: 0,
+            wrongCount: 0,
+            currentQuestionIndex: 0,
+            maxQuestions: 10,
+            currentQuestions: [],
+            isAnswered: false,
+            isGameOver: false,
+            level: 1,
+            mode: 'classic',
+            questionTimer: 480,
+            questionTimerInterval: null,
+            ruletaPreguntas: [],
+            ruletaIndice: 0,
+            ruletaGirando: false,
+            ruletaAnguloActual: 0,
+            ruletaPreguntaActiva: false,
+            carX: 50,
+            carY: 160,
+            carNumbers: [],
+            carCollected: [],
+            carQuestion: null,
+        };
+
+        // --- BANCOS DE 200 PREGUNTAS ÚNICAS ---
+        let bankLevel1 = [];
+        let bankLevel2 = [];
+
+        // --- AUDIO ---
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
+
+        function playTone(freq, duration, type = 'sine', volume = 0.3) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (_) {}
+        }
+
+        function soundCorrect() { playTone(523, 0.12);
+            setTimeout(() => playTone(659, 0.12), 120);
+            setTimeout(() => playTone(784, 0.20), 240); }
+
+        function soundWrong() { playTone(330, 0.25, 'sawtooth', 0.2);
+            setTimeout(() => playTone(277, 0.35, 'sawtooth', 0.2), 200); }
+
+        function soundGameOver() { playTone(440, 0.3, 'square', 0.15);
+            setTimeout(() => playTone(349, 0.3, 'square', 0.15), 300);
+            setTimeout(() => playTone(277, 0.5, 'square', 0.15), 600); }
+
+        function soundTick() { playTone(800, 0.06, 'sine', 0.1); }
+
+        function soundCollect() { playTone(880, 0.08);
+            setTimeout(() => playTone(1100, 0.08), 100); }
+
+        // --- CONFETTI ---
+        function launchConfetti(count = 80) {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#a29bfe', '#fd79a8', '#fdcb6e', '#00b894', '#e17055'];
+            for (let i = 0; i < count; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                const size = 8 + Math.random() * 12;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const delay = Math.random() * 1.2;
+                const duration = 2.2 + Math.random() * 2;
+                piece.style.cssText =
+                    `left:${left}%;width:${size}px;height:${size*(0.5+Math.random())}px;background:${color};animation-delay:${delay}s;animation-duration:${duration}s;border-radius:${Math.random()>0.5?'50%':'2px'};`;
+                confettiContainer.appendChild(piece);
+                setTimeout(() => piece.remove(), (delay + duration) * 1000 + 100);
+            }
+        }
+
+        // --- UTILIDADES ---
+        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = randInt(0, i);
+                [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+        function getDivisors(n) {
+            const divs = [];
+            for (let i = 1; i <= Math.sqrt(n); i++) {
+                if (n % i === 0) { divs.push(i); if (i !== n / i) divs.push(n / i); }
+            }
+            return divs.sort((a, b) => a - b).filter(d => d > 1 && d < n);
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // ================================================================
+        //  GENERADOR DE 200 PREGUNTAS ÚNICAS
+        // ================================================================
+
+        function generarBancoPreguntas(level, cantidad = 100) {
+            const banco = [];
+            const usados = new Set();
+
+            let bases = level === 1 ? [2, 3, 4, 5, 6] : [6, 7, 8, 9, 10, 11, 12];
+            let targets = level === 1 ? [12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30] :
+                [24, 28, 30, 32, 36, 40, 42, 44, 45, 48, 50, 52, 54, 56, 60, 63, 64, 66, 68, 70, 72];
+
+            let intentos = 0;
+            while (banco.length < cantidad && intentos < 1200) {
+                intentos++;
+                const tipo = randInt(0, 3);
+                let q = null;
+
+                switch (tipo) {
+                    case 0: {
+                            const base = bases[randInt(0, bases.length - 1)];
+                            const mult = randInt(2, 6);
+                            const correct = base * mult;
+                            if (correct > (level === 1 ? 35 : 70)) break;
+                            const clave = `M${base}-${correct}`;
+                            if (usados.has(clave)) break;
+                            const wrongs = new Set();
+                            let att = 0;
+                            while (wrongs.size < 3 && att < 40) {
+                                att++;
+                                let w = correct + randInt(-10, 10);
+                                if (w > 0 && w !== correct && w <= (level === 1 ? 35 : 70) && w % base !== 0) wrongs.add(w);
+                            }
+                            let wArr = Array.from(wrongs);
+                            while (wArr.length < 3) {
+                                let f = correct + wArr.length + 2;
+                                if (f > 0 && f !== correct && !wArr.includes(f) && f <= (level === 1 ? 35 : 70)) wArr.push(f);
+                                else { f = correct + 5 + wArr.length; if (f <= (level === 1 ? 35 : 70) && f !== correct &&
+                                        !wArr.includes(f)) wArr.push(f); }
+                            }
+                            const options = shuffle([correct, ...wArr.slice(0, 3)]);
+                            q = {
+                                type: 'multiple',
+                                question: `¿Cuál es un <span class="highlight">múltiplo</span> de <span class="highlight">${base}</span>?`,
+                                options: options.map(n => n.toString()),
+                                correct: correct.toString(),
+                                explanation: `${correct} es múltiplo de ${base} porque ${base} × ${mult} = ${correct}`,
+                                badge: '📐 Múltiplo',
+                                base: base,
+                                correctNum: correct,
+                                shortLabel: `M${base}`
+                            };
+                            usados.add(clave);
+                            break;
+                        }
+                    case 1: {
+                            const target = targets[randInt(0, targets.length - 1)];
+                            const divs = getDivisors(target);
+                            if (divs.length < 2) break;
+                            const correct = divs[randInt(0, divs.length - 1)];
+                            const clave = `D${target}-${correct}`;
+                            if (usados.has(clave)) break;
+                            const wrongs = new Set();
+                            let att = 0;
+                            while (wrongs.size < 3 && att < 40) {
+                                att++;
+                                let w = randInt(2, Math.min(target - 1, 18));
+                                if (w !== correct && target % w !== 0 && !wrongs.has(w) && w > 0) wrongs.add(w);
+                            }
+                            let wArr = Array.from(wrongs);
+                            while (wArr.length < 3) {
+                                let f = randInt(2, 15);
+                                if (f !== correct && !wArr.includes(f) && target % f !== 0) wArr.push(f);
+                                else { f = f + 3; if (f !== correct && !wArr.includes(f) && target % f !== 0 && f > 0) wArr
+                                        .push(f); }
+                            }
+                            const options = shuffle([correct, ...wArr.slice(0, 3)]);
+                            q = {
+                                type: 'divisor',
+                                question: `¿Cuál es un <span class="highlight-divisor">divisor</span> de <span class="highlight-divisor">${target}</span>?`,
+                                options: options.map(n => n.toString()),
+                                correct: correct.toString(),
+                                explanation: `${correct} es divisor de ${target} porque ${target} ÷ ${correct} = ${target / correct}`,
+                                badge: '➗ Divisor',
+                                target: target,
+                                correctNum: correct,
+                                shortLabel: `D${target}`
+                            };
+                            usados.add(clave);
+                            break;
+                        }
+                    case 2: {
+                            const base = bases[randInt(0, bases.length - 1)];
+                            const mult = randInt(2, 5);
+                            const num = base * mult;
+                            if (num > (level === 1 ? 35 : 70)) break;
+                            const isTrue = Math.random() < 0.5;
+                            const clave = `IM${base}-${num}-${isTrue}`;
+                            if (usados.has(clave)) break;
+                            if (isTrue) {
+                                q = {
+                                    type: 'isMultiple',
+                                    question: `¿Es <span class="highlight">${num}</span> un múltiplo de <span class="highlight">${base}</span>?`,
+                                    options: ['Sí', 'No'],
+                                    correct: 'Sí',
+                                    explanation: `✅ ${num} es múltiplo de ${base} porque ${base} × ${mult} = ${num}`,
+                                    badge: '❓ ¿Múltiplo?',
+                                    isTrueFalse: true,
+                                    base: base,
+                                    correctNum: num,
+                                    shortLabel: `M${base}`
+                                };
+                            } else {
+                                let fake = num + randInt(1, 8);
+                                let att = 0;
+                                while ((fake % base === 0 || fake === num || fake > (level === 1 ? 35 : 70)) && att < 20) {
+                                    fake = num + randInt(1, 10);
+                                    att++;
+                                }
+                                if (fake % base === 0 || fake > (level === 1 ? 35 : 70)) fake = num + 1;
+                                if (fake > (level === 1 ? 35 : 70)) fake = num - 1;
+                                q = {
+                                    type: 'isMultiple',
+                                    question: `¿Es <span class="highlight">${fake}</span> un múltiplo de <span class="highlight">${base}</span>?`,
+                                    options: ['Sí', 'No'],
+                                    correct: 'No',
+                                    explanation: `❌ ${fake} NO es múltiplo de ${base}. ${base} × n = ${fake} no tiene solución entera.`,
+                                    badge: '❓ ¿Múltiplo?',
+                                    isTrueFalse: true,
+                                    base: base,
+                                    correctNum: fake,
+                                    shortLabel: `M${base}`
+                                };
+                            }
+                            usados.add(clave);
+                            break;
+                        }
+                    case 3: {
+                            const target = targets[randInt(0, targets.length - 1)];
+                            const divs = getDivisors(target);
+                            if (divs.length < 2) break;
+                            const isTrue = Math.random() < 0.5;
+                            let num;
+                            const clave = `ID${target}-${isTrue}`;
+                            if (usados.has(clave)) break;
+                            if (isTrue) {
+                                num = divs[randInt(0, divs.length - 1)];
+                                q = {
+                                    type: 'isDivisor',
+                                    question: `¿Es <span class="highlight-divisor">${num}</span> un divisor de <span class="highlight-divisor">${target}</span>?`,
+                                    options: ['Sí', 'No'],
+                                    correct: 'Sí',
+                                    explanation: `✅ ${num} es divisor de ${target} porque ${target} ÷ ${num} = ${target / num}`,
+                                    badge: '❓ ¿Divisor?',
+                                    isTrueFalse: true,
+                                    target: target,
+                                    correctNum: num,
+                                    shortLabel: `D${target}`
+                                };
+                            } else {
+                                let fake = randInt(2, Math.min(target - 1, 18));
+                                let att = 0;
+                                while ((target % fake === 0 || divs.includes(fake)) && att < 20) {
+                                    fake = randInt(2, Math.min(target - 1, 18));
+                                    att++;
+                                }
+                                if (target % fake === 0) fake = target - 1;
+                                if (fake < 2) fake = 2;
+                                num = fake;
+                                q = {
+                                    type: 'isDivisor',
+                                    question: `¿Es <span class="highlight-divisor">${num}</span> un divisor de <span class="highlight-divisor">${target}</span>?`,
+                                    options: ['Sí', 'No'],
+                                    correct: 'No',
+                                    explanation: `❌ ${num} NO es divisor de ${target}. ${target} ÷ ${num} no es entero.`,
+                                    badge: '❓ ¿Divisor?',
+                                    isTrueFalse: true,
+                                    target: target,
+                                    correctNum: num,
+                                    shortLabel: `D${target}`
+                                };
+                            }
+                            usados.add(clave);
+                            break;
+                        }
+                }
+                if (q) banco.push(q);
+            }
+
+            while (banco.length < cantidad) {
+                const base = bases[0];
+                const mult = randInt(2, 5);
+                const correct = base * mult;
+                const options = shuffle([correct, correct + 1, correct + 2, correct + 3]);
+                banco.push({
+                    type: 'multiple',
+                    question: `¿Cuál es un <span class="highlight">múltiplo</span> de <span class="highlight">${base}</span>?`,
+                    options: options.map(n => n.toString()),
+                    correct: correct.toString(),
+                    explanation: `${correct} es múltiplo de ${base}`,
+                    badge: '📐 Múltiplo',
+                    base: base,
+                    correctNum: correct,
+                    shortLabel: `M${base}`
+                });
+            }
+
+            return shuffle(banco);
+        }
+
+        // --- RENDER VIDAS ---
+        function renderLives() {
+            const hearts = livesDisplay.querySelectorAll('.heart');
+            hearts.forEach((el, i) => {
+                if (i < state.lives) { el.classList.remove('lost');
+                    el.textContent = '❤️'; } else { el.classList.add('lost');
+                    el.textContent = '🖤'; }
+            });
+        }
+
+        // --- TIMER ---
+        function startQuestionTimer(seconds) {
+            if (state.questionTimerInterval) {
+                clearInterval(state.questionTimerInterval);
+                state.questionTimerInterval = null;
+            }
+            state.questionTimer = seconds || 480;
+            updateQuestionTimerDisplay();
+            state.questionTimerInterval = setInterval(() => {
+                state.questionTimer--;
+                updateQuestionTimerDisplay();
+                if (state.questionTimer <= 30) {
+                    timerDisplay.classList.add('warning');
+                    if (state.questionTimer % 5 === 0) soundTick();
+                }
+                if (state.questionTimer <= 0) {
+                    clearInterval(state.questionTimerInterval);
+                    state.questionTimerInterval = null;
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function updateQuestionTimerDisplay() {
+            timerDisplay.textContent = `⏱️ ${formatTime(state.questionTimer)}`;
+        }
+
+        function stopQuestionTimer() {
+            if (state.questionTimerInterval) {
+                clearInterval(state.questionTimerInterval);
+                state.questionTimerInterval = null;
+            }
+            timerDisplay.classList.remove('warning');
+        }
+
+        function handleTimeout() {
+            if (state.isAnswered || state.isGameOver) return;
+            state.isAnswered = true;
+            state.ruletaPreguntaActiva = false;
+            let q;
+            if (state.mode === 'ruleta') q = state.ruletaPreguntas[state.ruletaIndice];
+            else if (state.mode === 'car') q = state.carQuestion;
+            else q = state.currentQuestions[state.currentQuestionIndex];
+            if (!q) return;
+
+            state.lives--;
+            state.wrongCount++;
+            soundWrong();
+
+            if (state.mode === 'car') {
+                carFeedback.className = 'car-feedback wrong';
+                carFeedback.innerHTML = `<span class="fb-icon">⏰</span><span>¡Tiempo! La respuesta era: ${q.correct}</span>`;
+            } else {
+                feedbackArea.className = 'feedback-area wrong';
+                feedbackArea.innerHTML = `<span class="fb-icon">⏰</span><span>¡Tiempo! Correcta: ${q.correct}</span>`;
+                optionsGrid.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.dataset.value === q
+                        .correct) b.classList.add('reveal-correct'); });
+            }
+            renderLives();
+            if (state.lives <= 0) { setTimeout(() => endGame(false), 1000); return; }
+
+            setTimeout(() => {
+                if (state.isGameOver) return;
+                if (state.mode === 'ruleta') {
+                    spinBtn.disabled = false;
+                    spinBtn.classList.remove('spinning');
+                    ruletaPreguntaBox.innerHTML = '🎰 ¡Gira de nuevo!';
+                    optionsGrid.querySelectorAll('.option-btn').forEach(b => { b.style.display = 'none'; });
+                    questionCard.classList.remove('visible');
+                    state.ruletaPreguntaActiva = false;
+                } else if (state.mode === 'car') {
+                    nextCarQuestion();
+                } else {
+                    state.currentQuestionIndex++;
+                    if (state.currentQuestionIndex >= state.currentQuestions.length) endGame(true);
+                    else renderQuestion();
+                }
+            }, 1500);
+        }
+
+        // ================================================================
+        //  RULETA - CENTRO DIBUJADO EN EL CANVAS
+        // ================================================================
+
+        function initRuleta(preguntas) {
+            state.ruletaPreguntas = preguntas.slice(0, 12);
+            state.ruletaIndice = 0;
+            state.ruletaAnguloActual = 0;
+            state.ruletaPreguntaActiva = false;
+            ruletaCanvas.style.transform = 'rotate(0rad)';
+            drawRuleta();
+            spinBtn.disabled = false;
+        }
+
+        function drawRuleta() {
+            const canvas = ruletaCanvas;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const radius = w / 2 - 10;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const total = state.ruletaPreguntas.length || 1;
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#a29bfe', '#fd79a8', '#fdcb6e', '#55efc4', '#fab1a0', '#74b9ff',
+                '#e17055', '#00b894', '#6c5ce7'
+            ];
+
+            for (let i = 0; i < total; i++) {
+                const angle = (i / total) * 2 * Math.PI - Math.PI / 2;
+                const nextAngle = ((i + 1) / total) * 2 * Math.PI - Math.PI / 2;
+
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, angle, nextAngle);
+                ctx.closePath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                const midAngle = (angle + nextAngle) / 2;
+                const textRadius = radius * 0.72;
+                const tx = cx + Math.cos(midAngle) * textRadius;
+                const ty = cy + Math.sin(midAngle) * textRadius;
+
+                ctx.save();
+                ctx.translate(tx, ty);
+                ctx.rotate(midAngle + Math.PI / 2);
+                ctx.fillStyle = '#2d3436';
+                ctx.font = 'bold 15px Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const label = state.ruletaPreguntas[i]?.shortLabel || `${i+1}`;
+                ctx.fillText(label, 0, 0);
+                ctx.restore();
+
+                ctx.save();
+                ctx.translate(cx + Math.cos(midAngle) * (radius * 0.93), cy + Math.sin(midAngle) * (radius * 0.93));
+                ctx.fillStyle = '#2d3436';
+                ctx.font = 'bold 11px Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(i + 1, 0, 0);
+                ctx.restore();
+            }
+
+            // ============================================
+            // DIBUJAR EL CENTRO DE LA RULETA EN EL CANVAS
+            // ============================================
+            const centerRadius = 26;
+            // Círculo exterior (borde blanco)
+            ctx.beginPath();
+            ctx.arc(cx, cy, centerRadius + 4, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 0;
+
+            // Círculo negro
+            ctx.beginPath();
+            ctx.arc(cx, cy, centerRadius, 0, 2 * Math.PI);
+            ctx.fillStyle = '#2d3436';
+            ctx.fill();
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 0;
+
+            // Signo "?"
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 28px "Fredoka One", cursive';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('?', cx, cy + 1);
+        }
+
+        function girarRuleta() {
+            // No se puede girar si ya hay una pregunta activa sin responder
+            if (state.ruletaPreguntaActiva) {
+                ruletaPreguntaBox.innerHTML = '⚠️ ¡Responde la pregunta actual primero!';
+                return;
+            }
+
+            if (state.ruletaGirando || state.isGameOver || state.ruletaPreguntas.length === 0) return;
+
+            state.ruletaGirando = true;
+            spinBtn.disabled = true;
+
+            const total = state.ruletaPreguntas.length;
+            const sector = randInt(0, total - 1);
+            const sectorAngle = (sector / total) * 2 * Math.PI;
+            const targetAngle = -sectorAngle + Math.PI / 2;
+            const vueltas = 5 + Math.random() * 3;
+            const destino = vueltas * 2 * Math.PI + targetAngle;
+            state.ruletaAnguloActual += destino;
+
+            const canvas = ruletaCanvas;
+            canvas.style.transition = 'transform 4.5s cubic-bezier(0.25, 0.1, 0.15, 1)';
+            canvas.style.transform = `rotate(${state.ruletaAnguloActual}rad)`;
+            state.ruletaIndice = sector;
+
+            setTimeout(() => {
+                state.ruletaGirando = false;
+                spinBtn.disabled = false;
+                const q = state.ruletaPreguntas[sector];
+                if (q) {
+                    state.ruletaPreguntaActiva = true;
+                    mostrarPreguntaRuleta(q);
+                } else {
+                    ruletaPreguntaBox.innerHTML = '❌ Error. Intenta de nuevo.';
+                }
+            }, 4700);
+        }
+
+        function mostrarPreguntaRuleta(q) {
+            ruletaPreguntaBox.innerHTML = `🎯 ${q.question.replace(/<[^>]*>/g, '')}`;
+            questionCard.classList.add('visible');
+            questionTypeBadge.textContent = q.badge || '🎰';
+            questionText.innerHTML = q.question;
+            questionCounter.textContent = `🎰 Ruleta - ${state.ruletaIndice + 1}`;
+            progressBar.style.width = '50%';
+
+            const btns = optionsGrid.querySelectorAll('.option-btn');
+            const opts = q.options;
+
+            if (q.isTrueFalse) {
+                optionsGrid.className = 'options-grid two-cols';
+                btns.forEach((btn, idx) => {
+                    if (idx < 2) {
+                        btn.textContent = opts[idx] || (idx === 0 ? 'Sí' : 'No');
+                        btn.style.display = 'flex';
+                        btn.dataset.value = opts[idx] || (idx === 0 ? 'Sí' : 'No');
+                        btn.disabled = false;
+                        btn.className = 'option-btn';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            } else {
+                optionsGrid.className = 'options-grid four-cols';
+                btns.forEach((btn, idx) => {
+                    if (idx < opts.length) {
+                        btn.textContent = opts[idx];
+                        btn.style.display = 'flex';
+                        btn.dataset.value = opts[idx];
+                        btn.disabled = false;
+                        btn.className = 'option-btn';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            }
+
+            feedbackArea.className = 'feedback-area';
+            feedbackArea.innerHTML = `<span class="fb-icon">🎰</span><span>¡Responde!</span>`;
+            state.isAnswered = false;
+            spinBtn.disabled = true;
+            startQuestionTimer(300);
+        }
+
+        // ================================================================
+        //  CARRERAS
+        // ================================================================
+
+        function initCarGame(preguntas) {
+            const shuffled = shuffle([...preguntas]);
+            state.currentQuestions = shuffled.slice(0, state.maxQuestions);
+            state.currentQuestionIndex = 0;
+            carZone.style.display = 'flex';
+            questionCard.classList.remove('visible');
+            nextCarQuestion();
+        }
+
+        function nextCarQuestion() {
+            if (state.currentQuestionIndex >= state.currentQuestions.length) { endGame(true); return; }
+
+            const q = state.currentQuestions[state.currentQuestionIndex];
+            state.carQuestion = q;
+
+            let consigna = '',
+                correctos = [];
+            if (q.type === 'multiple' || q.type === 'isMultiple') {
+                const base = q.base || 3;
+                consigna = `Múltiplos de ${base}`;
+                for (let i = 1; i <= 20; i++) { if (i % base === 0) correctos.push(i); }
+            } else if (q.type === 'divisor' || q.type === 'isDivisor') {
+                const target = q.target || 12;
+                consigna = `Divisores de ${target}`;
+                for (let i = 1; i <= 20; i++) { if (target % i === 0 && i > 1) correctos.push(i); }
+            } else {
+                consigna = `Números correctos`;
+                for (let i = 1; i <= 20; i++) { if (i % 3 === 0) correctos.push(i); }
+            }
+
+            const numerosDisponibles = shuffle([...Array(20).keys()].map(i => i + 1));
+            const seleccionados = numerosDisponibles.slice(0, 8);
+
+            state.carNumbers = seleccionados.map(n => ({
+                value: n,
+                x: 0,
+                y: 0,
+                esCorrecto: correctos.includes(n),
+                recogido: false,
+                lane: randInt(0, 3)
+            }));
+
+            state.carCollected = [];
+            state.carX = 50;
+            state.carY = 160;
+
+            carConsigna.textContent = consigna;
+            carFeedback.className = 'car-feedback';
+            carFeedback.innerHTML = `<span class="fb-icon">🚗</span><span>¡Recoge los números que son ${consigna.toLowerCase()}!</span>`;
+
+            const canvas = carCanvas;
+            const w = canvas.width,
+                h = canvas.height;
+            const spacing = Math.min(68, (w - 80) / state.carNumbers.length);
+            const lanes = [55, 130, 210, 280];
+
+            state.carNumbers.forEach((num, idx) => {
+                num.x = 55 + idx * spacing + Math.sin(idx * 1.3) * 12;
+                num.y = lanes[num.lane % 4] + (Math.random() - 0.5) * 15;
+                num.y = Math.max(40, Math.min(h - 40, num.y));
+                num.recogido = false;
+            });
+
+            questionCounter.textContent = `🚗 Carrera ${state.currentQuestionIndex + 1} de ${state.currentQuestions.length}`;
+            progressBar.style.width = `${(state.currentQuestionIndex / state.currentQuestions.length) * 100}%`;
+            state.isAnswered = false;
+            drawCarGame();
+            startQuestionTimer(300);
+        }
+
+        function drawCarGame() {
+            const canvas = carCanvas;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const grad = ctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, '#1a1a2e');
+            grad.addColorStop(0.5, '#2d3436');
+            grad.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            const lanes = [55, 130, 210, 280];
+
+            ctx.strokeStyle = 'rgba(85, 239, 196, 0.15)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(30, lanes[i]);
+                for (let x = 30; x < w - 30; x += 2) {
+                    const y = lanes[i] + Math.sin(x * 0.015 + i * 1.2) * 15;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([12, 18]);
+            lanes.forEach(laneY => {
+                ctx.beginPath();
+                ctx.moveTo(30, laneY);
+                ctx.lineTo(w - 30, laneY);
+                ctx.stroke();
+            });
+            ctx.setLineDash([]);
+
+            ctx.strokeStyle = 'rgba(85, 239, 196, 0.25)';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(25, 35, w - 50, h - 70);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            ctx.font = 'bold 14px Nunito, sans-serif';
+            ctx.textAlign = 'center';
+            for (let i = 0; i < 6; i++) {
+                const x = 80 + i * 100;
+                ctx.fillText('🏁', x, 20);
+            }
+
+            state.carNumbers.forEach(num => {
+                if (num.recogido) return;
+                const x = num.x,
+                    y = num.y;
+
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 12;
+
+                const radius = 26;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255,255,255,0.10)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 22px Nunito, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(num.value, x, y + 1);
+
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.font = '12px Nunito, sans-serif';
+                ctx.fillText('?', x, y + 36);
+            });
+
+            const cx = state.carX,
+                cy = state.carY;
+            ctx.shadowColor = 'rgba(253, 203, 110, 0.4)';
+            ctx.shadowBlur = 25;
+
+            ctx.fillStyle = '#fdcb6e';
+            ctx.beginPath();
+            ctx.roundRect(cx - 28, cy - 20, 56, 40, 10);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#e17055';
+            ctx.beginPath();
+            ctx.roundRect(cx - 14, cy - 28, 28, 18, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#74b9ff';
+            ctx.beginPath();
+            ctx.roundRect(cx - 10, cy - 26, 9, 14, 4);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.roundRect(cx + 2, cy - 26, 9, 14, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffeaa7';
+            ctx.beginPath();
+            ctx.arc(cx + 27, cy - 12, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + 27, cy + 12, 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = '#2d3436';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.beginPath();
+            ctx.arc(cx - 20, cy + 22, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + 20, cy + 22, 8, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 15px Nunito, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`✅ Recogidos: ${state.carCollected.length}`, 10, 25);
+
+            const totalCorrectos = state.carNumbers.filter(n => n.esCorrecto).length;
+            const recogidosCorrectos = state.carCollected.filter(v =>
+                state.carNumbers.filter(n => n.esCorrecto).some(n => n.value === v)
+            ).length;
+
+            ctx.fillStyle = '#ffeaa7';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Faltan: ${totalCorrectos - recogidosCorrectos}`, w - 10, 25);
+            ctx.fillStyle = '#55efc4';
+            ctx.font = 'bold 13px Nunito, sans-serif';
+            ctx.fillText(carConsigna.textContent, w - 10, 45);
+
+            if (recogidosCorrectos === totalCorrectos && totalCorrectos > 0) {
+                ctx.fillStyle = '#55efc4';
+                ctx.font = 'bold 28px Fredoka One, cursive';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(85, 239, 196, 0.5)';
+                ctx.shadowBlur = 30;
+                ctx.fillText('🎉 ¡COMPLETADO!', w / 2, 85);
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (r > w / 2) r = w / 2;
+                if (r > h / 2) r = h / 2;
+                this.moveTo(x + r, y);
+                this.lineTo(x + w - r, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r);
+                this.lineTo(x + w, y + h - r);
+                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                this.lineTo(x + r, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r);
+                this.lineTo(x, y + r);
+                this.quadraticCurveTo(x, y, x + r, y);
+                return this;
+            };
+        }
+
+        function moverCoche(dx, dy) {
+            if (state.isGameOver || state.mode !== 'car') return;
+            const canvas = carCanvas;
+            const w = canvas.width,
+                h = canvas.height;
+            let newX = Math.max(35, Math.min(w - 35, state.carX + dx));
+            let newY = Math.max(45, Math.min(h - 45, state.carY + dy));
+            state.carX = newX;
+            state.carY = newY;
+
+            state.carNumbers.forEach(num => {
+                if (num.recogido) return;
+                const dist = Math.hypot(state.carX - num.x, state.carY - num.y);
+                if (dist < 34) {
+                    num.recogido = true;
+                    state.carCollected.push(num.value);
+
+                    const totalCorrectos = state.carNumbers.filter(n => n.esCorrecto).length;
+                    const recogidosCorrectos = state.carCollected.filter(v =>
+                        state.carNumbers.filter(n => n.esCorrecto).some(n => n.value === v)
+                    ).length;
+
+                    if (num.esCorrecto) {
+                        soundCollect();
+                        state.score += 5;
+                        state.correctCount++;
+                        carFeedback.className = 'car-feedback correct';
+                        carFeedback.innerHTML =
+                            `<span class="fb-icon">✅</span><span>¡Correcto! ${num.value} es ${carConsigna.textContent.toLowerCase()}</span>`;
+                        launchConfetti(10);
+                    } else {
+                        soundWrong();
+                        state.lives--;
+                        state.wrongCount++;
+                        renderLives();
+                        carFeedback.className = 'car-feedback wrong';
+                        carFeedback.innerHTML =
+                            `<span class="fb-icon">❌</span><span>${num.value} NO es ${carConsigna.textContent.toLowerCase()}. Pierdes una vida.`;
+                        if (state.lives <= 0) { setTimeout(() => endGame(false), 800); return; }
+                    }
+                    scoreDisplay.textContent = state.score;
+
+                    if (recogidosCorrectos === totalCorrectos && totalCorrectos > 0) {
+                        setTimeout(() => {
+                            if (state.isGameOver) return;
+                            state.currentQuestionIndex++;
+                            if (state.currentQuestionIndex >= state.currentQuestions.length) endGame(true);
+                            else nextCarQuestion();
+                        }, 1200);
+                    }
+                }
+            });
+            drawCarGame();
+        }
+
+        // ================================================================
+        //  RENDER PREGUNTA (Clásico y V/F)
+        // ================================================================
+
+        function renderQuestion() {
+            if (state.currentQuestionIndex >= state.currentQuestions.length) { endGame(true); return; }
+            const q = state.currentQuestions[state.currentQuestionIndex];
+            const total = state.currentQuestions.length;
+
+            questionCard.classList.add('visible');
+            questionTypeBadge.textContent = q.badge || '❓';
+            questionText.innerHTML = q.question;
+
+            const btns = optionsGrid.querySelectorAll('.option-btn');
+            const opts = q.options;
+
+            if (q.isTrueFalse) {
+                optionsGrid.className = 'options-grid two-cols';
+                btns.forEach((btn, idx) => {
+                    if (idx < 2) {
+                        btn.textContent = opts[idx] || (idx === 0 ? 'Sí' : 'No');
+                        btn.style.display = 'flex';
+                        btn.dataset.value = opts[idx] || (idx === 0 ? 'Sí' : 'No');
+                        btn.disabled = false;
+                        btn.className = 'option-btn';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            } else {
+                optionsGrid.className = 'options-grid four-cols';
+                btns.forEach((btn, idx) => {
+                    if (idx < opts.length) {
+                        btn.textContent = opts[idx];
+                        btn.style.display = 'flex';
+                        btn.dataset.value = opts[idx];
+                        btn.disabled = false;
+                        btn.className = 'option-btn';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            }
+
+            questionCounter.textContent = `Pregunta ${state.currentQuestionIndex + 1} de ${total}`;
+            progressBar.style.width = `${(state.currentQuestionIndex / total) * 100}%`;
+            feedbackArea.className = 'feedback-area';
+            feedbackArea.innerHTML = `<span class="fb-icon">💡</span><span>Selecciona una opción</span>`;
+            state.isAnswered = false;
+
+            ruletaZone.style.display = 'none';
+            carZone.style.display = 'none';
+            startQuestionTimer(480);
+        }
+
+        // ================================================================
+        //  MANEJAR RESPUESTA
+        // ================================================================
+
+        function handleAnswer(btn, value) {
+            if (state.isAnswered || state.isGameOver || state.mode === 'car') return;
+            stopQuestionTimer();
+            state.isAnswered = true;
+
+            let q = state.mode === 'ruleta' ? state.ruletaPreguntas[state.ruletaIndice] : state.currentQuestions[state
+                .currentQuestionIndex];
+            if (!q) return;
+
+            const isCorrect = value === q.correct;
+            const allBtns = optionsGrid.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            allBtns.forEach(b => {
+                if (b.dataset.value === q.correct) b.classList.add('correct');
+                else if (b === btn && !isCorrect) b.classList.add('wrong');
+                if (!isCorrect && b.dataset.value === q.correct) b.classList.add('reveal-correct');
+            });
+
+            if (isCorrect) {
+                state.score += 10;
+                state.correctCount++;
+                soundCorrect();
+                feedbackArea.className = 'feedback-area correct';
+                feedbackArea.innerHTML = `<span class="fb-icon">🎉</span><span>${q.explanation}</span>`;
+                launchConfetti(20);
+            } else {
+                state.lives--;
+                state.wrongCount++;
+                soundWrong();
+                feedbackArea.className = 'feedback-area wrong';
+                feedbackArea.innerHTML = `<span class="fb-icon">😅</span><span>${q.explanation}</span>`;
+                renderLives();
+                if (state.lives <= 0) { setTimeout(() => endGame(false), 800); return; }
+            }
+
+            scoreDisplay.textContent = state.score;
+
+            setTimeout(() => {
+                if (state.isGameOver) return;
+                if (state.mode === 'ruleta') {
+                    state.ruletaPreguntaActiva = false;
+                    spinBtn.disabled = false;
+                    ruletaPreguntaBox.innerHTML = '🎰 ¡Gira de nuevo!';
+                    optionsGrid.querySelectorAll('.option-btn').forEach(b => { b.style.display = 'none'; });
+                    questionCard.classList.remove('visible');
+                } else {
+                    state.currentQuestionIndex++;
+                    if (state.currentQuestionIndex >= state.currentQuestions.length) endGame(true);
+                    else renderQuestion();
+                }
+            }, isCorrect ? 1200 : 2000);
+        }
+
+        // ================================================================
+        //  FIN DEL JUEGO
+        // ================================================================
+
+        function endGame(completed) {
+            if (state.isGameOver) return;
+            state.isGameOver = true;
+            stopQuestionTimer();
+            optionsGrid.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+            const total = state.correctCount + state.wrongCount;
+            const ratio = total > 0 ? state.correctCount / total : 0;
+            let stars = 0;
+            if (ratio >= 0.9) stars = 3;
+            else if (ratio >= 0.7) stars = 2;
+            else if (ratio >= 0.4) stars = 1;
+            const starStr = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+
+            let msg = '',
+                icon = '',
+                title = '';
+            if (state.lives <= 0) {
+                icon = '😢';
+                title = '¡Oh no!';
+                msg = `Te quedaste sin vidas, pero ${state.playerName} aprendiste mucho. ¡Sigue así!`;
+                soundGameOver();
+            } else if (state.currentQuestionIndex >= state.currentQuestions.length && completed) {
+                icon = '🏆';
+                title = '¡Completaste el desafío!';
+                if (stars >= 3) msg = `¡Increíble, ${state.playerName}! Eres un genio. 🌟`;
+                else if (stars >= 2) msg = `¡Muy bien, ${state.playerName}! Sigue practicando. 💪`;
+                else if (stars >= 1) msg = `Buen intento, ${state.playerName}. ¡Practica más! 📚`;
+                else msg = `No te rindas, ${state.playerName}. ¡Cada error es aprendizaje! 🧠`;
+                if (stars >= 2) launchConfetti(100);
+                if (stars >= 3) setTimeout(() => launchConfetti(80), 500);
+            } else {
+                icon = '⏰';
+                title = '¡Tiempo agotado!';
+                msg = `Se acabó el tiempo. ¡Sigue practicando, ${state.playerName}!`;
+                soundGameOver();
+            }
+
+            gameoverIcon.textContent = icon;
+            gameoverTitle.textContent = title;
+            gameoverTitle.className = 'gameover-title ' + (stars >= 2 ? 'win' : 'lose');
+            starsRating.textContent = starStr;
+            gameoverMsg.textContent = msg;
+            finalScore.textContent = state.score;
+            finalCorrect.textContent = state.correctCount;
+            finalWrong.textContent = state.wrongCount;
+            showScreen('gameOverScreen');
+        }
+
+        // ================================================================
+        //  CAMBIAR PANTALLA
+        // ================================================================
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // ================================================================
+        //  INICIAR JUEGO
+        // ================================================================
+
+        function startGame(level, mode) {
+            const name = nameInput.value.trim();
+            if (!name || name.length < 2 || !name.includes(' ')) {
+                loginError.textContent = '⚠️ Escribe tu nombre completo (nombre y apellido)';
+                return;
+            }
+            loginError.textContent = '';
+            state.playerName = name;
+            playerNameDisplay.textContent = name;
+            state.level = level;
+            state.mode = mode;
+
+            timerRule.innerHTML = (mode === 'ruleta' || mode === 'car') ? '<i>⏱️</i> 5 min / pregunta' :
+                '<i>⏱️</i> 8 min / pregunta';
+
+            state.lives = state.maxLives;
+            state.score = 0;
+            state.correctCount = 0;
+            state.wrongCount = 0;
+            state.currentQuestionIndex = 0;
+            state.isGameOver = false;
+            state.ruletaPreguntaActiva = false;
+
+            let bank = level === 1 ? bankLevel1 : bankLevel2;
+            let filtered = [];
+            if (mode === 'classic') filtered = bank.filter(q => q.type === 'multiple' || q.type === 'divisor');
+            else if (mode === 'tf') filtered = bank.filter(q => q.isTrueFalse === true);
+            else filtered = bank;
+
+            if (filtered.length < 10) filtered = bank;
+            const shuffled = shuffle([...filtered]);
+            state.currentQuestions = shuffled.slice(0, state.maxQuestions);
+
+            renderLives();
+            scoreDisplay.textContent = '0';
+
+            ruletaZone.style.display = 'none';
+            carZone.style.display = 'none';
+            questionCard.classList.remove('visible');
+
+            if (mode === 'ruleta') {
+                ruletaZone.style.display = 'flex';
+                ruletaPreguntaBox.innerHTML = '🎰 ¡Gira la ruleta!';
+                questionCounter.textContent = '🎰 Modo Ruleta';
+                progressBar.style.width = '30%';
+                spinBtn.disabled = false;
+                stopQuestionTimer();
+                timerDisplay.textContent = '⏱️ 5:00';
+                initRuleta(state.currentQuestions);
+                optionsGrid.querySelectorAll('.option-btn').forEach(b => { b.style.display = 'none'; });
+                questionCard.classList.remove('visible');
+            } else if (mode === 'car') {
+                carZone.style.display = 'flex';
+                initCarGame(state.currentQuestions);
+            } else {
+                questionCard.classList.add('visible');
+                renderQuestion();
+            }
+            showScreen('gameScreen');
+        }
+
+        // ================================================================
+        //  EVENTOS
+        // ================================================================
+
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const level = parseInt(btn.dataset.level);
+                const mode = btn.dataset.mode;
+                initAudio();
+                startGame(level, mode);
+            });
+        });
+
+        nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const b = document.querySelector(
+                    '.mode-btn'); if (b) b.click(); } });
+        nameInput.addEventListener('input', () => { loginError.textContent = ''; });
+
+        spinBtn.addEventListener('click', girarRuleta);
+
+        document.addEventListener('keydown', (e) => {
+            if (state.mode !== 'car' || state.isGameOver) return;
+            const key = e.key;
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+                e.preventDefault();
+                switch (key) {
+                    case 'ArrowUp':
+                        moverCoche(0, -20);
+                        break;
+                    case 'ArrowDown':
+                        moverCoche(0, 20);
+                        break;
+                    case 'ArrowLeft':
+                        moverCoche(-20, 0);
+                        break;
+                    case 'ArrowRight':
+                        moverCoche(20, 0);
+                        break;
+                }
+            }
+        });
+
+        carUp.addEventListener('click', () => moverCoche(0, -20));
+        carDown.addEventListener('click', () => moverCoche(0, 20));
+        carLeft.addEventListener('click', () => moverCoche(-20, 0));
+        carRight.addEventListener('click', () => moverCoche(20, 0));
+
+        optionsGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('.option-btn');
+            if (!btn || btn.disabled || state.mode === 'car') return;
+            const value = btn.dataset.value;
+            if (value !== undefined) handleAnswer(btn, value);
+        });
+
+        playAgainBtn.addEventListener('click', () => { initAudio();
+            startGame(state.level, state.mode); });
+
+        homeBtn.addEventListener('click', () => {
+            stopQuestionTimer();
+            state.isGameOver = true;
+            showScreen('loginScreen');
+            nameInput.value = state.playerName || '';
+            nameInput.focus();
+        });
+
+        // ================================================================
+        //  INICIALIZACIÓN
+        // ================================================================
+
+        bankLevel1 = generarBancoPreguntas(1, 100);
+        bankLevel2 = generarBancoPreguntas(2, 100);
+        showScreen('loginScreen');
+        nameInput.focus();
+        setTimeout(() => launchConfetti(15), 600);
+        console.log(`✅ Bancos generados: N1=${bankLevel1.length}, N2=${bankLevel2.length} (200 preguntas únicas)`);
+        console.log('🎮 Modos: Clásico (8min), V/F (8min), Ruleta (5min), Carreras (5min)');
+        console.log('✅ Corrección: Centro de la ruleta dibujado directamente en el canvas');
+        console.log('✅ Bloqueo de giro implementado: no se puede girar sin responder');
+    </script>
+
+</body>
+</html>
