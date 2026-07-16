@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplicando con la Ruleta</title>
+    <style>
+        /* ===== ESTILOS ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', cursive, sans-serif;
+            background: linear-gradient(145deg, #f9e6b3 0%, #f5d78c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .screen {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(6px);
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px 40px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 4px solid #fff8e7;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #2d4059;
+            text-shadow: 4px 4px 0 #fbd46d;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #2d4059;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #364f6b;
+            margin: 10px 0;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            font-size: 1.3rem;
+            padding: 14px 20px;
+            border: 3px solid #fbd46d;
+            border-radius: 50px;
+            outline: none;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            background: #fffef7;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #f08a5d;
+            box-shadow: 0 0 0 4px rgba(240, 138, 93, 0.3);
+            transform: scale(1.02);
+        }
+
+        button {
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 14px 35px;
+            border: none;
+            border-radius: 60px;
+            background: #f08a5d;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #b85c3a;
+            transition: all 0.08s linear;
+            margin: 10px 5px;
+            font-family: inherit;
+            letter-spacing: 1px;
+            border: 2px solid #fff3e0;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 0 #b85c3a;
+            background: #f79a6e;
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #b85c3a;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #b85c3a;
+            cursor: not-allowed;
+        }
+
+        #error-msg {
+            color: #d63031;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        #header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #2d4059;
+            padding: 12px 20px;
+            border-radius: 60px;
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #header span {
+            margin: 0 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px;
+            border-radius: 40px;
+            white-space: nowrap;
+        }
+
+        #lives {
+            font-size: 1.6rem;
+            letter-spacing: 3px;
+        }
+
+        #timer {
+            background: #e17055 !important;
+            font-weight: bold;
+            min-width: 90px;
+        }
+
+        #ruleta-container {
+            position: relative;
+            display: inline-block;
+            margin: 15px auto 10px;
+            width: 300px;
+            height: 300px;
+        }
+
+        #ruletaCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 8px #2d4059, 0 0 0 12px #fbd46d, 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: filter 0.2s;
+        }
+
+        #ruletaCanvas:hover {
+            filter: brightness(1.02);
+        }
+
+        #arrow {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 3.2rem;
+            color: #d63031;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+            pointer-events: none;
+            line-height: 1;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        #spin-btn {
+            background: #00b894;
+            box-shadow: 0 8px 0 #006f5a;
+            font-size: 1.6rem;
+            padding: 12px 40px;
+            margin-top: 5px;
+        }
+        #spin-btn:hover:not(:disabled) {
+            background: #00d2a0;
+        }
+        #spin-btn:active:not(:disabled) {
+            box-shadow: 0 2px 0 #006f5a;
+        }
+
+        #question-area {
+            background: #fff8e7;
+            border-radius: 40px;
+            padding: 20px 25px 25px;
+            margin-top: 20px;
+            border: 3px dashed #fbd46d;
+            box-shadow: inset 0 0 0 4px #fff0d0;
+        }
+
+        #question-area h2 {
+            color: #2d4059;
+            font-size: 1.8rem;
+            margin: 0 0 5px;
+        }
+
+        #question-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #1e272e;
+            background: #f5f0e1;
+            padding: 10px 20px;
+            border-radius: 60px;
+            display: inline-block;
+            margin: 10px auto 15px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #answer-input {
+            width: 150px;
+            font-size: 2rem;
+            padding: 10px;
+            border-radius: 40px;
+            border: 3px solid #fbd46d;
+            text-align: center;
+            background: white;
+        }
+
+        #check-btn {
+            background: #0984e3;
+            box-shadow: 0 8px 0 #0652dd;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            margin-left: 10px;
+        }
+        #check-btn:hover:not(:disabled) {
+            background: #1e90ff;
+        }
+        #check-btn:active:not(:disabled) {
+            box-shadow: 0 2px 0 #0652dd;
+        }
+
+        #feedback-msg {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 3rem;
+        }
+
+        .feedback-correct {
+            color: #00b894;
+        }
+        .feedback-wrong {
+            color: #d63031;
+        }
+        .feedback-timeout {
+            color: #e17055;
+        }
+
+        #gameover-screen h1 {
+            color: #d63031;
+        }
+        #final-score {
+            font-size: 2.2rem;
+            background: #2d4059;
+            color: #fff;
+            padding: 10px 30px;
+            border-radius: 60px;
+            display: inline-block;
+            margin: 15px 0;
+        }
+        #restart-btn {
+            background: #6c5ce7;
+            box-shadow: 0 8px 0 #3d3d8a;
+        }
+        #restart-btn:hover:not(:disabled) {
+            background: #7d6ff0;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 4px 18px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 6px 0 10px;
+        }
+        .level-basic { background: #55efc4; color: #006f5a; }
+        .level-intermediate { background: #fdcb6e; color: #7d5a0a; }
+        .level-advanced { background: #e17055; color: #fff; }
+
+        @media (max-width: 600px) {
+            .screen {
+                padding: 20px 18px;
+                border-radius: 40px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            #header {
+                font-size: 0.9rem;
+                padding: 10px 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            #header span {
+                margin: 3px 5px;
+                padding: 4px 12px;
+            }
+            #ruleta-container {
+                width: 240px;
+                height: 240px;
+            }
+            #arrow {
+                font-size: 2.6rem;
+                top: -18px;
+            }
+            #question-text {
+                font-size: 1.6rem;
+            }
+            #answer-input {
+                width: 120px;
+                font-size: 1.6rem;
+            }
+            button {
+                font-size: 1.1rem;
+                padding: 10px 22px;
+            }
+            #spin-btn {
+                font-size: 1.3rem;
+                padding: 10px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== PANTALLA DE INICIO ===== -->
+    <div id="start-screen" class="screen">
+        <h1>🎯 Multiplicando<br>con la Ruleta</h1>
+        <p style="font-size:1.1rem;">¡Practica las tablas del 1 al 12 y diviértete!</p>
+        <input type="text" id="name-input" placeholder="Escribe tu nombre completo" autofocus />
+        <br>
+        <button id="start-btn">¡Jugar!</button>
+        <p id="error-msg" style="display:none;">⚠️ Por favor, ingresa tu nombre completo.</p>
+    </div>
+
+    <!-- ===== PANTALLA DE JUEGO ===== -->
+    <div id="game-screen" class="screen" style="display:none;">
+        <div id="header">
+            <span id="player-name">👤 </span>
+            <span id="lives">❤️❤️❤️❤️❤️</span>
+            <span id="score">⭐ 0</span>
+            <span id="timer">⏱️ 1:00</span>
+        </div>
+
+        <div id="ruleta-container">
+            <canvas id="ruletaCanvas" width="400" height="400"></canvas>
+            <div id="arrow">▼</div>
+        </div>
+
+        <button id="spin-btn">🎲 Girar Ruleta</button>
+
+        <div id="question-area" style="display:none;">
+            <h2 id="table-label">📐 Tabla del <span id="table-number"></span></h2>
+            <div id="level-badge" class="level-badge">🌟 Básico</div>
+            <p id="question-text">¿Cuánto es <span id="factor1"></span> × <span id="factor2"></span>?</p>
+            <input type="number" id="answer-input" placeholder="?" autofocus />
+            <button id="check-btn">✔ Comprobar</button>
+            <p id="feedback-msg"></p>
+        </div>
+    </div>
+
+    <!-- ===== PANTALLA DE GAME OVER ===== -->
+    <div id="gameover-screen" class="screen" style="display:none;">
+        <h1>💔 ¡Game Over!</h1>
+        <p id="gameover-name"></p>
+        <p id="final-score">Puntuación: 0</p>
+        <button id="restart-btn">🔄 Volver a jugar</button>
+    </div>
+
+    <script>
+        // ============================================================
+        //  JAVASCRIPT – LÓGICA COMPLETA DEL JUEGO (CORREGIDA)
+        // ============================================================
+
+        (function() {
+            'use strict';
+
+            // --- Elementos DOM ---
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const gameoverScreen = document.getElementById('gameover-screen');
+            const nameInput = document.getElementById('name-input');
+            const startBtn = document.getElementById('start-btn');
+            const errorMsg = document.getElementById('error-msg');
+            const playerNameSpan = document.getElementById('player-name');
+            const livesSpan = document.getElementById('lives');
+            const scoreSpan = document.getElementById('score');
+            const timerSpan = document.getElementById('timer');
+            const canvas = document.getElementById('ruletaCanvas');
+            const ctx = canvas.getContext('2d');
+            const spinBtn = document.getElementById('spin-btn');
+            const questionArea = document.getElementById('question-area');
+            const tableNumberSpan = document.getElementById('table-number');
+            const levelBadge = document.getElementById('level-badge');
+            const factor1Span = document.getElementById('factor1');
+            const factor2Span = document.getElementById('factor2');
+            const answerInput = document.getElementById('answer-input');
+            const checkBtn = document.getElementById('check-btn');
+            const feedbackMsg = document.getElementById('feedback-msg');
+            const finalScoreSpan = document.getElementById('final-score');
+            const gameoverNameP = document.getElementById('gameover-name');
+            const restartBtn = document.getElementById('restart-btn');
+
+            // --- Variables de estado ---
+            let playerName = '';
+            let lives = 5;
+            let score = 0;
+            let timeLeft = 60;
+            let timerInterval = null;
+            let currentAngle = 0; // ángulo en radianes (normalizado)
+            let isSpinning = false;
+            let currentTable = null;
+            let currentMultiplier = null;
+            let currentAnswer = null;
+            let currentLevel = 'basic';
+            let gameState = 'idle'; // 'idle' | 'spinning' | 'question' | 'feedback'
+
+            // --- Colores de sectores ---
+            const coloresSectores = [
+                '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB',
+                '#0ABDE3', '#10AC84', '#EE5A24', '#5F27CD',
+                '#341F97', '#FF9FF3', '#54A0FF', '#5F6DEC'
+            ];
+            const SECTORES = 12;
+            const ANGULO_SECTOR = (2 * Math.PI) / SECTORES;
+
+            // --- Niveles ---
+            const NIVELES = [
+                { id: 'basic', label: '🌟 Básico', rango: [1, 5], clase: 'level-basic' },
+                { id: 'intermediate', label: '🔥 Intermedio', rango: [1, 9], clase: 'level-intermediate' },
+                { id: 'advanced', label: '🚀 Avanzado', rango: [1, 12], clase: 'level-advanced' }
+            ];
+
+            // ============================================================
+            //  DIBUJO DE LA RULETA
+            // ============================================================
+            function dibujarRuleta(angulo) {
+                const w = canvas.width;
+                const h = canvas.height;
+                const cx = w / 2;
+                const cy = h / 2;
+                const radio = Math.min(w, h) * 0.42;
+
+                ctx.clearRect(0, 0, w, h);
+
+                for (let i = 0; i < SECTORES; i++) {
+                    const inicio = i * ANGULO_SECTOR + angulo;
+                    const fin = inicio + ANGULO_SECTOR;
+
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, radio, inicio, fin);
+                    ctx.closePath();
+
+                    ctx.fillStyle = coloresSectores[i % coloresSectores.length];
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    const medio = inicio + ANGULO_SECTOR / 2;
+                    const texto = (i + 1).toString();
+                    ctx.fillStyle = '#1e272e';
+                    ctx.font = 'bold 24px "Comic Sans MS", "Chalkboard SE", cursive';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    const distTexto = radio * 0.7;
+                    const xTexto = cx + Math.cos(medio) * distTexto;
+                    const yTexto = cy + Math.sin(medio) * distTexto;
+                    ctx.shadowColor = 'rgba(255,255,255,0.6)';
+                    ctx.shadowBlur = 6;
+                    ctx.fillText(texto, xTexto, yTexto);
+                    ctx.shadowBlur = 0;
+                }
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, radio * 0.16, 0, 2 * Math.PI);
+                ctx.fillStyle = '#2d4059';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fbd46d';
+                ctx.font = 'bold 26px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('×', cx, cy + 2);
+            }
+
+            // ============================================================
+            //  CANCELAR PREGUNTA
+            // ============================================================
+            function cancelarPregunta() {
+                if (gameState === 'question' || gameState === 'feedback') {
+                    detenerTemporizador();
+                    perderVida();
+                    feedbackMsg.textContent = '⏹️ Pregunta cancelada. Pierdes una vida.';
+                    feedbackMsg.className = 'feedback-timeout';
+                    gameState = 'feedback';
+                    setTimeout(() => {
+                        questionArea.style.display = 'none';
+                        gameState = 'idle';
+                        feedbackMsg.textContent = '';
+                        feedbackMsg.className = '';
+                    }, 1200);
+                }
+            }
+
+            // ============================================================
+            //  GIRO DE LA RULETA (versión corregida)
+            // ============================================================
+            function girarRuleta() {
+                if (isSpinning || gameState === 'spinning') return;
+
+                if (gameState === 'question' || gameState === 'feedback') {
+                    cancelarPregunta();
+                    setTimeout(() => {
+                        if (gameState === 'idle' && !isSpinning) {
+                            iniciarGiro();
+                        }
+                    }, 200);
+                    return;
+                }
+
+                if (gameState === 'idle') {
+                    iniciarGiro();
+                }
+            }
+
+            function iniciarGiro() {
+                if (isSpinning) return;
+                isSpinning = true;
+                gameState = 'spinning';
+                spinBtn.disabled = true;
+                spinBtn.textContent = '🌀 Girando...';
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = '';
+                questionArea.style.display = 'none';
+                answerInput.value = '';
+
+                // Elegir sector destino (0-11)
+                const indiceDestino = Math.floor(Math.random() * SECTORES);
+                // Queremos que el centro del sector quede alineado con la flecha (arriba, -PI/2)
+                const anguloCentro = indiceDestino * ANGULO_SECTOR + ANGULO_SECTOR / 2;
+                // Ángulo final: la flecha apunta a -PI/2, así que el ángulo de la ruleta debe ser tal que
+                // el centro del sector esté en -PI/2. Por tanto: anguloFinal + anguloCentro = -PI/2 -> anguloFinal = -PI/2 - anguloCentro
+                let anguloFinal = -Math.PI / 2 - anguloCentro;
+
+                // Añadir 5 vueltas completas para efecto visual (constante)
+                const vueltas = 5;
+                anguloFinal += vueltas * 2 * Math.PI;
+
+                // Asegurar que el giro sea hacia adelante (ángulo final mayor que el actual)
+                while (anguloFinal <= currentAngle) {
+                    anguloFinal += 2 * Math.PI;
+                }
+
+                const anguloInicial = currentAngle;
+                const duracion = 1800; // 1.8 segundos fijo
+                const inicio = performance.now();
+
+                function animar(ahora) {
+                    const progreso = Math.min((ahora - inicio) / duracion, 1);
+                    // Interpolación LINEAL (sin easing) -> velocidad constante
+                    const anguloActual = anguloInicial + (anguloFinal - anguloInicial) * progreso;
+                    currentAngle = anguloActual;
+                    dibujarRuleta(anguloActual);
+
+                    if (progreso < 1) {
+                        requestAnimationFrame(animar);
+                    } else {
+                        currentAngle = anguloFinal;
+                        // Normalizar ángulo para que esté en [0, 2*PI) y evitar acumulación
+                        currentAngle = currentAngle % (2 * Math.PI);
+                        if (currentAngle < 0) currentAngle += 2 * Math.PI;
+                        dibujarRuleta(currentAngle);
+
+                        isSpinning = false;
+                        gameState = 'idle';
+                        spinBtn.disabled = false;
+                        spinBtn.textContent = '🎲 Girar Ruleta';
+
+                        // Determinar la tabla seleccionada
+                        // La flecha está en -PI/2, pero usamos el ángulo normalizado actual
+                        let anguloFlecha = -Math.PI / 2;
+                        let anguloRelativo = (anguloFlecha - currentAngle) % (2 * Math.PI);
+                        if (anguloRelativo < 0) anguloRelativo += 2 * Math.PI;
+                        const indice = Math.floor(anguloRelativo / ANGULO_SECTOR);
+                        const tabla = (indice % SECTORES) + 1;
+                        currentTable = tabla;
+
+                        // Elegir nivel aleatorio
+                        const nivelIdx = Math.floor(Math.random() * NIVELES.length);
+                        currentLevel = NIVELES[nivelIdx];
+
+                        // Iniciar pregunta
+                        iniciarPregunta(tabla, currentLevel);
+                    }
+                }
+                requestAnimationFrame(animar);
+            }
+
+            // ============================================================
+            //  PREGUNTAS CON NIVEL
+            // ============================================================
+            function iniciarPregunta(tabla, nivel) {
+                gameState = 'question';
+                const [min, max] = nivel.rango;
+                const mult = Math.floor(Math.random() * (max - min + 1)) + min;
+                currentMultiplier = mult;
+                currentAnswer = tabla * mult;
+
+                questionArea.style.display = 'block';
+                tableNumberSpan.textContent = tabla;
+                levelBadge.textContent = nivel.label;
+                levelBadge.className = `level-badge ${nivel.clase}`;
+                factor1Span.textContent = tabla;
+                factor2Span.textContent = mult;
+                answerInput.value = '';
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = '';
+                answerInput.focus();
+
+                iniciarTemporizador();
+                spinBtn.disabled = false;
+            }
+
+            function comprobarRespuesta() {
+                if (gameState !== 'question') return;
+                const inputVal = answerInput.value.trim();
+                if (inputVal === '') {
+                    feedbackMsg.textContent = '✏️ Escribe un número.';
+                    feedbackMsg.className = 'feedback-wrong';
+                    return;
+                }
+                const respuestaUsuario = Number(inputVal);
+                if (isNaN(respuestaUsuario)) {
+                    feedbackMsg.textContent = '🔢 Ingresa un número válido.';
+                    feedbackMsg.className = 'feedback-wrong';
+                    return;
+                }
+
+                if (respuestaUsuario === currentAnswer) {
+                    detenerTemporizador();
+                    score += 10;
+                    actualizarUI();
+                    feedbackMsg.textContent = '✅ ¡Correcto! +10 puntos';
+                    feedbackMsg.className = 'feedback-correct';
+                    gameState = 'feedback';
+                    spinBtn.disabled = false;
+                    setTimeout(() => {
+                        questionArea.style.display = 'none';
+                        gameState = 'idle';
+                        feedbackMsg.textContent = '';
+                        feedbackMsg.className = '';
+                    }, 1200);
+                } else {
+                    feedbackMsg.textContent = `❌ Incorrecto. Intenta de nuevo.`;
+                    feedbackMsg.className = 'feedback-wrong';
+                    answerInput.value = '';
+                    answerInput.focus();
+                }
+            }
+
+            // ============================================================
+            //  TEMPORIZADOR
+            // ============================================================
+            function iniciarTemporizador() {
+                detenerTemporizador();
+                timeLeft = 60;
+                actualizarTimerUI();
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    actualizarTimerUI();
+                    if (timeLeft <= 0) {
+                        detenerTemporizador();
+                        perderVida();
+                        feedbackMsg.textContent = '⏰ ¡Tiempo agotado! Pierdes una vida.';
+                        feedbackMsg.className = 'feedback-timeout';
+                        gameState = 'feedback';
+                        spinBtn.disabled = false;
+                        setTimeout(() => {
+                            questionArea.style.display = 'none';
+                            gameState = 'idle';
+                            feedbackMsg.textContent = '';
+                            feedbackMsg.className = '';
+                        }, 1500);
+                    }
+                }, 1000);
+            }
+
+            function detenerTemporizador() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            }
+
+            function actualizarTimerUI() {
+                const minutos = Math.floor(timeLeft / 60);
+                const segundos = timeLeft % 60;
+                timerSpan.textContent = `⏱️ ${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+                timerSpan.style.background = timeLeft <= 10 ? '#e17055' : '';
+            }
+
+            // ============================================================
+            //  VIDAS Y PUNTUACIÓN
+            // ============================================================
+            function perderVida() {
+                lives--;
+                actualizarUI();
+                if (lives <= 0) {
+                    gameOver();
+                }
+            }
+
+            function actualizarUI() {
+                let corazones = '';
+                for (let i = 0; i < lives; i++) corazones += '❤️';
+                for (let i = lives; i < 5; i++) corazones += '🖤';
+                livesSpan.textContent = corazones;
+                scoreSpan.textContent = `⭐ ${score}`;
+                playerNameSpan.textContent = `👤 ${playerName}`;
+            }
+
+            // ============================================================
+            //  GAME OVER
+            // ============================================================
+            function gameOver() {
+                detenerTemporizador();
+                gameState = 'gameover';
+                gameScreen.style.display = 'none';
+                gameoverScreen.style.display = 'block';
+                finalScoreSpan.textContent = `Puntuación: ${score}`;
+                gameoverNameP.textContent = `¡${playerName}, has llegado al final!`;
+            }
+
+            // ============================================================
+            //  REINICIO
+            // ============================================================
+            function reiniciarJuego() {
+                lives = 5;
+                score = 0;
+                timeLeft = 60;
+                currentTable = null;
+                currentMultiplier = null;
+                currentAnswer = null;
+                gameState = 'idle';
+                isSpinning = false;
+                detenerTemporizador();
+                currentAngle = 0;
+                dibujarRuleta(0);
+
+                gameoverScreen.style.display = 'none';
+                gameScreen.style.display = 'block';
+                questionArea.style.display = 'none';
+                spinBtn.disabled = false;
+                spinBtn.textContent = '🎲 Girar Ruleta';
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = '';
+                actualizarUI();
+                timerSpan.textContent = '⏱️ 1:00';
+                timerSpan.style.background = '';
+                answerInput.value = '';
+                playerNameSpan.textContent = `👤 ${playerName}`;
+            }
+
+            // ============================================================
+            //  EVENTOS
+            // ============================================================
+            startBtn.addEventListener('click', function() {
+                const nombre = nameInput.value.trim();
+                if (nombre === '') {
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                errorMsg.style.display = 'none';
+                playerName = nombre;
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'block';
+                dibujarRuleta(0);
+                actualizarUI();
+                playerNameSpan.textContent = `👤 ${playerName}`;
+                spinBtn.focus();
+            });
+
+            nameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') startBtn.click();
+            });
+
+            spinBtn.addEventListener('click', girarRuleta);
+
+            canvas.addEventListener('click', function() {
+                if (!isSpinning) girarRuleta();
+            });
+
+            checkBtn.addEventListener('click', comprobarRespuesta);
+
+            answerInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkBtn.click();
+                }
+            });
+
+            restartBtn.addEventListener('click', function() {
+                reiniciarJuego();
+            });
+
+            // ============================================================
+            //  INICIALIZACIÓN
+            // ============================================================
+            dibujarRuleta(0);
+            nameInput.focus();
+
+        })();
+    </script>
+</body>
+</html>
