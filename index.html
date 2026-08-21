@@ -471,8 +471,11 @@
 <!-- ========== SCRIPT ========== -->
 <script>
   (function() {
-    // Lista completa de juegos (19 en total, se agregó "Multiplicando con la Ruleta")
+    // ================================================================
+    // LISTA COMPLETA DE JUEGOS (20 en total)
+    // ================================================================
     const games = [
+      // ---- MATEMÁTICA ----
       { title: '🎈 DiviDiversión', desc: 'Aprende divisiones jugando.', icon: '🎈', file: 'DiviDiversión.html', tag: 'matemáticas', subject: 'matematica', new: true },
       { title: '📚 División por Niveles', desc: '5 niveles progresivos.', icon: '📚', file: 'Prodivi.html', tag: 'matemáticas', subject: 'matematica', new: true },
       { title: 'ASTRONAVE MATEMÁTICA', desc: 'Dispara a las naves correctas.', icon: '🚀', file: 'MATEMATICA NAVES.html', tag: 'matemáticas', subject: 'matematica' },
@@ -485,14 +488,22 @@
       { title: '🎮 Aprendiendo a Sumar', desc: 'Para 1° grado.', icon: '➕', file: 'SUMA PRIMER GRADO.html', tag: 'matemáticas', subject: 'matematica', new: true },
       { title: '📊 Maestro del Gráfico Circular', desc: 'Estadística.', icon: '📊', file: 'GRAFICOS ESTADISTICOS.html', tag: 'matemáticas', subject: 'matematica', new: true },
       { title: '🐘 Organiza los Animales', desc: 'Conteo para 1° grado.', icon: '🐧', file: 'MATEMATICA - PRIMER GRADO.html', tag: 'matemáticas', subject: 'matematica' },
-      // 👇 NUEVO JUEGO AGREGADO (Multiplicando con la Ruleta)
-      { title: '🎯 Multiplicando con la Ruleta', desc: 'Practica las tablas del 1 al 12 girando la ruleta y respondiendo preguntas.', icon: '🎯', file: 'TABLAMULTI - RULETA - MATE.html', tag: 'matemáticas', subject: 'matematica', new: true },
+      { title: '🎯 Multiplicando con la Ruleta', desc: 'Practica las tablas del 1 al 12 girando la ruleta.', icon: '🎯', file: 'TABLAMULTI - RULETA - MATE.html', tag: 'matemáticas', subject: 'matematica', new: true },
       { title: '🎲 Múltiplos y Divisores', desc: 'Ruleta y carreras de múltiplos y divisores.', icon: '🎲', file: 'MULTIPLOS Y DIVISORES - MATEMATICA.html', tag: 'matemáticas', subject: 'matematica', new: true },
-      { title: 'Lecturas Izquierdinas', desc: 'Comprensión lectora.', icon: '📖', file: 'PLAN LECTOR.html', tag: 'lectura', subject: 'comunicacion' },
-      { title: 'ECO-MISIÓN: Reciclaje', desc: 'Clasifica residuos.', icon: '♻️', file: 'JUEGO DE RECICLAJE 2.html', tag: 'ciencias', subject: 'ciencias' },
-      { title: 'El Gran Reto del Reciclaje', desc: 'Contenedores correctos.', icon: '🗑️', file: 'JUEGO RECICLAJE 1.html', tag: 'ciencias', subject: 'ciencias' },
+
+      // ---- COMUNICACIÓN (LECTURA) ----
+      { title: '📖 Lecturas Izquierdinas', desc: 'Comprensión lectora.', icon: '📖', file: 'PLAN LECTOR.html', tag: 'lectura', subject: 'comunicacion' },
+
+      // 👇 NUEVO JUEGO DE VERBOS (AGREGADO)
+      { title: '🚂 El Tren de los Verbos', desc: 'Clasifica verbos en Hoy, Ayer y Mañana. Arrastra y aprende.', icon: '🚂', file: 'VERBOS PRIMERO PRIMARIA.html', tag: 'verbos · 1°', subject: 'comunicacion', new: true },
+
+      // ---- CIENCIAS ----
+      { title: '♻️ ECO-MISIÓN: Reciclaje', desc: 'Clasifica residuos.', icon: '♻️', file: 'JUEGO DE RECICLAJE 2.html', tag: 'ciencias', subject: 'ciencias' },
+      { title: '🗑️ El Gran Reto del Reciclaje', desc: 'Contenedores correctos.', icon: '🗑️', file: 'JUEGO RECICLAJE 1.html', tag: 'ciencias', subject: 'ciencias' },
       { title: '🌍 Eco-Retos', desc: '5 juegos ambientales.', icon: '🌍', file: 'ECORETOS.html', tag: 'ciencias', subject: 'ciencias', new: true },
-      { title: '🍽️ Aventura Peruana', desc: 'Comidas típicas.', icon: '🇵🇪', file: 'PLATOS TIPICOS SEGUNDO PRIMARIA.html', tag: 'cultura', subject: 'cultura', new: true }
+
+      // ---- CULTURA ----
+      { title: '🇵🇪 Aventura Peruana', desc: 'Comidas típicas.', icon: '🇵🇪', file: 'PLATOS TIPICOS SEGUNDO PRIMARIA.html', tag: 'cultura', subject: 'cultura', new: true }
     ];
 
     // Elementos del DOM

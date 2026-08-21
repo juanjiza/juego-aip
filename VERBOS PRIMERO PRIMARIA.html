@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>El Tren de los Verbos · Arrastrar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', cursive, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #b3d9ff 0%, #7fc1f0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-wrapper {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255, 255, 240, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 80px 80px 50px 50px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 0 0 3px #fffbe6;
+            border: 3px solid #f5c542;
+        }
+
+        /* PANTALLA DE INICIO */
+        #startScreen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        #startScreen h1 {
+            font-size: 3.5rem;
+            color: #2d1d07;
+            margin-bottom: 10px;
+        }
+
+        #startScreen .subtitle {
+            font-size: 1.8rem;
+            color: #4f3a1a;
+            margin-bottom: 30px;
+        }
+
+        #startScreen .emoji-train {
+            font-size: 5rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        #startScreen label {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d1d07;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        #startScreen input {
+            padding: 15px 30px;
+            border-radius: 60px;
+            border: 4px solid #b68b40;
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: #fffcf0;
+            width: 280px;
+            outline: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #startScreen input:focus {
+            border-color: #7a5f2b;
+            box-shadow: 0 0 0 4px #ffe28a;
+        }
+
+        #startBtn {
+            background: #4f8a4e;
+            border: none;
+            border-radius: 60px;
+            padding: 16px 50px;
+            font-weight: 700;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: inset 0 -6px 0 #2f5a2e, 0 8px 0 #1f3f1e;
+            border: 3px solid #7fb07e;
+            transition: 0.07s;
+            display: inline-block;
+        }
+
+        #startBtn:active {
+            transform: translateY(6px);
+            box-shadow: inset 0 -2px 0 #2f5a2e, 0 2px 0 #1f3f1e;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #f7d97e;
+            padding: 14px 28px;
+            border-radius: 60px;
+            margin-bottom: 20px;
+            border: 3px solid #c49b4a;
+            box-shadow: inset 0 -4px 0 #b68b40;
+        }
+
+        .player-name-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d1d07;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-weight: 700;
+            color: #2d1d07;
+            font-size: 1.2rem;
+            background: #fff3ce;
+            padding: 6px 20px;
+            border-radius: 60px;
+            border: 2px solid #c9a45c;
+            flex-wrap: wrap;
+        }
+
+        .stats .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stats .stat-item span:last-child {
+            background: #2d1d07;
+            color: #f9eec1;
+            padding: 0 14px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .stats .stat-item .aciertos-color {
+            color: #2e7d32;
+        }
+        .stats .stat-item .desaciertos-color {
+            color: #c62828;
+        }
+
+        .stats .stat-item .puntos-color {
+            color: #e65100;
+        }
+
+        /* TREN */
+        .train-area {
+            background: #e8dcc4;
+            border-radius: 60px 60px 30px 30px;
+            padding: 25px 20px 30px;
+            border: 4px solid #b68b40;
+            box-shadow: inset 0 6px 0 #dbb46a, 0 12px 0 #8f723a;
+            margin-top: 10px;
+        }
+
+        .train-message {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2d1d07;
+            background: #fcf3da;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-align: center;
+            border: 2px dashed #b68b40;
+            margin-bottom: 24px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wagons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .wagon {
+            flex: 1 1 180px;
+            min-width: 160px;
+            background: #fdf6e3;
+            border-radius: 40px 40px 20px 20px;
+            padding: 16px 10px 18px;
+            border: 4px solid #b68b40;
+            box-shadow: inset 0 -6px 0 #a07f41, 0 8px 0 #7a5f2b;
+            text-align: center;
+            transition: all 0.2s;
+            min-height: 180px;
+        }
+
+        .wagon.drag-over {
+            background: #e8f5e0;
+            border-color: #4caf50;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .wagon h3 {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+            padding: 6px 0;
+            border-radius: 40px;
+            border: 2px solid #b68b40;
+        }
+
+        .wagon .wagon-zone {
+            min-height: 100px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: #f5efe0;
+            border-radius: 30px;
+            border: 2px dashed #b68b40;
+            transition: background 0.2s;
+        }
+
+        .verb-chip {
+            background: #fff8e7;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border: 3px solid #b68b40;
+            box-shadow: 0 4px 0 #7a5f2b;
+            cursor: grab;
+            transition: 0.08s;
+            color: #1f1507;
+            display: inline-block;
+            touch-action: none;
+        }
+
+        .verb-chip:active {
+            cursor: grabbing;
+        }
+
+        .verb-chip.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .verb-chip.correct-placement {
+            background: #a8d5a2;
+            border-color: #1f7225;
+            box-shadow: 0 4px 0 #1a551e;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .verb-chip.incorrect {
+            background: #f5a3a3;
+            border-color: #b14242;
+            box-shadow: 0 4px 0 #772b2b;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .verb-pool {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 12px;
+            background: #f7efe0;
+            border-radius: 60px;
+            border: 3px solid #b68b40;
+            margin-top: 8px;
+            min-height: 80px;
+        }
+
+        .verb-pool .verb-chip {
+            background: #fcf3da;
+        }
+
+        .reset-btn {
+            background: #c9a063;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 40px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1f1507;
+            box-shadow: inset 0 -4px 0 #82663b, 0 6px 0 #5f4827;
+            border: 2px solid #b68b40;
+            cursor: pointer;
+            margin: 18px auto 0;
+            display: block;
+            transition: 0.06s;
+        }
+
+        .reset-btn:active {
+            transform: translateY(6px);
+            box-shadow: inset 0 -1px 0 #82663b, 0 1px 0 #5f4827;
+        }
+
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d1d07;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Drag ghost */
+        .drag-ghost {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.8;
+            background: #fff8e7;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: 3px solid #b68b40;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: rotate(-5deg) scale(1.05);
+            z-index: 1000;
+            color: #1f1507;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .game-wrapper { padding: 16px; }
+            .header { flex-direction: column; gap: 10px; align-items: stretch; }
+            .stats { justify-content: center; font-size: 1rem; }
+            .wagon { flex: 1 1 130px; min-width: 120px; }
+            .verb-chip { font-size: 1rem; padding: 6px 12px; }
+            .train-message { font-size: 1.2rem; min-height: 60px; }
+            #startScreen h1 { font-size: 2.5rem; }
+            #startScreen input { width: 200px; font-size: 1.4rem; }
+            #startBtn { font-size: 1.5rem; padding: 14px 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <!-- ===== PANTALLA DE INICIO ===== -->
+        <div id="startScreen">
+            <span class="emoji-train">🚂</span>
+            <h1>El Tren de los Verbos</h1>
+            <p class="subtitle">📚 Clasifica verbos en <strong>Hoy</strong>, <strong>Ayer</strong> y <strong>Mañana</strong></p>
+            <label for="startNameInput">✏️ Escribe tu nombre</label>
+            <input type="text" id="startNameInput" placeholder="Ej: Lucía" maxlength="12" value="Lucía" />
+            <br />
+            <button id="startBtn">🎮 ¡Jugar!</button>
+        </div>
+
+        <!-- ===== JUEGO ===== -->
+        <div id="gameArea" class="hidden">
+            <div class="header">
+                <div class="player-name-display" id="playerNameDisplay">👦🏽 Lucía</div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="aciertos-color">✅ Aciertos</span>
+                        <span id="aciertosDisplay">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="desaciertos-color">❌ Desaciertos</span>
+                        <span id="desaciertosDisplay">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="puntos-color">⭐ Puntos</span>
+                        <span id="scoreDisplay">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>⏱️</span>
+                        <span id="timerDisplay">60</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="train-area">
+                <div class="train-message" id="gameMessage">
+                    🚂 <strong>Arrastra</strong> los verbos al vagón correcto<br />
+                    <span style="font-size:1.2rem;">🟢 Hoy &nbsp;|&nbsp; 🔵 Ayer &nbsp;|&nbsp; 🟠 Mañana</span>
+                </div>
+
+                <div class="wagons">
+                    <div class="wagon" data-time="presente" id="wagon-presente">
+                        <h3 style="background:#b5d6a8;">🟢 Hoy</h3>
+                        <div class="wagon-zone" id="zone-presente"></div>
+                    </div>
+                    <div class="wagon" data-time="pasado" id="wagon-pasado">
+                        <h3 style="background:#f0b3b3;">🔵 Ayer</h3>
+                        <div class="wagon-zone" id="zone-pasado"></div>
+                    </div>
+                    <div class="wagon" data-time="futuro" id="wagon-futuro">
+                        <h3 style="background:#f5d98f;">🟠 Mañana</h3>
+                        <div class="wagon-zone" id="zone-futuro"></div>
+                    </div>
+                </div>
+
+                <div class="verb-pool" id="verbPool"></div>
+
+                <button class="reset-btn" id="resetGameBtn">🔄 Nuevo tren</button>
+            </div>
+            <div class="footer">⭐ 1° Primaria · Arrastra y aprende tiempos verbales ⭐</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- LISTA DE VERBOS CLASIFICADOS ----------
+            const VERBOS = {
+                presente: ['bailan', 'canta', 'estudia', 'maneja'],
+                pasado: ['nadaron', 'floreció', 'salté', 'habló', 'planchó', 'lloró', 'jugué'],
+                futuro: ['ganará', 'dormiré', 'crecerá', 'calentará', 'dibujará', 'estudiará', 'almozará']
+            };
+
+            const TODOS_VERBOS = [...VERBOS.presente, ...VERBOS.pasado, ...VERBOS.futuro];
+
+            // ---------- ESTADO ----------
+            let score = 0;
+            let aciertos = 0;
+            let desaciertos = 0;
+            let timeLeft = 60;
+            let timerInterval = null;
+            let gameActive = false;
+            let playerName = '';
+
+            // DOM - Pantalla de inicio
+            const startScreen = document.getElementById('startScreen');
+            const gameArea = document.getElementById('gameArea');
+            const startNameInput = document.getElementById('startNameInput');
+            const startBtn = document.getElementById('startBtn');
+
+            // DOM - Juego
+            const playerNameDisplay = document.getElementById('playerNameDisplay');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const aciertosDisplay = document.getElementById('aciertosDisplay');
+            const desaciertosDisplay = document.getElementById('desaciertosDisplay');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const gameMessage = document.getElementById('gameMessage');
+            const verbPool = document.getElementById('verbPool');
+            const zonePresente = document.getElementById('zone-presente');
+            const zonePasado = document.getElementById('zone-pasado');
+            const zoneFuturo = document.getElementById('zone-futuro');
+            const resetBtn = document.getElementById('resetGameBtn');
+            const wagons = document.querySelectorAll('.wagon');
+
+            // ---------- AUX ----------
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function updateUI() {
+                scoreDisplay.textContent = score;
+                aciertosDisplay.textContent = aciertos;
+                desaciertosDisplay.textContent = desaciertos;
+                timerDisplay.textContent = timeLeft;
+                playerNameDisplay.textContent = '👦🏽 ' + playerName;
+            }
+
+            // ---------- FIN JUEGO ----------
+            function endGame() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                gameActive = false;
+
+                const total = aciertos + desaciertos;
+                let mensajeFinal = '';
+                if (total === 0) {
+                    mensajeFinal = '😅 No clasificaste ningún verbo. ¡Intenta de nuevo!';
+                } else if (desaciertos === 0 && aciertos === TODOS_VERBOS.length) {
+                    mensajeFinal = '🏆 ¡PERFECTO! Clasificaste TODOS los verbos sin errores. ¡Eres un campeón! 🎉';
+                } else if (aciertos >= TODOS_VERBOS.length * 0.7) {
+                    mensajeFinal = `🌟 ¡Muy bien ${playerName}! Clasificaste ${aciertos} de ${TODOS_VERBOS.length} verbos. ¡Sigue así!`;
+                } else if (aciertos >= TODOS_VERBOS.length * 0.4) {
+                    mensajeFinal = `📚 Buen intento ${playerName}. Clasificaste ${aciertos} verbos. ¡Practica más y lo lograrás!`;
+                } else {
+                    mensajeFinal = `💪 No te rindas ${playerName}. Clasificaste ${aciertos} verbos. ¡Sigue practicando!`;
+                }
+
+                gameMessage.innerHTML = `
+                    ⏰ ¡TIEMPO!<br />
+                    <span style="font-size:1.2rem;">
+                        ✅ Aciertos: ${aciertos} &nbsp;|&nbsp; ❌ Desaciertos: ${desaciertos} &nbsp;|&nbsp; ⭐ Puntos: ${score}
+                    </span><br />
+                    <span style="font-size:1.3rem; color:#2d1d07;">${mensajeFinal}</span><br />
+                    <span style="font-size:1rem;">Haz clic en "Nuevo tren" para jugar de nuevo</span>
+                `;
+
+                document.querySelectorAll('.verb-chip').forEach(c => {
+                    c.style.cursor = 'default';
+                    c.draggable = false;
+                });
+            }
+
+            // ---------- TEMPORIZADOR ----------
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                timeLeft = 60;
+                updateUI();
+                gameActive = true;
+                timerInterval = setInterval(() => {
+                    timeLeft -= 1;
+                    timerDisplay.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        timerDisplay.textContent = 0;
+                        endGame();
+                    }
+                }, 1000);
+            }
+
+            // ---------- VERIFICAR SI TERMINÓ ----------
+            function checkWin() {
+                const total = TODOS_VERBOS.length;
+                const colocados = document.querySelectorAll('.verb-chip.correct-placement').length;
+                if (colocados === total && gameActive) {
+                    const mensajeFinal = `🎉 ¡FELICIDADES ${playerName}! ¡Clasificaste TODOS los verbos! 🎉<br />
+                                          ✅ Aciertos: ${aciertos} &nbsp;|&nbsp; ❌ Desaciertos: ${desaciertos} &nbsp;|&nbsp; ⭐ Puntos: ${score}`;
+                    gameMessage.innerHTML = mensajeFinal;
+                    if (timerInterval) clearInterval(timerInterval);
+                    gameActive = false;
+                    return true;
+                }
+                return false;
+            }
+
+            // ---------- COLOCAR VERBO (drag & drop) ----------
+            function placeVerb(verb, timeCategory, chipElement) {
+                if (!gameActive) return false;
+                if (chipElement.classList.contains('correct-placement')) return false;
+
+                let correct = false;
+                let targetZone = null;
+
+                if (timeCategory === 'presente' && VERBOS.presente.includes(verb)) {
+                    correct = true;
+                    targetZone = zonePresente;
+                } else if (timeCategory === 'pasado' && VERBOS.pasado.includes(verb)) {
+                    correct = true;
+                    targetZone = zonePasado;
+                } else if (timeCategory === 'futuro' && VERBOS.futuro.includes(verb)) {
+                    correct = true;
+                    targetZone = zoneFuturo;
+                }
+
+                if (correct && targetZone) {
+                    chipElement.classList.add('correct-placement');
+                    chipElement.draggable = false;
+                    chipElement.style.cursor = 'default';
+                    targetZone.appendChild(chipElement);
+                    score += 10;
+                    aciertos++;
+                    updateUI();
+                    gameMessage.innerHTML = `✅ ¡Bien! +10 pts (${playerName})`;
+                    if (!checkWin()) {
+                        // Mensaje neutro
+                    }
+                    return true;
+                } else {
+                    // Incorrecto
+                    chipElement.classList.add('incorrect');
+                    setTimeout(() => chipElement.classList.remove('incorrect'), 350);
+                    score = Math.max(0, score - 3);
+                    desaciertos++;
+                    updateUI();
+                    gameMessage.innerHTML = `❌ "${verb}" no va ahí. -3 pts`;
+                    // Devolver el chip al pool después de un momento
+                    setTimeout(() => {
+                        if (!chipElement.classList.contains('correct-placement')) {
+                            verbPool.appendChild(chipElement);
+                        }
+                    }, 400);
+                    return false;
+                }
+            }
+
+            // ---------- CONFIGURAR DRAG & DROP ----------
+            function setupDragDrop() {
+                const chips = document.querySelectorAll('.verb-chip:not(.correct-placement)');
+
+                chips.forEach(chip => {
+                    chip.draggable = true;
+
+                    chip.addEventListener('dragstart', (e) => {
+                        if (!gameActive) {
+                            e.preventDefault();
+                            return false;
+                        }
+                        chip.classList.add('dragging');
+                        e.dataTransfer.setData('text/plain', chip.dataset.verb);
+                        e.dataTransfer.effectAllowed = 'move';
+
+                        const ghost = chip.cloneNode(true);
+                        ghost.classList.add('drag-ghost');
+                        ghost.style.position = 'absolute';
+                        ghost.style.top = '-1000px';
+                        document.body.appendChild(ghost);
+                        e.dataTransfer.setDragImage(ghost, 40, 30);
+                        setTimeout(() => document.body.removeChild(ghost), 0);
+                    });
+
+                    chip.addEventListener('dragend', (e) => {
+                        chip.classList.remove('dragging');
+                    });
+                });
+
+                wagons.forEach(wagon => {
+                    wagon.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        wagon.classList.add('drag-over');
+                    });
+
+                    wagon.addEventListener('dragleave', (e) => {
+                        wagon.classList.remove('drag-over');
+                    });
+
+                    wagon.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        wagon.classList.remove('drag-over');
+
+                        if (!gameActive) {
+                            gameMessage.innerHTML = '⏰ El juego ya terminó. Haz clic en "Nuevo tren"';
+                            return;
+                        }
+
+                        const verb = e.dataTransfer.getData('text/plain');
+                        if (!verb) return;
+
+                        const chip = document.querySelector(`.verb-chip[data-verb="${verb}"]:not(.correct-placement)`);
+                        if (!chip) {
+                            gameMessage.innerHTML = '⚠️ Ese verbo ya está colocado';
+                            return;
+                        }
+
+                        const timeCategory = wagon.dataset.time;
+                        placeVerb(verb, timeCategory, chip);
+                    });
+                });
+            }
+
+            // ---------- CONFIGURAR JUEGO ----------
+            function setupGame() {
+                // Limpiar vagones
+                zonePresente.innerHTML = '';
+                zonePasado.innerHTML = '';
+                zoneFuturo.innerHTML = '';
+
+                // Resetear contadores
+                score = 0;
+                aciertos = 0;
+                desaciertos = 0;
+
+                // Mezclar y crear pool
+                verbPool.innerHTML = '';
+                const shuffled = shuffleArray([...TODOS_VERBOS]);
+                shuffled.forEach(verb => {
+                    const chip = document.createElement('div');
+                    chip.className = 'verb-chip';
+                    chip.textContent = verb;
+                    chip.dataset.verb = verb;
+                    chip.draggable = true;
+                    verbPool.appendChild(chip);
+                });
+
+                updateUI();
+                gameMessage.innerHTML = `🚂 <strong>Arrastra</strong> los verbos al vagón correcto<br />
+                                         <span style="font-size:1.2rem;">🟢 Hoy &nbsp;|&nbsp; 🔵 Ayer &nbsp;|&nbsp; 🟠 Mañana</span>`;
+
+                setupDragDrop();
+                startTimer();
+            }
+
+            // ---------- RESET ----------
+            function resetGame() {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                setupGame();
+            }
+
+            // ---------- INICIAR JUEGO (desde pantalla de inicio) ----------
+            function startGame() {
+                const name = startNameInput.value.trim();
+                if (name === '') {
+                    startNameInput.value = 'Jugador';
+                    playerName = 'Jugador';
+                } else {
+                    playerName = name;
+                }
+
+                // Ocultar pantalla de inicio y mostrar juego
+                startScreen.classList.add('hidden');
+                gameArea.classList.remove('hidden');
+
+                // Configurar y empezar
+                setupGame();
+            }
+
+            // ---------- EVENTOS ----------
+            startBtn.addEventListener('click', startGame);
+
+            // Enter en el input de inicio
+            startNameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    startGame();
+                }
+            });
+
+            resetBtn.addEventListener('click', resetGame);
+
+            // Inicializar: mostramos pantalla de inicio
+            startScreen.classList.remove('hidden');
+            gameArea.classList.add('hidden');
+
+        })();
+    </script>
+</body>
+</html>
