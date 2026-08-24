@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Restas Divertidas - Aprende Jugando</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .game-wrapper {
+            max-width: 800px;
+            width: 100%;
+            background: #fff8f0;
+            border-radius: 70px 70px 50px 50px;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2), 0 8px 0 #d49a6a;
+            padding: 25px 30px 35px;
+            border: 5px solid #f5b67a;
+            position: relative;
+        }
+
+        .game-wrapper::before {
+            content: "🌈 🦄 🍭";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2.5rem;
+            letter-spacing: 10px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            color: #a64d2e;
+            text-shadow: 3px 3px 0 #fad6a5, 0 5px 0 #b45f2a;
+            margin-top: -8px;
+            letter-spacing: 1px;
+        }
+
+        /* Ventana de nombre */
+        .name-modal {
+            background: #fef3d6;
+            padding: 25px 20px;
+            border-radius: 60px;
+            margin: 12px 0 20px;
+            border: 4px dashed #e8a87c;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: inset 0 -4px 0 #dba87a;
+        }
+
+        .name-modal label {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4a2c1a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .name-modal input {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: 3px solid #f3a15d;
+            font-size: 1.4rem;
+            background: #fffbe6;
+            outline: none;
+            flex: 1 1 160px;
+            text-align: center;
+            font-family: inherit;
+            font-weight: bold;
+            color: #3d2b1a;
+        }
+
+        .name-modal input:focus {
+            border-color: #e07c2e;
+            box-shadow: 0 0 0 4px #f7d49c;
+        }
+
+        .name-modal button {
+            background: #f3b33d;
+            border: none;
+            border-radius: 60px;
+            padding: 10px 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2f2a1a;
+            border-bottom: 6px solid #b46f1e;
+            cursor: pointer;
+            transition: 0.06s linear;
+            box-shadow: 0 4px 0 #7f551a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .name-modal button:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+            box-shadow: 0 2px 0 #7f551a;
+        }
+
+        .name-modal button:disabled {
+            opacity: 0.6;
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+            pointer-events: none;
+        }
+
+        /* Selector de modo */
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 12px 28px;
+            border-radius: 60px;
+            border: 4px solid #c97d4a;
+            background: #fae1c0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #3d2415;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 6px 0 #9f6a42;
+            flex: 1 1 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .mode-btn.active {
+            background: #f7c77b;
+            border-color: #b56d2e;
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #9f6a42;
+        }
+
+        .mode-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #9f6a42;
+        }
+
+        .mode-btn:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #9f6a42;
+            pointer-events: none;
+        }
+
+        /* Barra de estado */
+        .status-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            background: #fbebd2;
+            border-radius: 100px;
+            padding: 10px 22px;
+            margin: 8px 0 18px;
+            border: 3px solid #e8b07a;
+            font-weight: bold;
+            font-size: 1.15rem;
+            color: #3d2c1b;
+        }
+
+        .status-bar span {
+            background: #dba56d;
+            padding: 3px 16px;
+            border-radius: 40px;
+            color: #2f1d0b;
+            font-size: 1.2rem;
+            box-shadow: inset 0 -3px 0 #7f4f24;
+        }
+
+        /* Panel de pregunta */
+        .question-panel {
+            background: #fff5e6;
+            border-radius: 90px 90px 60px 60px;
+            padding: 25px 15px 20px;
+            border: 5px solid #f5b67a;
+            box-shadow: 0 8px 0 #b47b44, inset 0 -4px 0 #dba562;
+            text-align: center;
+        }
+
+        .question-panel .emoji-deco {
+            font-size: 2.2rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 8px 5px;
+            opacity: 0.6;
+        }
+
+        .question-panel .resta-display {
+            font-size: 4.2rem;
+            font-weight: 800;
+            color: #1f3c4a;
+            background: #ffedc0;
+            display: inline-block;
+            padding: 8px 30px;
+            border-radius: 100px;
+            margin: 8px 0;
+            box-shadow: inset 0 -5px 0 #b88b47;
+            letter-spacing: 4px;
+        }
+
+        .question-panel .resta-display span {
+            font-size: 2.6rem;
+            margin: 0 4px;
+        }
+
+        .question-panel .tipo-texto {
+            font-size: 1.5rem;
+            color: #5a3a20;
+            background: #fcead0;
+            padding: 5px 20px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Opciones */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin: 22px 0 12px;
+        }
+
+        .option-btn {
+            background: #c7e1f0;
+            border: 4px solid #2c6e8a;
+            border-radius: 60px;
+            padding: 14px 0;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #032b3b;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #1a4a60;
+            transition: all 0.06s linear;
+            font-family: inherit;
+            border-bottom: 6px solid #2b6a86;
+        }
+
+        .option-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #1a4a60;
+        }
+
+        .option-btn:disabled {
+            opacity: 0.6;
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #1a4a60;
+            pointer-events: none;
+        }
+
+        .option-btn.correct {
+            background: #8fda8f;
+            border-color: #1c7e1c;
+            box-shadow: 0 0 20px #66cc66;
+        }
+
+        .option-btn.wrong {
+            background: #f7a7a7;
+            border-color: #aa2b2b;
+            box-shadow: 0 0 20px #ff6b6b;
+        }
+
+        /* Feedback */
+        .feedback-area {
+            min-height: 3.8rem;
+            font-size: 1.7rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 8px 0 0;
+            background: #feedd6;
+            border-radius: 60px;
+            padding: 6px 18px;
+            border: 2px dashed #d39b62;
+        }
+
+        .game-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .record-box {
+            background: #f7d594;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 3px solid #b1742c;
+            color: #38210b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reset-btn {
+            background: #e7b9a4;
+            border: none;
+            border-radius: 60px;
+            padding: 8px 24px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-bottom: 6px solid #8f5b48;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6f4232;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f6c9b5;
+            color: #2f1a10;
+            font-family: inherit;
+        }
+
+        .reset-btn:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+            box-shadow: 0 2px 0 #6f4232;
+        }
+
+        @media (max-width: 550px) {
+            .game-wrapper {
+                padding: 18px 12px;
+            }
+            .question-panel .resta-display {
+                font-size: 3.2rem;
+                padding: 5px 16px;
+            }
+            .options-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .mode-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .name-modal {
+                flex-direction: column;
+            }
+            .status-bar {
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+            .game-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper" id="app">
+    <h1>🧸 Restas con Amigos</h1>
+
+    <!-- Ventana de nombre -->
+    <div class="name-modal" id="nameModal">
+        <label for="playerName">👋 Tu nombre:</label>
+        <input type="text" id="playerName" placeholder="Escribe aquí" maxlength="20" value="Sofía">
+        <button id="startGameBtn">🎮 Jugar</button>
+    </div>
+
+    <!-- Selector de modo -->
+    <div class="mode-selector" id="modeSelector">
+        <button class="mode-btn active" data-mode="operation" id="modeOp">🧮 Operaciones</button>
+        <button class="mode-btn" data-mode="problem" id="modeProb">📖 Problemas</button>
+    </div>
+
+    <!-- Barra de estado -->
+    <div class="status-bar" id="statusBar">
+        <div>⭐ <span id="playerNameDisplay">Jugador</span></div>
+        <div>🏆 Puntos: <span id="scoreDisplay">0</span></div>
+        <div>⏳ Tiempo: <span id="timerDisplay">10:00</span></div>
+    </div>
+
+    <!-- Panel de pregunta -->
+    <div class="question-panel" id="questionPanel">
+        <div class="emoji-deco">
+            <span>🐼</span>
+            <span>🍎</span>
+            <span>🐧</span>
+        </div>
+        <div class="resta-display" id="restaDisplay">5 - 2 = ?</div>
+        <div class="tipo-texto" id="tipoTexto">✨ Elige la respuesta</div>
+        <div class="options-grid" id="optionsGrid">
+            <button class="option-btn" data-index="0">3</button>
+            <button class="option-btn" data-index="1">4</button>
+            <button class="option-btn" data-index="2">2</button>
+            <button class="option-btn" data-index="3">1</button>
+        </div>
+        <div class="feedback-area" id="feedbackArea">
+            <span>🤔 ¡Selecciona una opción!</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="game-footer">
+        <div class="record-box" id="recordBox">🏅 Récord: 0</div>
+        <button class="reset-btn" id="resetBtn">🔄 Nuevo juego</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- ESTADO -----
+        let playerName = 'Sofía';
+        let score = 0;
+        let record = 0;
+        let timeLeft = 600; // 10 min
+        let timerInterval = null;
+        let gameActive = false;
+        let isAnswered = false;
+        let currentMode = 'operation'; // 'operation' o 'problem'
+
+        // elementos DOM
+        const nameInput = document.getElementById('playerName');
+        const startBtn = document.getElementById('startGameBtn');
+        const modeOp = document.getElementById('modeOp');
+        const modeProb = document.getElementById('modeProb');
+        const playerNameDisplay = document.getElementById('playerNameDisplay');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const restaDisplay = document.getElementById('restaDisplay');
+        const tipoTexto = document.getElementById('tipoTexto');
+        const optionsBtns = document.querySelectorAll('.option-btn');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const recordBox = document.getElementById('recordBox');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // variables de pregunta actual
+        let currentAnswer = 0;
+        let currentOperands = { a: 0, b: 0 };
+        let currentProblemText = '';
+
+        // ----- FUNCIONES AUXILIARES -----
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // Genera resta para OPERACIONES: números pequeños (1-20) y resultado entre 0 y 10
+        function generateOperation() {
+            let a, b, result;
+            let attempts = 0;
+            do {
+                // a entre 2 y 18, b entre 1 y a-1
+                a = Math.floor(Math.random() * 17) + 2; // 2..18
+                b = Math.floor(Math.random() * (a - 1)) + 1; // 1..a-1
+                result = a - b;
+                attempts++;
+            } while ((result > 10 || result < 0 || a > 20) && attempts < 50);
+            // asegurar que sea adecuado
+            if (result > 10) { a = 8; b = 3; result = 5; }
+            if (a > 20) { a = 12; b = 5; result = 7; }
+            return { a, b, result };
+        }
+
+        // Genera PROBLEMA con texto y operación (resultado <= 10)
+        function generateProblem() {
+            const scenarios = [
+                { text: '🍎 Ana tenía {a} manzanas y regaló {b}. ¿Cuántas le quedan?', emoji: '🍎' },
+                { text: '🐶 En el parque había {a} perritos y se fueron {b}. ¿Cuántos quedan?', emoji: '🐶' },
+                { text: '🍭 Luis tenía {a} caramelos y se comió {b}. ¿Cuántos le sobran?', emoji: '🍭' },
+                { text: '🐧 Había {a} pingüinos en el hielo y {b} se fueron a nadar. ¿Cuántos quedan?', emoji: '🐧' },
+                { text: '🌟 Sara tenía {a} estrellas y perdió {b}. ¿Cuántas tiene ahora?', emoji: '🌟' },
+                { text: '🐱 En la casa hay {a} gatitos y {b} se fueron a dormir. ¿Cuántos están despiertos?', emoji: '🐱' },
+                { text: '🧁 La abuela hizo {a} cupcakes y los niños comieron {b}. ¿Cuántos quedan?', emoji: '🧁' },
+                { text: '🚗 En el estacionamiento hay {a} autos y salen {b}. ¿Cuántos autos quedan?', emoji: '🚗' }
+            ];
+
+            let a, b, result;
+            let attempts = 0;
+            do {
+                a = Math.floor(Math.random() * 15) + 2; // 2..16
+                b = Math.floor(Math.random() * (a - 1)) + 1; // 1..a-1
+                result = a - b;
+                attempts++;
+            } while ((result > 10 || result < 0 || a > 18) && attempts < 40);
+            if (result > 10) { a = 8; b = 3; result = 5; }
+
+            const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const text = scenario.text.replace('{a}', a).replace('{b}', b);
+            return { a, b, result, text, emoji: scenario.emoji };
+        }
+
+        // Cargar nueva pregunta según modo
+        function loadNewQuestion() {
+            if (!gameActive) return;
+
+            let a, b, result, text, emoji;
+
+            if (currentMode === 'operation') {
+                const op = generateOperation();
+                a = op.a; b = op.b; result = op.result;
+                text = `${a} - ${b} = ?`;
+                emoji = '🧮';
+                tipoTexto.textContent = '✨ Elige el resultado';
+            } else {
+                const prob = generateProblem();
+                a = prob.a; b = prob.b; result = prob.result;
+                text = prob.text;
+                emoji = prob.emoji;
+                tipoTexto.textContent = '📖 Lee y resuelve';
+            }
+
+            currentAnswer = result;
+            currentOperands = { a, b };
+            currentProblemText = text;
+
+            // Mostrar en pantalla
+            if (currentMode === 'operation') {
+                restaDisplay.innerHTML = `${a} <span>−</span> ${b} <span>= ?</span>`;
+            } else {
+                // Para problemas mostramos el texto más pequeño
+                restaDisplay.innerHTML = `${emoji} ${text}`;
+                restaDisplay.style.fontSize = '1.8rem';
+                // Ajustar tamaño para que no se salga
+                if (text.length > 30) {
+                    restaDisplay.style.fontSize = '1.4rem';
+                } else {
+                    restaDisplay.style.fontSize = '1.8rem';
+                }
+            }
+
+            // Generar opciones (4 opciones, incluyendo la correcta)
+            let options = new Set();
+            options.add(result);
+            let attempts = 0;
+            while (options.size < 4 && attempts < 200) {
+                let offset = Math.floor(Math.random() * 6) + 1;
+                let candidate = result + (Math.random() > 0.5 ? offset : -offset);
+                if (candidate >= 0 && candidate <= 15 && !options.has(candidate)) {
+                    options.add(candidate);
+                }
+                attempts++;
+            }
+            // Rellenar si faltan
+            let fallbacks = [result+1, result+2, result-1, result+3];
+            for (let val of fallbacks) {
+                if (options.size >= 4) break;
+                if (val >= 0 && val <= 15 && !options.has(val)) options.add(val);
+            }
+            let optArray = Array.from(options);
+            // Mezclar
+            for (let i = optArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optArray[i], optArray[j]] = [optArray[j], optArray[i]];
+            }
+            while (optArray.length < 4) {
+                optArray.push(Math.floor(Math.random() * 10) + 1);
+            }
+            optArray = optArray.slice(0, 4);
+
+            optionsBtns.forEach((btn, idx) => {
+                btn.textContent = optArray[idx] || '?';
+                btn.dataset.value = optArray[idx] || '0';
+                btn.disabled = false;
+                btn.className = 'option-btn';
+            });
+
+            isAnswered = false;
+            feedbackArea.innerHTML = `<span>🤔 ¿Cuál es la respuesta?</span>`;
+        }
+
+        function updateUI() {
+            scoreDisplay.textContent = score;
+            timerDisplay.textContent = formatTime(timeLeft);
+            recordBox.innerHTML = `🏅 Récord: ${record}`;
+            playerNameDisplay.textContent = playerName;
+            if (score > record) {
+                record = score;
+                recordBox.innerHTML = `🏅 Récord: ${record} ⭐ ¡Nuevo!`;
+            }
+        }
+
+        function endGame(message = '⏰ ¡Se acabó el tiempo!') {
+            if (!gameActive) return;
+            gameActive = false;
+            clearInterval(timerInterval);
+            timerInterval = null;
+            optionsBtns.forEach(btn => btn.disabled = true);
+            feedbackArea.innerHTML = `<span>${message}  🎯 Puntos: ${score}</span>`;
+            if (score >= 50) {
+                feedbackArea.innerHTML += ` 🌟 ¡Excelente trabajo!`;
+            }
+            updateUI();
+            startBtn.disabled = false;
+            startBtn.textContent = '🔁 Reintentar';
+            // habilitar modos
+            modeOp.disabled = false;
+            modeProb.disabled = false;
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            gameActive = false;
+            score = 0;
+            timeLeft = 600;
+            isAnswered = false;
+            optionsBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.className = 'option-btn';
+            });
+            restaDisplay.innerHTML = '🌟 ¡Prepárate!';
+            restaDisplay.style.fontSize = '4.2rem';
+            tipoTexto.textContent = '✨ Elige la respuesta';
+            feedbackArea.innerHTML = `<span>🎮 Presiona "Jugar" para empezar</span>`;
+            updateUI();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 Jugar';
+            playerNameDisplay.textContent = playerName;
+            modeOp.disabled = false;
+            modeProb.disabled = false;
+        }
+
+        function startGame() {
+            let name = nameInput.value.trim();
+            if (name === '') name = 'Jugador';
+            playerName = name;
+            playerNameDisplay.textContent = playerName;
+
+            if (gameActive) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            score = 0;
+            timeLeft = 600;
+            gameActive = true;
+            isAnswered = false;
+            startBtn.disabled = true;
+            startBtn.textContent = '⏳ Jugando...';
+            modeOp.disabled = true;
+            modeProb.disabled = true;
+
+            optionsBtns.forEach(btn => btn.disabled = false);
+            loadNewQuestion();
+            updateUI();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = formatTime(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    endGame('⏰ ¡Tiempo finalizado!');
+                    startBtn.disabled = false;
+                    startBtn.textContent = '🔁 Reintentar';
+                    modeOp.disabled = false;
+                    modeProb.disabled = false;
+                }
+                updateUI();
+            }, 1000);
+        }
+
+        function handleAnswer(btn) {
+            if (!gameActive || isAnswered || btn.disabled) return;
+            const selectedValue = parseInt(btn.dataset.value, 10);
+            const isCorrect = (selectedValue === currentAnswer);
+
+            optionsBtns.forEach(b => b.disabled = true);
+            isAnswered = true;
+
+            if (isCorrect) {
+                score += 2;
+                feedbackArea.innerHTML = `✅ ¡Correcto! +2 puntos 🎉`;
+                btn.classList.add('correct');
+                updateUI();
+                if (score >= 50 && gameActive) {
+                    feedbackArea.innerHTML += ` 🌟 ¡Excelente! Llevas ${score} puntos. ¡Sigue así!`;
+                }
+                setTimeout(() => {
+                    if (gameActive) {
+                        loadNewQuestion();
+                        optionsBtns.forEach(b => b.disabled = false);
+                    }
+                }, 650);
+            } else {
+                score = Math.max(0, score - 1);
+                feedbackArea.innerHTML = `❌ ¡Oops! Era ${currentAnswer}. -1 punto 😅`;
+                btn.classList.add('wrong');
+                updateUI();
+                setTimeout(() => {
+                    if (gameActive) {
+                        loadNewQuestion();
+                        optionsBtns.forEach(b => b.disabled = false);
+                    }
+                }, 900);
+            }
+        }
+
+        // ----- EVENTOS -----
+        optionsBtns.forEach(btn => {
+            btn.addEventListener('click', function() { handleAnswer(this); });
+        });
+
+        startBtn.addEventListener('click', startGame);
+
+        resetBtn.addEventListener('click', function() {
+            if (gameActive) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                gameActive = false;
+            }
+            resetGame();
+            startBtn.disabled = false;
+            startBtn.textContent = '🎮 Jugar';
+            modeOp.disabled = false;
+            modeProb.disabled = false;
+            updateUI();
+        });
+
+        // Cambiar modo
+        modeOp.addEventListener('click', function() {
+            if (gameActive) return;
+            currentMode = 'operation';
+            modeOp.classList.add('active');
+            modeProb.classList.remove('active');
+            resetGame();
+            // mostrar preview
+            restaDisplay.innerHTML = '5 - 2 = ?';
+            restaDisplay.style.fontSize = '4.2rem';
+            tipoTexto.textContent = '✨ Elige el resultado';
+            feedbackArea.innerHTML = `<span>🧮 Modo operaciones</span>`;
+        });
+
+        modeProb.addEventListener('click', function() {
+            if (gameActive) return;
+            currentMode = 'problem';
+            modeProb.classList.add('active');
+            modeOp.classList.remove('active');
+            resetGame();
+            restaDisplay.innerHTML = '🐶 Había 8 perritos y se fueron 3. ¿Cuántos quedan?';
+            restaDisplay.style.fontSize = '1.8rem';
+            tipoTexto.textContent = '📖 Modo problemas';
+            feedbackArea.innerHTML = `<span>📖 Lee atentamente y resuelve</span>`;
+        });
+
+        // Inicializar
+        window.addEventListener('load', function() {
+            resetGame();
+            nameInput.value = 'Sofía';
+            playerName = 'Sofía';
+            playerNameDisplay.textContent = 'Sofía';
+            updateUI();
+            // Preview de operación
+            restaDisplay.innerHTML = '5 - 2 = ?';
+            restaDisplay.style.fontSize = '4.2rem';
+            tipoTexto.textContent = '✨ Elige el resultado';
+            feedbackArea.innerHTML = `<span>🤔 ¡Elige una opción!</span>`;
+            modeOp.classList.add('active');
+            modeProb.classList.remove('active');
+            currentMode = 'operation';
+        });
+
+    })();
+</script>
+
+</body>
+</html>
