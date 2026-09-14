@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juegos Matemáticos - Contando hasta 30</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3b6 100%);
+    min-height: 100vh; padding: 15px; color: #2c3e50;
+  }
+  h1 { font-size: 2rem; text-align: center; color: #2d5016; text-shadow: 3px 3px 0 #ffeb99; margin: 8px 0; }
+  h2 { font-size: 1.4rem; color: #2d5016; text-align: center; margin: 8px 0; }
+  .oculto { display: none !important; }
+  .pantalla {
+    max-width: 1200px; margin: 0 auto; background: rgba(255,255,255,0.9);
+    border-radius: 30px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border: 5px solid #ffb347;
+  }
+  #pantalla-inicio { text-align: center; }
+  #pantalla-inicio .emoji-grande { font-size: 4.5rem; margin: 15px; }
+  #pantalla-inicio input {
+    font-size: 1.4rem; padding: 14px 22px; border-radius: 50px;
+    border: 4px solid #ffb347; text-align: center; font-family: inherit;
+    outline: none; width: 80%; max-width: 400px; margin: 15px auto; display: block;
+  }
+  .btn-grande {
+    font-size: 1.4rem; padding: 15px 35px; border-radius: 60px; border: none;
+    background: linear-gradient(180deg, #ffd54f 0%, #ff9800 100%);
+    color: #4a2800; font-weight: bold; cursor: pointer;
+    box-shadow: 0 7px 0 #b36200, 0 10px 18px rgba(0,0,0,0.15);
+    font-family: inherit; transition: transform 0.1s, box-shadow 0.1s;
+    margin: 8px; user-select: none;
+  }
+  .btn-grande:hover { transform: translateY(-2px); }
+  .btn-grande:active { transform: translateY(5px); box-shadow: 0 2px 0 #b36200; }
+  .btn-grande:disabled { opacity: 0.5; pointer-events: none; }
+  .btn-secundario {
+    font-size: 1rem; padding: 10px 20px; border-radius: 50px; border: none;
+    background: #4caf50; color: white; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 0 #2e7d32; font-family: inherit;
+  }
+  .btn-secundario:active { transform: translateY(3px); box-shadow: 0 1px 0 #2e7d32; }
+  #pantalla-menu { text-align: center; }
+  .menu-opciones { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 25px; }
+  .menu-btn {
+    flex: 1 1 280px; max-width: 340px; padding: 25px 18px;
+    border-radius: 30px; border: 5px solid #2d5016; background: #fff8e1;
+    cursor: pointer; font-family: inherit; transition: transform 0.15s; text-align: center;
+  }
+  .menu-btn:hover { transform: scale(1.03); background: #fff3c4; }
+  .menu-btn .numero { font-size: 2.8rem; display: block; color: #ff7043; font-weight: bold; }
+  .menu-btn .titulo { font-size: 1.3rem; font-weight: bold; color: #2d5016; margin: 8px 0; }
+  .menu-btn .desc { font-size: 0.95rem; color: #5d6d4e; }
+  .cabecera-juego {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+  }
+  .saludo {
+    font-size: 1.1rem; background: #fff3c4; padding: 7px 16px;
+    border-radius: 30px; border: 3px solid #ffb347;
+  }
+  .instruccion-drag {
+    background: #e3f2fd; border: 3px dashed #1976d2;
+    padding: 14px; border-radius: 15px; margin: 10px 0;
+    text-align: center; color: #0d47a1; font-weight: bold; font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .instruccion {
+    background: #fff9c4; border-left: 10px solid #fbc02d;
+    padding: 12px 18px; border-radius: 15px; font-size: 1.05rem;
+    margin: 10px 0; text-align: center; color: #5d4037; font-weight: bold;
+  }
+  .marcador {
+    display: flex; justify-content: space-around; flex-wrap: wrap; gap: 5px;
+    background: #e8f5e9; padding: 10px 15px; border-radius: 30px;
+    font-size: 1rem; font-weight: bold; margin-bottom: 12px; border: 3px solid #81c784;
+  }
+  /* JUEGO 1 */
+  .zona-suelta {
+    background: #fff8e1; min-height: 110px; border-radius: 25px;
+    padding: 12px; border: 4px dashed #ffb347;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 8px; transition: background 0.2s;
+  }
+  .zona-suelta.sobre-drop { background: #ffe0b2; }
+  .circulos-decena {
+    display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;
+    margin: 15px 0; min-height: 130px;
+  }
+  .circulo {
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 5px dashed #b0bec5; background: #eceff1;
+    display: flex; flex-wrap: wrap; align-content: center;
+    justify-content: center; align-items: center; gap: 2px;
+    padding: 12px; transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .circulo.vacio::before {
+    content: "10"; position: absolute; font-size: 3rem;
+    color: #cfd8dc; font-weight: bold; z-index: 0;
+  }
+  .circulo.sobre-drop { border-color: #4caf50; background: #c8e6c9; transform: scale(1.05); }
+  .circulo.completo {
+    border: 5px solid #2e7d32; background: #a5d6a7;
+    box-shadow: 0 0 15px rgba(46,125,50,0.5);
+  }
+  .circulo.completo::after {
+    content: "✓ 10"; position: absolute; top: 2px; right: 6px;
+    font-size: 0.9rem; color: #1b5e20; font-weight: bold;
+  }
+  .circulo.parcial {
+    border: 4px dashed #f57c00; background: #fff3e0;
+  }
+  .circulo.parcial::after {
+    content: "faltan"; position: absolute; bottom: 2px; left: 0; right: 0;
+    text-align: center; font-size: 0.75rem; color: #e65100; font-weight: bold;
+  }
+  .icono {
+    font-size: 1.8rem; line-height: 1; cursor: grab;
+    user-select: none; touch-action: none; transition: transform 0.1s; z-index: 1;
+  }
+  .icono:active { cursor: grabbing; transform: scale(1.2); }
+  .icono.arrastrando { opacity: 0.4; }
+  .icono.dentro-circulo { font-size: 1.3rem; cursor: pointer; }
+  .icono.dentro-circulo:hover { transform: scale(1.2); }
+  .unidades-restantes {
+    text-align: center; font-size: 1.2rem; font-weight: bold;
+    color: #e65100; padding: 8px;
+  }
+  .formulario-respuesta {
+    background: #fff3e0; border: 4px solid #ff9800; border-radius: 25px;
+    padding: 15px; margin-top: 12px; display: flex;
+    justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;
+  }
+  .formulario-respuesta label { font-size: 1.15rem; font-weight: bold; color: #bf360c; }
+  .formulario-respuesta input {
+    font-size: 1.6rem; width: 80px; text-align: center; font-weight: bold;
+    border: 3px solid #ff9800; border-radius: 15px; padding: 6px;
+    font-family: inherit; color: #bf360c;
+  }
+  .feedback {
+    text-align: center; font-size: 1.3rem; font-weight: bold;
+    padding: 12px; min-height: 55px; color: #2e7d32;
+    background: #f1f8e9; border-radius: 20px; margin-top: 10px;
+  }
+  .feedback.error { color: #c62828; background: #ffebee; }
+  .feedback.exito { color: #2e7d32; background: #e8f5e9; }
+  .feedback.info { color: #0d47a1; background: #e3f2fd; }
+  /* JUEGO 2 */
+  .base10-zona {
+    background: #f3e5f5; border-radius: 25px; padding: 20px;
+    border: 4px dashed #9c27b0; display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 15px; min-height: 150px; align-items: center;
+  }
+  .barra-decena-visual {
+    background: linear-gradient(90deg, #a1887f 0%, #8d6e63 100%);
+    width: 30px; height: 90px; border-radius: 8px; position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: space-around; box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    border: 2px solid #4e342e;
+  }
+  .barra-decena-visual::before {
+    content: "10"; position: absolute; top: -25px;
+    font-size: 0.85rem; font-weight: bold; color: #4e342e;
+  }
+  .barra-decena-visual .linea { width: 80%; height: 2px; background: #4e342e; }
+  .unidad-visual {
+    background: #ffd54f; width: 30px; height: 30px; border-radius: 8px;
+    border: 2px solid #f57f17; box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+  .pregunta-caja {
+    background: #e1f5fe; border: 4px solid #0288d1; border-radius: 22px;
+    padding: 20px; font-size: 1.35rem; font-weight: bold;
+    color: #01579b; text-align: center; margin: 15px 0; line-height: 1.5;
+    min-height: 90px; display: flex; align-items: center; justify-content: center;
+  }
+  .opciones-respuesta {
+    display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 18px 0;
+  }
+  .opcion-btn {
+    font-size: 1.8rem; padding: 14px 30px; border-radius: 25px;
+    border: 4px solid #4caf50; background: white; color: #1b5e20;
+    font-weight: bold; cursor: pointer; font-family: inherit;
+    box-shadow: 0 6px 0 #2e7d32; min-width: 90px;
+  }
+  .opcion-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #2e7d32; }
+  .opcion-btn:disabled { opacity: 0.6; pointer-events: none; }
+  .opcion-btn.correcto { background: #a5d6a7; }
+  .opcion-btn.incorrecto { background: #ef9a9a; }
+  /* JUEGO 3 */
+  .problema-caja {
+    background: #e1f5fe; border-radius: 25px; padding: 18px;
+    border: 4px solid #0288d1; font-size: 1.15rem; line-height: 1.6;
+    margin-bottom: 15px; color: #01579b;
+  }
+  .tablero-posicional { display: flex; gap: 15px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+  .columna-tab {
+    flex: 0 0 140px; background: #fff9c4; border-radius: 20px;
+    border: 4px solid #fbc02d; padding: 10px; text-align: center;
+  }
+  .columna-tab h3 {
+    background: #fbc02d; color: #4e342e; padding: 8px;
+    border-radius: 15px; margin-bottom: 8px; font-size: 1rem;
+  }
+  .columna-tab .valor {
+    font-size: 3rem; font-weight: bold; color: #bf360c;
+    background: white; border-radius: 15px; padding: 5px;
+    min-height: 75px; display: flex; align-items: center;
+    justify-content: center; border: 3px solid #ffb300;
+  }
+  .bienvenida-emoji { animation: girar 3s infinite linear; }
+  @keyframes girar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (max-width: 600px) {
+    h1 { font-size: 1.4rem; }
+    .menu-btn { flex: 1 1 100%; }
+    .circulo { width: 120px; height: 120px; }
+    .icono { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PANTALLA INICIO ============ -->
+<div id="pantalla-inicio" class="pantalla">
+  <div class="emoji-grande bienvenida-emoji">🌟</div>
+  <h1>¡Bienvenido a Juegos Matemáticos!</h1>
+  <h2>Contando hasta 30</h2>
+  <p style="font-size:1.2rem; margin:15px 0; color:#5d4037;">
+    Antes de empezar, escribe tu nombre 👇
+  </p>
+  <input type="text" id="input-nombre" placeholder="Escribe tu nombre aquí" maxlength="20" autofocus>
+  <p id="error-nombre" style="color:#c62828; font-size:1rem; min-height:22px;"></p>
+  <button class="btn-grande" id="btn-empezar">🎮 ¡COMENZAR A JUGAR! 🎮</button>
+</div>
+
+<!-- ============ MENÚ ============ -->
+<div id="pantalla-menu" class="pantalla oculto">
+  <h1>¡Hola, <span id="nombre-mostrado">amigo</span>! 👋</h1>
+  <h2>Elige un juego para aprender</h2>
+  <div class="menu-opciones">
+    <button class="menu-btn" data-juego="1">
+      <span class="numero">1</span>
+      <div class="titulo">Agrupa y Cuenta</div>
+      <div class="desc">Arrastra objetos a los círculos y escribe decenas y unidades.</div>
+    </button>
+    <button class="menu-btn" data-juego="2">
+      <span class="numero">2</span>
+      <div class="titulo">Base Diez</div>
+      <div class="desc">Aprende a agrupar respondiendo preguntas hasta el 30.</div>
+    </button>
+    <button class="menu-btn" data-juego="3">
+      <span class="numero">3</span>
+      <div class="titulo">Problemas Reales</div>
+      <div class="desc">Resuelve problemas y ubica los números en el tablero.</div>
+    </button>
+  </div>
+</div>
+
+<!-- ============ JUEGO 1 ============ -->
+<div id="juego-1" class="pantalla oculto">
+  <div class="cabecera-juego">
+    <button class="btn-secundario" onclick="volverAlMenu()">⬅️ Volver al menú</button>
+    <span class="saludo">👦 <span id="j1-nombre">amigo</span></span>
+  </div>
+  <h1>🔵 Juego 1: Agrupa y Cuenta</h1>
+  <div class="instruccion-drag">
+    ✋ <b>ARRASTRA</b> los objetos a los círculos para formar decenas (10).<br>
+    🌱 Los objetos que <b>no completes</b> pueden quedarse en un círculo o en la zona amarilla (serán tus unidades).<br>
+    ✍️ Al final escribe <b>cuántas decenas</b> y <b>cuántas unidades</b> tienes.
+  </div>
+  <div class="marcador">
+    <span>✅ Aciertos: <span id="j1-aciertos">0</span></span>
+    <span>📊 Ronda: <span id="j1-ronda">0</span> / 60</span>
+    <span>🎯 Total: <span id="j1-cantidad">0</span></span>
+  </div>
+  <p style="text-align:center; font-weight:bold; color:#5d4037;">📦 Objetos sueltos (los que sobran son unidades):</p>
+  <div class="zona-suelta" id="j1-zona-suelta"></div>
+  <p style="text-align:center; font-weight:bold; color:#5d4037; margin-top:12px;">
+    🔵 Círculos para formar decenas (máx. 3):
+  </p>
+  <div class="circulos-decena" id="j1-circulos"></div>
+  <div class="unidades-restantes" id="j1-unidades-info"></div>
+
+  <div class="formulario-respuesta" id="j1-formulario">
+    <label>✍️ Decenas:</label>
+    <input type="number" id="j1-input-dec" min="0" max="3" placeholder="?">
+    <label>✍️ Unidades:</label>
+    <input type="number" id="j1-input-uni" min="0" max="9" placeholder="?">
+    <button class="btn-grande" id="j1-comprobar"
+      style="background: linear-gradient(180deg,#81c784 0%,#388e3c 100%); box-shadow: 0 8px 0 #1b5e20; font-size:1.2rem; padding:12px 25px;">
+      ✅ COMPROBAR
+    </button>
+  </div>
+
+  <div class="selector-numero" style="justify-content:center;">
+    <button class="btn-grande" id="j1-devolver"
+      style="background: linear-gradient(180deg,#9575cd 0%,#5e35b1 100%); box-shadow: 0 8px 0 #311b92; font-size:1.1rem; padding:12px 22px;">
+      ↩️ DEVOLVER TODOS LOS OBJETOS
+    </button>
+    <button class="btn-grande" id="j1-nuevo"
+      style="background: linear-gradient(180deg,#ffb74d 0%,#f57c00 100%); box-shadow: 0 8px 0 #e65100;">
+      🔄 NUEVO
+    </button>
+  </div>
+  <div class="feedback" id="j1-feedback">Arrastra los objetos a los círculos 👆</div>
+</div>
+
+<!-- ============ JUEGO 2 ============ -->
+<div id="juego-2" class="pantalla oculto">
+  <div class="cabecera-juego">
+    <button class="btn-secundario" onclick="volverAlMenu()">⬅️ Volver al menú</button>
+    <span class="saludo">👦 <span id="j2-nombre">amigo</span></span>
+  </div>
+  <h1>🟫 Juego 2: Base Diez</h1>
+  <div class="instruccion">
+    👇 Lee la pregunta y presiona el botón con la respuesta correcta. ¡Aprende a agrupar hasta 30!
+  </div>
+  <div class="marcador">
+    <span>✅ Aciertos: <span id="j2-aciertos">0</span></span>
+    <span>📊 Ronda: <span id="j2-ronda">0</span> / 60</span>
+  </div>
+  <div class="pregunta-caja" id="j2-pregunta">Cargando pregunta...</div>
+  <div class="base10-zona" id="j2-visual"></div>
+  <div class="opciones-respuesta" id="j2-opciones"></div>
+  <div class="feedback" id="j2-feedback">Elige una respuesta 👆</div>
+</div>
+
+<!-- ============ JUEGO 3 ============ -->
+<div id="juego-3" class="pantalla oculto">
+  <div class="cabecera-juego">
+    <button class="btn-secundario" onclick="volverAlMenu()">⬅️ Volver al menú</button>
+    <span class="saludo">👦 <span id="j3-nombre">amigo</span></span>
+  </div>
+  <h1>📝 Juego 3: Problemas Reales</h1>
+  <div class="instruccion">
+    👇 Lee el problema, elige la respuesta correcta y observa el Tablero Posicional
+  </div>
+  <div class="marcador">
+    <span>✅ Aciertos: <span id="j3-aciertos">0</span></span>
+    <span>📊 Ronda: <span id="j3-ronda">0</span> / 60</span>
+  </div>
+  <div class="problema-caja" id="j3-problema">Cargando problema...</div>
+  <p style="text-align:center; font-weight:bold; font-size:1.1rem; color:#5d4037;">
+    🎯 Presiona uno de los botones verdes:
+  </p>
+  <div class="opciones-respuesta" id="j3-opciones"></div>
+  <p style="text-align:center; font-weight:bold; font-size:1.1rem; color:#5d4037; margin-top:12px;">
+    📋 Tablero de Valor Posicional:
+  </p>
+  <div class="tablero-posicional">
+    <div class="columna-tab">
+      <h3>DECENAS</h3>
+      <div class="valor" id="j3-decena">?</div>
+    </div>
+    <div class="columna-tab">
+      <h3>UNIDADES</h3>
+      <div class="valor" id="j3-unidad">?</div>
+    </div>
+  </div>
+  <div class="feedback" id="j3-feedback">Elige una respuesta 👆</div>
+</div>
+
+<script>
+// ==================== DATOS GENERALES ====================
+let nombreJugador = '';
+let generoJugador = 'neutro';
+
+const NOMBRES_FEMENINOS = [
+  'kaori','lucía','lucia','ana','sofía','sofia','valeria','camila','isabella',
+  'valentina','daniela','renata','maría','maria','laura','paula','carla',
+  'andrea','gabriela','fernanda','alejandra','catalina','julieta','antonella',
+  'micaela','florencia','agustina','belén','belen','milagros','guadalupe',
+  'ximena','nicole','brianna','abril','danna','emilia','elena','sara',
+  'noa','lía','lia','emma','olivia','mía','mia','luna','alba','clara',
+  'irene','rocio','rocío','pilar','carmen','nuria','alicia','beatriz'
+];
+const NOMBRES_MASCULINOS = [
+  'carlos','pedro','diego','jorge','mateo','sebastián','sebastian','andrés',
+  'andres','alejandro','emilio','juan','josé','jose','luis','miguel','angel',
+  'ángel','manuel','francisco','pablo','sergio','david','daniel','javier',
+  'alberto','raul','raúl','víctor','victor','gabriel','adrián','adrian',
+  'marcos','alonso','bruno','dante','thiago','santiago','benjamín','benjamin',
+  'matías','matias','tomas','tomás','lucas','martín','martin','nicolás','nicolas',
+  'joaquín','joaquin','agustín','agustin','facundo','ignacio','rodrigo',
+  'gonzalo','cristóbal','cristobal','felipe','vicente','renato','alessandro'
+];
+
+function detectarGenero(nombre) {
+  const n = nombre.toLowerCase().trim();
+  if (NOMBRES_FEMENINOS.includes(n)) return 'femenino';
+  if (NOMBRES_MASCULINOS.includes(n)) return 'masculino';
+  if (n.endsWith('a')) return 'femenino';
+  if (n.endsWith('o')) return 'masculino';
+  if (/(el|in|ón|on|or)$/.test(n)) return 'masculino';
+  return 'neutro';
+}
+
+const EMOJIS = ['🍎','🍌','🍇','🍓','🍒','🍉','🍊','🍋','🍑','🥝','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐸','⭐','🌟','✨','⚡','🌈','☀️','🌙','⛅','☁️','🌊','⚽','🏀','🎾','🏐','🎲','🧩','🎈','🎁','🎨','📚','🚗','🚕','🚙','🚌','🚓','🚑','🚒','🚲','✈️','🚀','🍕','🍔','🌭','🍟','🍿','🧁','🍰','🍩','🍪','🍫'];
+
+const OBJETOS_PROBLEMA = [
+  {emoji:'🩹', nombre:'botiquines de primeros auxilios'},
+  {emoji:'✏️', nombre:'lápices'},
+  {emoji:'📓', nombre:'cuadernos'},
+  {emoji:'⚽', nombre:'pelotas'},
+  {emoji:'🍎', nombre:'manzanas'},
+  {emoji:'🧸', nombre:'juguetes'},
+  {emoji:'📚', nombre:'libros'},
+  {emoji:'🖍️', nombre:'colores'},
+  {emoji:'📏', nombre:'reglas'},
+  {emoji:'🎒', nombre:'mochilas'},
+  {emoji:'🍪', nombre:'galletas'},
+  {emoji:'🧃', nombre:'jugos'},
+  {emoji:'🖊️', nombre:'bolígrafos'},
+  {emoji:'📐', nombre:'escuadras'},
+  {emoji:'🎨', nombre:'pinturas'}
+];
+const NOMBRES_PROBLEMA_F = ['Kaori','Lucía','Ana','Sofía','Valeria','Camila','Isabella','Valentina','Daniela','Renata','Laura','Paula','Carla','Andrea','Gabriela'];
+const NOMBRES_PROBLEMA_M = ['Carlos','Pedro','Diego','Jorge','Mateo','Sebastián','Andrés','Alejandro','Emilio','Juan','José','Luis','Miguel','Ángel','Manuel'];
+const CONTEXTOS = ['para las aulas de primaria','para el salón de clases','para los estudiantes','para la biblioteca','para el recreo','para los talleres'];
+
+function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function barajar(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ==================== NAVEGACIÓN ====================
+const pantallaInicio = document.getElementById('pantalla-inicio');
+const pantallaMenu = document.getElementById('pantalla-menu');
+const juego1Div = document.getElementById('juego-1');
+const juego2Div = document.getElementById('juego-2');
+const juego3Div = document.getElementById('juego-3');
+
+function mostrarPantalla(p) {
+  [pantallaInicio, pantallaMenu, juego1Div, juego2Div, juego3Div].forEach(x => x.classList.add('oculto'));
+  p.classList.remove('oculto');
+  window.scrollTo(0, 0);
+}
+function volverAlMenu() { mostrarPantalla(pantallaMenu); }
+
+document.getElementById('btn-empezar').addEventListener('click', () => {
+  const input = document.getElementById('input-nombre');
+  const nombre = input.value.trim();
+  if (nombre.length < 2) {
+    document.getElementById('error-nombre').textContent = '⚠️ Escribe tu nombre (mínimo 2 letras)';
+    input.focus(); return;
+  }
+  nombreJugador = nombre;
+  generoJugador = detectarGenero(nombre);
+  document.getElementById('nombre-mostrado').textContent = nombre;
+  document.getElementById('j1-nombre').textContent = nombre;
+  document.getElementById('j2-nombre').textContent = nombre;
+  document.getElementById('j3-nombre').textContent = nombre;
+  mostrarPantalla(pantallaMenu);
+});
+document.getElementById('input-nombre').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('btn-empezar').click();
+});
+document.querySelectorAll('.menu-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const j = btn.dataset.juego;
+    if (j === '1') { mostrarPantalla(juego1Div); juego1.nuevo(); }
+    if (j === '2') { mostrarPantalla(juego2Div); juego2.nuevo(); }
+    if (j === '3') { mostrarPantalla(juego3Div); juego3.nuevo(); }
+  });
+});
+
+// ==========================================================
+// ============ JUEGO 1: AGRUPA Y CUENTA ====================
+// REGLA PEDAGÓGICA:
+//  - Cada círculo con 10 objetos = 1 DECENA.
+//  - Objetos en círculos incompletos + objetos en zona amarilla = UNIDADES.
+//  - NO se genera error por dejar objetos en zona amarilla.
+//  - Solo se valida que lo escrito coincida con la agrupación real.
+// ==========================================================
+const juego1 = {
+  cantidad: 0, aciertos: 0, ronda: 0, maxRondas: 60,
+  emojisActuales: [], circulosData: [[],[],[]], objetosLibres: [],
+  idCounter: 0, dragElemento: null, yaComprobado: false,
+  init() {
+    document.getElementById('j1-comprobar').addEventListener('click', () => this.comprobar());
+    document.getElementById('j1-nuevo').addEventListener('click', () => this.nuevo());
+    document.getElementById('j1-devolver').addEventListener('click', () => this.devolverTodo());
+  },
+  nuevo() {
+    if (this.ronda >= this.maxRondas) {
+      this.setFeedback('🎉 ¡Completaste las 60 rondas! Eres un campeón 🏆', 'exito');
+      return;
+    }
+    this.ronda++;
+    document.getElementById('j1-ronda').textContent = this.ronda;
+    this.cantidad = rnd(5, 30);
+    document.getElementById('j1-cantidad').textContent = this.cantidad;
+    const pool = barajar(EMOJIS);
+    this.emojisActuales = [];
+    for (let i = 0; i < this.cantidad; i++) this.emojisActuales.push(pool[i % pool.length]);
+    this.objetosLibres = [];
+    this.idCounter = 0;
+    for (let i = 0; i < this.cantidad; i++) {
+      this.objetosLibres.push({ id: 'obj-' + (this.idCounter++), emoji: this.emojisActuales[i] });
+    }
+    this.circulosData = [[],[],[]];
+    this.yaComprobado = false;
+    document.getElementById('j1-input-dec').value = '';
+    document.getElementById('j1-input-uni').value = '';
+    document.getElementById('j1-input-dec').disabled = false;
+    document.getElementById('j1-input-uni').disabled = false;
+    document.getElementById('j1-comprobar').disabled = false;
+    this.renderTodo();
+    this.setFeedback('✋ Arrastra objetos a los círculos. Cada círculo con 10 = 1 decena. Lo que sobre serán unidades.', 'info');
+  },
+  // Cuenta las decenas reales = círculos con EXACTAMENTE 10 objetos
+  contarDecenas() {
+    return this.circulosData.filter(c => c.length === 10).length;
+  },
+  // Cuenta las unidades reales = objetos en círculos incompletos + objetos en zona amarilla
+  contarUnidades() {
+    let unidades = this.objetosLibres.length;
+    this.circulosData.forEach(c => {
+      if (c.length > 0 && c.length < 10) unidades += c.length;
+    });
+    return unidades;
+  },
+  renderTodo() {
+    this.renderZonaSuelta();
+    this.renderCirculos();
+    this.renderInfoUnidades();
+  },
+  renderZonaSuelta() {
+    const zona = document.getElementById('j1-zona-suelta');
+    zona.innerHTML = '';
+    if (this.objetosLibres.length === 0) {
+      zona.innerHTML = '<span style="color:#999; font-style:italic;">No hay objetos sueltos. Los que sobran aparecen aquí.</span>';
+      return;
+    }
+    this.objetosLibres.forEach(obj => {
+      const span = document.createElement('span');
+      span.className = 'icono';
+      span.textContent = obj.emoji;
+      span.dataset.id = obj.id;
+      span.draggable = true;
+      this.attachDragEvents(span, obj);
+      zona.appendChild(span);
+    });
+  },
+  renderCirculos() {
+    const cont = document.getElementById('j1-circulos');
+    cont.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const c = document.createElement('div');
+      c.className = 'circulo';
+      c.dataset.circuloIdx = i;
+      const contenido = this.circulosData[i];
+      if (contenido.length === 0) c.classList.add('vacio');
+      if (contenido.length === 10) c.classList.add('completo');
+      if (contenido.length > 0 && contenido.length < 10) c.classList.add('parcial');
+      contenido.forEach(obj => {
+        const span = document.createElement('span');
+        span.className = 'icono dentro-circulo';
+        span.textContent = obj.emoji;
+        span.dataset.id = obj.id;
+        span.title = 'Clic para devolver a la zona amarilla';
+        span.addEventListener('click', () => this.devolverObjetoDeCirculo(i, obj.id));
+        c.appendChild(span);
+      });
+      this.attachDropEvents(c, i);
+      cont.appendChild(c);
+    }
+  },
+  renderInfoUnidades() {
+    const libres = this.objetosLibres.length;
+    const decenas = this.contarDecenas();
+    const unidades = this.contarUnidades();
+    document.getElementById('j1-unidades-info').innerHTML =
+      `🔵 Decenas (círculos con 10): <b>${decenas}</b> | 🟠 Unidades (objetos sueltos + círculos incompletos): <b>${unidades}</b>`;
+  },
+  attachDragEvents(span, obj) {
+    span.addEventListener('dragstart', (e) => {
+      this.dragElemento = obj;
+      span.classList.add('arrastrando');
+      e.dataTransfer.setData('text/plain', obj.id);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    span.addEventListener('dragend', () => {
+      span.classList.remove('arrastrando');
+      this.dragElemento = null;
+    });
+    span.addEventListener('touchstart', (e) => {
+      this.dragElemento = obj;
+      span.classList.add('arrastrando');
+      e.preventDefault();
+    }, {passive: false});
+    span.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      document.querySelectorAll('.circulo').forEach(c => c.classList.remove('sobre-drop'));
+      if (elem) {
+        const circ = elem.closest('.circulo');
+        if (circ && circ.dataset.circuloIdx !== undefined) {
+          const idx = parseInt(circ.dataset.circuloIdx);
+          if (this.circulosData[idx].length < 10) circ.classList.add('sobre-drop');
+        }
+      }
+    }, {passive: false});
+    span.addEventListener('touchend', (e) => {
+      span.classList.remove('arrastrando');
+      const touch = e.changedTouches[0];
+      const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+      document.querySelectorAll('.circulo').forEach(c => c.classList.remove('sobre-drop'));
+      if (elem) {
+        const circ = elem.closest('.circulo');
+        if (circ && circ.dataset.circuloIdx !== undefined) {
+          this.soltarEnCirculo(parseInt(circ.dataset.circuloIdx));
+        }
+      }
+      this.dragElemento = null;
+    });
+  },
+  attachDropEvents(circulo, idx) {
+    circulo.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (this.circulosData[idx].length < 10) circulo.classList.add('sobre-drop');
+    });
+    circulo.addEventListener('dragleave', () => circulo.classList.remove('sobre-drop'));
+    circulo.addEventListener('drop', (e) => {
+      e.preventDefault();
+      circulo.classList.remove('sobre-drop');
+      this.soltarEnCirculo(idx);
+    });
+  },
+  soltarEnCirculo(idx) {
+    if (!this.dragElemento || this.yaComprobado) return;
+    if (this.circulosData[idx].length >= 10) {
+      this.setFeedback('⚠️ Este círculo ya tiene 10 objetos (decena completa). No puedes poner más aquí.', 'error');
+      return;
+    }
+    const pos = this.objetosLibres.findIndex(o => o.id === this.dragElemento.id);
+    if (pos === -1) return;
+    const [obj] = this.objetosLibres.splice(pos, 1);
+    this.circulosData[idx].push(obj);
+    this.dragElemento = null;
+    this.renderTodo();
+    if (this.circulosData[idx].length === 10) {
+      this.setFeedback(`🎉 ¡Formaste una decena! Círculo ${idx+1} cerrado con 10 objetos.`, 'exito');
+    } else {
+      this.setFeedback(`📦 Círculo ${idx+1} tiene ${this.circulosData[idx].length} objetos (necesita 10 para ser decena).`, 'info');
+    }
+  },
+  devolverObjetoDeCirculo(idx, objId) {
+    if (this.yaComprobado) return;
+    const pos = this.circulosData[idx].findIndex(o => o.id === objId);
+    if (pos === -1) return;
+    const [obj] = this.circulosData[idx].splice(pos, 1);
+    this.objetosLibres.push(obj);
+    this.renderTodo();
+    this.setFeedback(`↩️ Devolviste un objeto a la zona amarilla.`, 'info');
+  },
+  devolverTodo() {
+    if (this.yaComprobado) return;
+    for (let i = 0; i < 3; i++) {
+      while (this.circulosData[i].length > 0) {
+        const obj = this.circulosData[i].pop();
+        this.objetosLibres.push(obj);
+      }
+    }
+    this.renderTodo();
+    this.setFeedback('↩️ Todos los objetos volvieron a la zona amarilla.', 'info');
+  },
+  comprobar() {
+    if (this.yaComprobado) return;
+    const decInput = document.getElementById('j1-input-dec');
+    const uniInput = document.getElementById('j1-input-uni');
+    const decEscrito = parseInt(decInput.value);
+    const uniEscrito = parseInt(uniInput.value);
+
+    if (isNaN(decEscrito) || isNaN(uniEscrito)) {
+      this.setFeedback('⚠️ Escribe un número en Decenas y en Unidades.', 'error');
+      return;
+    }
+
+    // Contar lo que REALMENTE tiene el niño en pantalla
+    const decenasReales = this.contarDecenas();
+    const unidadesReales = this.contarUnidades();
+    const sumaReal = decenasReales * 10 + unidadesReales;
+
+    // 1) Validar que el total coincida con la cantidad pedida
+    if (sumaReal !== this.cantidad) {
+      // No debería pasar porque los objetos no se crean ni destruyen,
+      // pero por seguridad lo dejamos.
+      this.setFeedback(`❌ Algo anda mal: tienes ${sumaReal} objetos pero el total es ${this.cantidad}.`, 'error');
+      return;
+    }
+
+    // 2) Validar lo que escribió
+    if (decEscrito !== decenasReales || uniEscrito !== unidadesReales) {
+      this.setFeedback(
+        `❌ Revisa lo que escribiste. En pantalla tienes ${decenasReales} decena(s) y ${unidadesReales} unidad(es). ` +
+        `Recuerda: cada círculo con 10 = 1 decena, y lo que sobra = unidades.`,
+        'error'
+      );
+      return;
+    }
+
+    // ¡Todo correcto!
+    this.yaComprobado = true;
+    decInput.disabled = true;
+    uniInput.disabled = true;
+    document.getElementById('j1-comprobar').disabled = true;
+    this.setFeedback(
+      `🎉 ¡Excelente, ${nombreJugador}! Tienes ${decenasReales} decena(s) y ${unidadesReales} unidad(es). ` +
+      `Total: ${this.cantidad}.`,
+      'exito'
+    );
+    this.aciertos++;
+    document.getElementById('j1-aciertos').textContent = this.aciertos;
+    setTimeout(() => { if (this.ronda < this.maxRondas) this.nuevo(); }, 2400);
+  },
+  setFeedback(msg, tipo) {
+    const el = document.getElementById('j1-feedback');
+    el.textContent = msg;
+    el.className = 'feedback ' + tipo;
+  }
+};
+
+// ==========================================================
+// ============ JUEGO 2: PREGUNTAS GUIADAS ==================
+// ==========================================================
+const juego2 = {
+  aciertos: 0, ronda: 0, maxRondas: 60, preguntaActual: null,
+  init() {},
+  generarPregunta() {
+    const tipo = rnd(1, 6);
+    if (tipo === 1) {
+      const decenas = rnd(1, 3);
+      const total = decenas * 10;
+      return {
+        pregunta: `🔵 Si agrupas ${total} objetos de 10 en 10, ¿cuántas decenas formas?`,
+        opciones: [decenas-1, decenas, decenas+1].filter(x => x >= 0).sort((a,b)=>a-b),
+        correcta: decenas,
+        visual: this.renderVisual(decenas, 0),
+        explicacion: `${total} ÷ 10 = ${decenas} decenas`
+      };
+    }
+    if (tipo === 2) {
+      const decenas = rnd(1, 3);
+      const total = decenas * 10;
+      return {
+        pregunta: `🔵 Si tienes ${decenas} decena(s), ¿cuántos objetos tienes en total?`,
+        opciones: [total-10, total, total+10].filter(x => x > 0 && x <= 40).sort((a,b)=>a-b),
+        correcta: total,
+        visual: this.renderVisual(decenas, 0),
+        explicacion: `${decenas} × 10 = ${total}`
+      };
+    }
+    if (tipo === 3) {
+      const decenas = rnd(1, 2);
+      const unidades = rnd(1, 9);
+      const total = decenas * 10 + unidades;
+      if (total > 30) return this.generarPregunta();
+      return {
+        pregunta: `🔵 Si tienes ${decenas} decena(s) y ${unidades} unidad(es), ¿cuánto es en total?`,
+        opciones: [total-1, total, total+1].filter(x => x > 0).sort((a,b)=>a-b),
+        correcta: total,
+        visual: this.renderVisual(decenas, unidades),
+        explicacion: `${decenas*10} + ${unidades} = ${total}`
+      };
+    }
+    if (tipo === 4) {
+      const decenas = rnd(1, 2);
+      const unidades = rnd(1, 9);
+      const total = decenas * 10 + unidades;
+      if (total > 30) return this.generarPregunta();
+      const correcta = `${decenas} decena(s) y ${unidades} unidad(es)`;
+      const opciones = [
+        correcta,
+        `${decenas+1} decena(s) y ${unidades} unidad(es)`,
+        `${decenas} decena(s) y ${Math.max(0,unidades-1)} unidad(es)`
+      ];
+      return {
+        pregunta: `🔵 El número ${total}, ¿cómo se descompone en decenas y unidades?`,
+        opciones: barajar(opciones),
+        correcta,
+        visual: this.renderVisual(decenas, unidades),
+        explicacion: `${total} = ${decenas*10} + ${unidades}`,
+        esTexto: true
+      };
+    }
+    if (tipo === 5) {
+      const actual = rnd(10, 29);
+      const faltan = 30 - actual;
+      return {
+        pregunta: `🔵 Si tienes ${actual} objetos, ¿cuántas unidades te faltan para llegar a 30?`,
+        opciones: [faltan-1, faltan, faltan+1].filter(x => x > 0).sort((a,b)=>a-b),
+        correcta: faltan,
+        visual: this.renderVisual(Math.floor(actual/10), actual%10),
+        explicacion: `30 - ${actual} = ${faltan}`
+      };
+    }
+    const decenas = rnd(1, 2);
+    const unidades = rnd(1, 9);
+    const total = decenas * 10 + unidades;
+    if (total > 30) return this.generarPregunta();
+    return {
+      pregunta: `🔵 ¿Cuántas decenas COMPLETAS puedes formar con ${total} objetos?`,
+      opciones: [decenas-1, decenas, decenas+1].filter(x => x >= 0).sort((a,b)=>a-b),
+      correcta: decenas,
+      visual: this.renderVisual(decenas, unidades),
+      explicacion: `Con ${total} objetos formas ${decenas} decena(s) completa(s) y sobran ${unidades}.`
+    };
+  },
+  renderVisual(decenas, unidades) {
+    let html = '';
+    for (let d = 0; d < decenas; d++) {
+      html += '<div class="barra-decena-visual">';
+      for (let i = 0; i < 5; i++) html += '<div class="linea"></div>';
+      html += '</div>';
+    }
+    for (let u = 0; u < unidades; u++) html += '<div class="unidad-visual"></div>';
+    if (html === '') html = '<span style="color:#7b1fa2;">—</span>';
+    return html;
+  },
+  nuevo() {
+    if (this.ronda >= this.maxRondas) {
+      this.setFeedback('🎉 ¡Completaste las 60 preguntas! Eres un campeón 🏆', 'exito');
+      return;
+    }
+    this.ronda++;
+    document.getElementById('j2-ronda').textContent = this.ronda;
+    this.preguntaActual = this.generarPregunta();
+    document.getElementById('j2-pregunta').textContent = this.preguntaActual.pregunta;
+    document.getElementById('j2-visual').innerHTML = this.preguntaActual.visual;
+    this.setFeedback('👆 Presiona la respuesta correcta', '');
+    const cont = document.getElementById('j2-opciones');
+    cont.innerHTML = '';
+    this.preguntaActual.opciones.forEach(op => {
+      const btn = document.createElement('button');
+      btn.className = 'opcion-btn';
+      btn.textContent = op;
+      if (this.preguntaActual.esTexto) btn.style.fontSize = '1.1rem';
+      btn.addEventListener('click', () => this.responder(btn, op));
+      cont.appendChild(btn);
+    });
+  },
+  responder(btn, op) {
+    const botones = document.querySelectorAll('#j2-opciones .opcion-btn');
+    botones.forEach(b => b.disabled = true);
+    if (op === this.preguntaActual.correcta) {
+      btn.classList.add('correcto');
+      this.setFeedback(`✅ ¡Correcto! ${this.preguntaActual.explicacion}`, 'exito');
+      this.aciertos++;
+      document.getElementById('j2-aciertos').textContent = this.aciertos;
+      setTimeout(() => { if (this.ronda < this.maxRondas) this.nuevo(); }, 1800);
+    } else {
+      btn.classList.add('incorrecto');
+      this.setFeedback(`❌ Casi. La respuesta correcta es: ${this.preguntaActual.correcta}. ${this.preguntaActual.explicacion}`, 'error');
+      setTimeout(() => {
+        botones.forEach(b => b.disabled = false);
+        btn.classList.remove('incorrecto');
+      }, 1800);
+    }
+  },
+  setFeedback(msg, tipo) {
+    const el = document.getElementById('j2-feedback');
+    el.textContent = msg;
+    el.className = 'feedback ' + tipo;
+  }
+};
+
+// ==========================================================
+// ============ JUEGO 3: PROBLEMAS CON GÉNERO ==============
+// ==========================================================
+const juego3 = {
+  problemas: [], aciertos: 0, ronda: 0, maxRondas: 60,
+  init() { this.generarProblemas(); },
+  generarProblemas() {
+    this.problemas = [];
+    for (let i = 0; i < 60; i++) {
+      let nombreProblema, generoProblema;
+      if (i % 2 === 0) {
+        nombreProblema = NOMBRES_PROBLEMA_F[(i/2) % NOMBRES_PROBLEMA_F.length];
+        generoProblema = 'femenino';
+      } else {
+        nombreProblema = NOMBRES_PROBLEMA_M[((i-1)/2) % NOMBRES_PROBLEMA_M.length];
+        generoProblema = 'masculino';
+      }
+      const obj = OBJETOS_PROBLEMA[i % OBJETOS_PROBLEMA.length];
+      const ctx = CONTEXTOS[i % CONTEXTOS.length];
+      let c1 = rnd(5, 18);
+      let c2 = rnd(3, 12);
+      if (c1 + c2 > 30) {
+        c1 = Math.min(c1, 20);
+        c2 = Math.min(c2, 30 - c1);
+      }
+      const total = c1 + c2;
+      const decenas = Math.floor(total / 10);
+      const unidades = total % 10;
+
+      const articulo = generoProblema === 'femenino' ? 'La' : 'El';
+      const cargo = generoProblema === 'femenino' ? 'profesora' : 'profesor';
+      const encargado = generoProblema === 'femenino' ? 'encargada' : 'encargado';
+
+      const texto = `${articulo} ${cargo} ${nombreProblema}, ${encargado} de la Comisión de Gestión del Riesgo de Desastres, compró ${c1} ${obj.nombre} ${ctx}. Luego compró ${c2} ${obj.nombre} más para completar la entrega a todas las aulas del colegio. ¿Cuántos ${obj.nombre} compró en total ${articulo.toLowerCase()} ${cargo} ${nombreProblema}?`;
+      const setOp = new Set([total]);
+      while (setOp.size < 3) {
+        let f = total + rnd(-5, 5);
+        if (f < 5) f = 5;
+        if (f > 30) f = 30;
+        if (f !== total) setOp.add(f);
+      }
+      this.problemas.push({
+        texto, total, decenas, unidades,
+        opciones: barajar(Array.from(setOp)),
+        emoji: obj.emoji
+      });
+    }
+    this.problemas = barajar(this.problemas);
+  },
+  nuevo() {
+    if (this.ronda >= this.maxRondas) {
+      this.setFeedback('🎉 ¡Completaste las 60 rondas! Eres un campeón 🏆', 'exito');
+      return;
+    }
+    this.ronda++;
+    document.getElementById('j3-ronda').textContent = this.ronda;
+    const p = this.problemas[(this.ronda - 1) % this.problemas.length];
+    document.getElementById('j3-problema').innerHTML = `${p.emoji} ${p.texto}`;
+    document.getElementById('j3-decena').textContent = '?';
+    document.getElementById('j3-unidad').textContent = '?';
+    this.setFeedback('👆 Presiona uno de los botones verdes para responder', '');
+    const cont = document.getElementById('j3-opciones');
+    cont.innerHTML = '';
+    p.opciones.forEach(op => {
+      const btn = document.createElement('button');
+      btn.className = 'opcion-btn';
+      btn.textContent = op;
+      btn.addEventListener('click', () => this.responder(btn, op, p));
+      cont.appendChild(btn);
+    });
+  },
+  responder(btn, op, p) {
+    const botones = document.querySelectorAll('#j3-opciones .opcion-btn');
+    botones.forEach(b => b.disabled = true);
+    if (op === p.total) {
+      btn.classList.add('correcto');
+      document.getElementById('j3-decena').textContent = p.decenas;
+      document.getElementById('j3-unidad').textContent = p.unidades;
+      this.setFeedback(`✅ ¡Excelente! La respuesta es ${p.total} = ${p.decenas} decena(s) y ${p.unidades} unidad(es)`, 'exito');
+      this.aciertos++;
+      document.getElementById('j3-aciertos').textContent = this.aciertos;
+      setTimeout(() => { if (this.ronda < this.maxRondas) this.nuevo(); }, 2000);
+    } else {
+      btn.classList.add('incorrecto');
+      this.setFeedback(`❌ Incorrecto. Vuelve a intentarlo. Pista: la respuesta está entre 0 y 30.`, 'error');
+      setTimeout(() => {
+        botones.forEach(b => b.disabled = false);
+        btn.classList.remove('incorrecto');
+      }, 1200);
+    }
+  },
+  setFeedback(msg, tipo) {
+    const el = document.getElementById('j3-feedback');
+    el.textContent = msg;
+    el.className = 'feedback ' + tipo;
+  }
+};
+
+// Inicializar
+juego1.init();
+juego2.init();
+juego3.init();
+</script>
+</body>
+</html>
