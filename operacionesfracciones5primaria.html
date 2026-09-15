@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fracciones divertidas - 5º grado</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background: linear-gradient(145deg, #f9e8b5 0%, #f5d9a0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .game-container {
+            max-width: 900px;
+            width: 100%;
+            background: #fff6e0;
+            border-radius: 60px 60px 40px 40px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2), inset 0 2px 5px rgba(255, 255, 240, 0.8);
+            padding: 28px 30px 35px;
+            border: 4px solid #ffb347;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            color: #b45f06;
+            text-shadow: 3px 3px 0 #ffd966;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+
+        .subhead {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #7f4f24;
+            background: #fff1c1;
+            border-radius: 40px;
+            padding: 8px 16px;
+            display: inline-block;
+            border: 2px dashed #f4a261;
+            font-weight: 600;
+        }
+
+        .subhead-container { text-align: center; margin-bottom: 20px; }
+
+        .screen { display: none; flex-direction: column; align-items: center; gap: 18px; }
+        .screen.active { display: flex; }
+
+        .input-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label { font-size: 1.3rem; color: #7f4f24; font-weight: bold; }
+
+        input {
+            font-size: 1.3rem;
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: 4px solid #f4a261;
+            background: #fffcf0;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            font-weight: 600;
+            color: #3b2a1a;
+            outline: none;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus { border-color: #e76f51; box-shadow: 0 0 0 4px #ffe0b0; }
+
+        .btn {
+            background: #f4a261;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2d1b0c;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #b45f06, 0 10px 15px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+            font-family: inherit;
+            letter-spacing: 1px;
+            border: 2px solid #ffcf8a;
+            min-width: 200px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn:active { transform: translateY(5px); box-shadow: 0 3px 0 #b45f06, 0 8px 10px rgba(0,0,0,0.1); }
+        .btn:disabled { opacity: 0.5; transform: translateY(4px); box-shadow: 0 4px 0 #b45f06; cursor: not-allowed; }
+
+        .menu-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .menu-btn {
+            background: #e9c46a;
+            box-shadow: 0 8px 0 #b68b40, 0 10px 15px rgba(0,0,0,0.1);
+            font-size: 1.3rem;
+            padding: 22px 22px;
+            min-width: 260px;
+            flex-direction: column;
+            gap: 8px;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .menu-btn .emoji-big { font-size: 2.8rem; }
+
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #ffe8b5;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid #d4a373;
+            font-weight: 600;
+            color: #4e2e1e;
+            font-size: 1rem;
+        }
+
+        .progress {
+            background: #e9c46a;
+            padding: 5px 18px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            border: 2px solid #b68b40;
+        }
+
+        .question-box {
+            background: #fff3d6;
+            border-radius: 50px;
+            padding: 20px 25px;
+            width: 100%;
+            box-shadow: inset 0 0 0 3px #ffe0a3, 0 10px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 3px solid #f4a261;
+        }
+
+        .fraction-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8b4513;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 1.8rem;
+            line-height: 1.1;
+            margin: 0 4px;
+        }
+
+        .frac .num { border-bottom: 4px solid #b45f06; padding: 0 5px; }
+        .frac .den { padding: 0 5px; }
+
+        .problem-image {
+            font-size: 3.2rem;
+            margin: 10px 0;
+            letter-spacing: 8px;
+            filter: drop-shadow(4px 6px 4px rgba(0,0,0,0.15));
+        }
+
+        .problem-text {
+            font-size: 1.25rem;
+            margin: 12px 5px;
+            color: #4e2e1e;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .option-btn {
+            background: #fae1b8;
+            border: 3px solid #c97e3a;
+            border-radius: 40px;
+            padding: 16px 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4b2e14;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 5px 0 #a5581a;
+            font-family: inherit;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+        }
+
+        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 #a5581a; }
+        .option-btn:disabled { cursor: default; }
+
+        .option-btn.correct { background: #95d5b2; border-color: #2d6a4f; box-shadow: 0 5px 0 #1b4332; color: #081c15; }
+        .option-btn.wrong { background: #f8ad9d; border-color: #b23b2e; box-shadow: 0 5px 0 #7f2a1f; color: #3a0c07; }
+
+        .feedback {
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 3rem;
+            color: #2d6a4f;
+            text-shadow: 0 1px 2px white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 5px 0;
+            text-align: center;
+            padding: 0 10px;
+        }
+
+        .feedback.error { color: #b23b2e; }
+
+        .footer-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .small-btn {
+            font-size: 1.05rem;
+            padding: 10px 20px;
+            min-width: auto;
+            background: #d4a373;
+            box-shadow: 0 6px 0 #7f4f24;
+        }
+
+        .results-box {
+            text-align: center;
+            padding: 10px;
+        }
+
+        .results-box .big-emoji { font-size: 3rem; margin-bottom: 10px; }
+        .results-box .title { font-size: 1.8rem; color: #b45f06; font-weight: bold; margin-bottom: 15px; }
+        .results-box .score { font-size: 1.6rem; margin: 10px 0; color: #4e2e1e; }
+        .results-box .percent { font-size: 2.5rem; font-weight: bold; color: #e76f51; margin: 10px 0; }
+        .results-box .msg { font-size: 1.2rem; margin-top: 15px; color: #2d6a4f; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .game-container { padding: 20px 15px; border-radius: 40px; }
+            h1 { font-size: 1.6rem; }
+            .fraction-display { font-size: 1.5rem; }
+            .frac { font-size: 1.5rem; }
+            .options-grid { grid-template-columns: 1fr; }
+            .menu-btn { min-width: 100%; font-size: 1.1rem; padding: 16px; }
+            .option-btn { font-size: 1.3rem; min-height: 60px; }
+            .game-header { font-size: 0.9rem; padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <h1>🧮 FRACCIONES DIVERTIDAS</h1>
+    <div class="subhead-container">
+        <span class="subhead">5º grado · suma, resta, multiplicación y división</span>
+    </div>
+
+    <!-- Pantalla INICIO -->
+    <div id="screen-start" class="screen active">
+        <div class="input-group">
+            <label for="studentName">✏️ Escribe tu nombre:</label>
+            <input type="text" id="studentName" placeholder="Ej: Valeria" autocomplete="off" maxlength="20">
+        </div>
+        <button class="btn" id="btnStart">¡EMPEZAR! 🚀</button>
+        <div style="font-size: 1rem; color: #7f4f24;">Ingresa tu nombre para jugar</div>
+    </div>
+
+    <!-- Pantalla MENÚ -->
+    <div id="screen-menu" class="screen">
+        <div style="font-size: 1.6rem; font-weight: bold; color: #8b4513; text-align: center;" id="welcomeMsg"></div>
+        <div class="menu-buttons">
+            <button class="btn menu-btn" id="btnGameOps">
+                <span class="emoji-big">➕➖✖️➗</span>
+                Operaciones con fracciones
+            </button>
+            <button class="btn menu-btn" id="btnGameProb">
+                <span class="emoji-big">🍕🍫🥛</span>
+                Problemas con imágenes
+            </button>
+        </div>
+        <button class="btn small-btn" id="btnBackToName">⬅️ Volver al inicio</button>
+    </div>
+
+    <!-- Pantalla JUEGO -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <span id="playerNameDisplay">👤 Jugador</span>
+            <span class="progress" id="progressDisplay">0 / 80</span>
+            <span id="modeDisplay">Modo</span>
+        </div>
+
+        <div class="question-box" id="questionBox"></div>
+        <div class="options-grid" id="optionsGrid"></div>
+        <div class="feedback" id="feedbackMsg"></div>
+
+        <div class="footer-nav">
+            <button class="btn small-btn" id="btnExitGame">🏠 Menú principal</button>
+            <button class="btn small-btn" id="btnNextQuestion" disabled>Siguiente ➡️</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============ CONSTANTES ============
+    const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const TOTAL_PREGUNTAS = 80;
+
+    // ============ UTILIDADES FRACCIONES ============
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+    function simplificar(n, d) {
+        if (d === 0) return [n, d];
+        if (n === 0) return [0, 1];
+        const signo = d < 0 ? -1 : 1;
+        n = n * signo;
+        d = d * signo;
+        const g = gcd(Math.abs(n), Math.abs(d));
+        return [n / g, d / g];
+    }
+
+    function formatoFraccion(n, d) {
+        if (d === 1) return `<span style="font-size:1.8rem;">${n}</span>`;
+        return `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+    }
+
+    function fraccionTexto(n, d) {
+        if (d === 1) return `${n}`;
+        return `${n}/${d}`;
+    }
+
+    function resultadoTexto(n, d) {
+        const [sn, sd] = simplificar(n, d);
+        if (sd === 1) return `${sn}`;
+        return `${sn}/${sd}`;
+    }
+
+    function sumaF(n1, d1, n2, d2) { return simplificar(n1 * d2 + n2 * d1, d1 * d2); }
+    function restaF(n1, d1, n2, d2) { return simplificar(n1 * d2 - n2 * d1, d1 * d2); }
+    function multF(n1, d1, n2, d2) { return simplificar(n1 * n2, d1 * d2); }
+    function divF(n1, d1, n2, d2) { return simplificar(n1 * d2, d1 * n2); }
+
+    // ============ GENERADOR DE OPCIONES ============
+    function generarOpciones(correctaTexto, rn, rd) {
+        const opciones = new Set();
+        opciones.add(correctaTexto);
+        let intentos = 0;
+
+        while (opciones.size < 4 && intentos < 200) {
+            intentos++;
+            let fakeN, fakeD;
+            const tipo = Math.floor(Math.random() * 4);
+
+            if (tipo === 0) {
+                // Variar numerador
+                fakeN = rn + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+                fakeD = rd;
+            } else if (tipo === 1) {
+                // Variar denominador
+                fakeN = rn;
+                fakeD = rd + (Math.random() < 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+            } else if (tipo === 2) {
+                // Invertir fracción
+                fakeN = rd;
+                fakeD = rn === 0 ? 2 : rn;
+            } else {
+                // Sumar o restar a ambos
+                fakeN = rn + Math.floor(Math.random() * 4);
+                fakeD = rd + Math.floor(Math.random() * 4);
+            }
+
+            if (fakeD <= 0) fakeD = 2;
+            if (fakeN < 0) fakeN = 1;
+            if (fakeN === 0) fakeN = 1;
+
+            const [sfn, sfd] = simplificar(fakeN, fakeD);
+            if (sfd === 0) continue;
+            const txt = resultadoTexto(sfn, sfd);
+            if (txt !== correctaTexto && !opciones.has(txt)) {
+                opciones.add(txt);
+            }
+        }
+
+        // Relleno por si acaso
+        let relleno = 2;
+        while (opciones.size < 4) {
+            const txt = resultadoTexto(relleno, relleno + 1);
+            if (txt !== correctaTexto) opciones.add(txt);
+            relleno++;
+        }
+
+        const arr = Array.from(opciones);
+        // Mezclar
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // ============ GENERAR PREGUNTAS OPERACIONES ============
+    function generarPreguntasOperaciones() {
+        const preguntas = [];
+        const ops = ['+', '-', '×', '÷'];
+
+        for (let i = 0; i < TOTAL_PREGUNTAS; i++) {
+            const op = ops[i % 4];
+            let n1, d1, n2, d2, valido = false;
+            let intentos = 0;
+
+            while (!valido && intentos < 500) {
+                intentos++;
+                n1 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                d1 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                n2 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                d2 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+
+                if (d1 === 0 || d2 === 0) continue;
+                if (op === '-' && (n1 * d2 < n2 * d1)) continue;
+                if (op === '÷' && n2 === 0) continue;
+
+                valido = true;
+            }
+
+            let resultado;
+            if (op === '+') resultado = sumaF(n1, d1, n2, d2);
+            else if (op === '-') resultado = restaF(n1, d1, n2, d2);
+            else if (op === '×') resultado = multF(n1, d1, n2, d2);
+            else resultado = divF(n1, d1, n2, d2);
+
+            const [rn, rd] = resultado;
+            if (rd === 0 || rn < 0) { i--; continue; }
+
+            const correctaTexto = resultadoTexto(rn, rd);
+            const opciones = generarOpciones(correctaTexto, rn, rd);
+            const frac1 = formatoFraccion(n1, d1);
+            const frac2 = formatoFraccion(n2, d2);
+
+            preguntas.push({
+                tipo: 'operacion',
+                preguntaHTML: `<div class="fraction-display">${frac1} <span style="font-size:2.2rem; margin:0 8px; color:#b45f06;">${op}</span> ${frac2}</div>`,
+                opciones: opciones,
+                correcta: correctaTexto
+            });
+        }
+        return preguntas;
+    }
+
+    // ============ GENERAR PREGUNTAS PROBLEMAS ============
+    function generarPreguntasProblemas() {
+        const preguntas = [];
+        const contextos = [
+            { emoji: '🍕', nombre: 'pizza', plural: 'porciones' },
+            { emoji: '🍫', nombre: 'chocolate', plural: 'barritas' },
+            { emoji: '🥛', nombre: 'leche', plural: 'vasos' },
+            { emoji: '🍰', nombre: 'pastel', plural: 'rebanadas' },
+            { emoji: '🍎', nombre: 'manzana', plural: 'manzanas' },
+            { emoji: '🍪', nombre: 'galleta', plural: 'galletas' },
+            { emoji: '🧃', nombre: 'jugo', plural: 'vasos' },
+            { emoji: '🍞', nombre: 'pan', plural: 'trozos' }
+        ];
+
+        for (let i = 0; i < TOTAL_PREGUNTAS; i++) {
+            const ctx = contextos[i % contextos.length];
+            const op = ['+', '-', '×', '÷'][i % 4];
+            let n1, d1, n2, d2, valido = false;
+            let intentos = 0;
+
+            while (!valido && intentos < 500) {
+                intentos++;
+                n1 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                d1 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                n2 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+                d2 = DIGITS[Math.floor(Math.random() * DIGITS.length)];
+
+                if (d1 === 0 || d2 === 0) continue;
+                if (op === '-' && (n1 * d2 < n2 * d1)) continue;
+                if (op === '÷' && n2 === 0) continue;
+                valido = true;
+            }
+
+            let resultado, textoProblema;
+            const f1HTML = formatoFraccion(n1, d1);
+            const f2HTML = formatoFraccion(n2, d2);
+
+            if (op === '+') {
+                resultado = sumaF(n1, d1, n2, d2);
+                textoProblema = `Tienes ${f1HTML} de ${ctx.nombre} y consigues ${f2HTML} más. ¿Cuánto tienes en total?`;
+            } else if (op === '-') {
+                resultado = restaF(n1, d1, n2, d2);
+                textoProblema = `Tienes ${f1HTML} de ${ctx.nombre} y regalas ${f2HTML}. ¿Cuánto te queda?`;
+            } else if (op === '×') {
+                resultado = multF(n1, d1, n2, d2);
+                textoProblema = `Tienes ${f1HTML} de una caja de ${ctx.nombre} y usas ${f2HTML} de esa parte. ¿Cuánto usaste?`;
+            } else {
+                resultado = divF(n1, d1, n2, d2);
+                textoProblema = `Divides ${f1HTML} de ${ctx.nombre} en partes de ${f2HTML}. ¿Cuántas partes obtienes?`;
+            }
+
+            const [rn, rd] = resultado;
+            if (rd === 0 || rn < 0) { i--; continue; }
+
+            const correctaTexto = resultadoTexto(rn, rd);
+            const opciones = generarOpciones(correctaTexto, rn, rd);
+
+            preguntas.push({
+                tipo: 'problema',
+                preguntaHTML: `
+                    <div class="problem-image">${ctx.emoji} ${ctx.emoji} ${ctx.emoji}</div>
+                    <div class="problem-text">${textoProblema}</div>
+                `,
+                opciones: opciones,
+                correcta: correctaTexto
+            });
+        }
+        return preguntas;
+    }
+
+    // ============ ESTADO ============
+    const state = {
+        nombre: '',
+        modo: null,
+        preguntas: [],
+        indice: 0,
+        puntaje: 0,
+        respondida: false
+    };
+
+    // ============ DOM ============
+    const screenStart = document.getElementById('screen-start');
+    const screenMenu = document.getElementById('screen-menu');
+    const screenGame = document.getElementById('screen-game');
+    const inputNombre = document.getElementById('studentName');
+    const btnStart = document.getElementById('btnStart');
+    const welcomeMsg = document.getElementById('welcomeMsg');
+    const btnGameOps = document.getElementById('btnGameOps');
+    const btnGameProb = document.getElementById('btnGameProb');
+    const btnBackToName = document.getElementById('btnBackToName');
+    const questionBox = document.getElementById('questionBox');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+    const progressDisplay = document.getElementById('progressDisplay');
+    const playerNameDisplay = document.getElementById('playerNameDisplay');
+    const modeDisplay = document.getElementById('modeDisplay');
+    const btnExitGame = document.getElementById('btnExitGame');
+    const btnNextQuestion = document.getElementById('btnNextQuestion');
+
+    // ============ FUNCIONES DE JUEGO ============
+    function cambiarPantalla(pantalla) {
+        screenStart.classList.remove('active');
+        screenMenu.classList.remove('active');
+        screenGame.classList.remove('active');
+        pantalla.classList.add('active');
+    }
+
+    function iniciarJuego(modo) {
+        state.modo = modo;
+        state.indice = 0;
+        state.puntaje = 0;
+        state.respondida = false;
+        state.preguntas = modo === 'operaciones'
+            ? generarPreguntasOperaciones()
+            : generarPreguntasProblemas();
+
+        playerNameDisplay.textContent = `👤 ${state.nombre}`;
+        modeDisplay.textContent = modo === 'operaciones' ? '➕➖✖️➗ Operaciones' : '🍕 Problemas';
+
+        cambiarPantalla(screenGame);
+        mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+        const pregunta = state.preguntas[state.indice];
+        if (!pregunta) return;
+
+        progressDisplay.textContent = `${state.indice + 1} / ${state.preguntas.length}`;
+        questionBox.innerHTML = pregunta.preguntaHTML;
+
+        optionsGrid.innerHTML = '';
+        pregunta.opciones.forEach((opTexto) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.dataset.valor = opTexto;
+
+            if (opTexto.includes('/')) {
+                const partes = opTexto.split('/');
+                btn.innerHTML = formatoFraccion(parseInt(partes[0]), parseInt(partes[1]));
+            } else {
+                btn.innerHTML = `<span style="font-size:1.8rem;">${opTexto}</span>`;
+            }
+
+            btn.addEventListener('click', () => seleccionarOpcion(opTexto, btn));
+            optionsGrid.appendChild(btn);
+        });
+
+        feedbackMsg.innerHTML = '';
+        feedbackMsg.classList.remove('error');
+        btnNextQuestion.disabled = true;
+        state.respondida = false;
+        btnNextQuestion.textContent = (state.indice === state.preguntas.length - 1)
+            ? 'Finalizar 🏁'
+            : 'Siguiente ➡️';
+    }
+
+    function seleccionarOpcion(valor, btn) {
+        if (state.respondida) return;
+
+        const pregunta = state.preguntas[state.indice];
+        const esCorrecta = (valor === pregunta.correcta);
+
+        const todos = document.querySelectorAll('.option-btn');
+        todos.forEach(b => b.disabled = true);
+
+        if (esCorrecta) {
+            btn.classList.add('correct');
+            feedbackMsg.innerHTML = '✅ ¡Correcto! ¡Muy bien!';
+            feedbackMsg.classList.remove('error');
+            state.puntaje++;
+        } else {
+            btn.classList.add('wrong');
+            todos.forEach(b => {
+                if (b.dataset.valor === pregunta.correcta) b.classList.add('correct');
+            });
+            feedbackMsg.innerHTML = `❌ Incorrecto. La respuesta correcta era: ${pregunta.correcta}`;
+            feedbackMsg.classList.add('error');
+        }
+
+        state.respondida = true;
+        btnNextQuestion.disabled = false;
+    }
+
+    function finalizarJuego() {
+        const total = state.preguntas.length;
+        const puntaje = state.puntaje;
+        const porcentaje = Math.round((puntaje / total) * 100);
+
+        let emoji = '🏆';
+        let mensaje = '';
+
+        if (porcentaje >= 90) { emoji = '🏆'; mensaje = '¡Excelente! Eres un maestro de las fracciones'; }
+        else if (porcentaje >= 70) { emoji = '🌟'; mensaje = '¡Muy bien! Sigue practicando'; }
+        else if (porcentaje >= 50) { emoji = '💪'; mensaje = 'Buen intento, puedes mejorar'; }
+        else { emoji = '📚'; mensaje = 'No te rindas, repasa las fracciones'; }
+
+        questionBox.innerHTML = `
+            <div class="results-box">
+                <div class="big-emoji">${emoji}</div>
+                <div class="title">¡Juego terminado!</div>
+                <div class="score">${state.nombre}, acertaste ${puntaje} de ${total}</div>
+                <div class="percent">${porcentaje}%</div>
+                <div class="msg">${mensaje}</div>
+            </div>
+        `;
+        optionsGrid.innerHTML = '';
+        feedbackMsg.innerHTML = '';
+        btnNextQuestion.disabled = true;
+        btnNextQuestion.textContent = '🏠 Volver al menú';
+        btnNextQuestion.onclick = () => {
+            btnNextQuestion.onclick = null;
+            cambiarPantalla(screenMenu);
+        };
+    }
+
+    // ============ EVENTOS ============
+    function init() {
+        btnStart.addEventListener('click', () => {
+            const nombre = inputNombre.value.trim();
+            if (!nombre) {
+                alert('Por favor escribe tu nombre para empezar 😊');
+                inputNombre.focus();
+                return;
+            }
+            state.nombre = nombre;
+            welcomeMsg.textContent = `¡Hola, ${nombre}! Elige un juego:`;
+            cambiarPantalla(screenMenu);
+        });
+
+        inputNombre.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') btnStart.click();
+        });
+
+        btnBackToName.addEventListener('click', () => {
+            inputNombre.value = '';
+            cambiarPantalla(screenStart);
+        });
+
+        btnGameOps.addEventListener('click', () => iniciarJuego('operaciones'));
+        btnGameProb.addEventListener('click', () => iniciarJuego('problemas'));
+
+        btnExitGame.addEventListener('click', () => {
+            state.preguntas = [];
+            cambiarPantalla(screenMenu);
+        });
+
+        btnNextQuestion.addEventListener('click', () => {
+            if (!state.respondida) return;
+            if (state.indice < state.preguntas.length - 1) {
+                state.indice++;
+                mostrarPregunta();
+            } else {
+                finalizarJuego();
+            }
+        });
+    }
+
+    // ✅ INICIALIZAR CUANDO CARGA EL DOM
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
