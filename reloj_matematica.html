@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprende la Hora - Fácil y Difícil</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #6dd5ed 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .contenedor {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    padding: 30px;
+    max-width: 850px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  h1 { text-align: center; color: #1e3c72; margin-bottom: 8px; font-size: 1.9rem; }
+  .subtitulo { text-align: center; color: #666; margin-bottom: 22px; font-size: 1rem; }
+
+  /* ---- REGISTRO / MENÚ ---- */
+  #pantallaRegistro { text-align: center; padding: 10px; }
+  #pantallaRegistro p { margin-bottom: 18px; color: #444; font-size: 1.05rem; }
+  #pantallaRegistro input {
+    padding: 12px 18px;
+    font-size: 1.05rem;
+    border: 2px solid #2a5298;
+    border-radius: 10px;
+    width: 280px;
+    max-width: 100%;
+    text-align: center;
+    outline: none;
+  }
+  #pantallaRegistro input:focus { border-color: #6dd5ed; box-shadow: 0 0 0 4px rgba(109,213,237,.3); }
+
+  .tarjetas-modo {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 22px;
+  }
+  .tarjeta-modo {
+    flex: 1;
+    min-width: 230px;
+    max-width: 320px;
+    border-radius: 16px;
+    padding: 22px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    border: 3px solid transparent;
+  }
+  .tarjeta-modo:hover { transform: translateY(-4px); }
+  .tarjeta-modo.facil {
+    background: linear-gradient(160deg, #e8f8ee, #d4edda);
+    border-color: #28a745;
+    box-shadow: 0 8px 22px rgba(40,167,69,.25);
+  }
+  .tarjeta-modo.dificil {
+    background: linear-gradient(160deg, #fdeee8, #f8d7da);
+    border-color: #dc3545;
+    box-shadow: 0 8px 22px rgba(220,53,69,.25);
+  }
+  .tarjeta-modo .emoji { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+  .tarjeta-modo h3 { font-size: 1.25rem; margin-bottom: 6px; }
+  .tarjeta-modo.facil h3 { color: #155724; }
+  .tarjeta-modo.dificil h3 { color: #721c24; }
+  .tarjeta-modo p { font-size: .88rem; color: #555; margin-bottom: 12px; line-height: 1.5; }
+  .tarjeta-modo button { width: 100%; }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    padding: 12px 26px;
+    font-weight: 600;
+    transition: transform .15s, box-shadow .15s;
+  }
+  button:hover:not(:disabled) { transform: translateY(-2px); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .btn-principal { background: linear-gradient(135deg, #2a5298, #1e3c72); color: #fff; box-shadow: 0 6px 16px rgba(30,60,114,.4); }
+  .btn-verde { background: linear-gradient(135deg, #28a745, #1e7e34); color: #fff; box-shadow: 0 6px 16px rgba(40,167,69,.4); }
+  .btn-rojo { background: linear-gradient(135deg, #dc3545, #a71d2a); color: #fff; box-shadow: 0 6px 16px rgba(220,53,69,.4); }
+  .btn-azul { background: linear-gradient(135deg, #17a2b8, #117a8b); color: #fff; box-shadow: 0 6px 16px rgba(23,162,184,.4); }
+  .btn-gris { background: #e9ecef; color: #333; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
+
+  /* ---- PANEL SUPERIOR ---- */
+  #barraInfo { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-bottom: 18px; }
+  .tarjeta-info {
+    flex: 1; min-width: 120px;
+    background: #f1f5fb; border-radius: 12px;
+    padding: 12px 10px; text-align: center;
+    border: 2px solid #dfe8f7;
+  }
+  .tarjeta-info .etiqueta { font-size: .72rem; color: #777; text-transform: uppercase; letter-spacing: .5px; }
+  .tarjeta-info .valor { font-size: 1.3rem; font-weight: 700; color: #1e3c72; }
+  #tiempoRestante { color: #c0392b; }
+  #tiempoRestante.aviso { animation: pulso .8s infinite; }
+  @keyframes pulso { 50% { opacity: .35; } }
+  #lblModo.facil { color: #28a745; }
+  #lblModo.dificil { color: #dc3545; }
+
+  /* ---- JUEGO ---- */
+  #zonaJuego { display: none; text-align: center; }
+  #preguntaTexto { font-size: 1.15rem; color: #333; margin-bottom: 14px; }
+  .area-reloj { display: flex; justify-content: center; margin-bottom: 20px; }
+  svg { filter: drop-shadow(0 6px 14px rgba(0,0,0,.18)); }
+
+  #opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .opcion {
+    background: #eef3fb; border: 2px solid #cfdcf2;
+    border-radius: 12px; padding: 16px 10px;
+    font-size: 1.25rem; font-weight: 700; color: #1e3c72;
+    cursor: pointer; transition: all .2s; user-select: none;
+  }
+  .opcion:hover:not(.bloqueada) { background: #dce8fb; border-color: #2a5298; transform: translateY(-2px); }
+  .opcion.correcta { background: #d4edda; border-color: #28a745; color: #155724; }
+  .opcion.incorrecta { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+  .opcion.bloqueada { cursor: not-allowed; opacity: .75; }
+
+  #feedback { min-height: 30px; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+  .ok { color: #28a745; }
+  .no { color: #dc3545; }
+
+  .enlaces { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  a.enlace-puntaje {
+    display: inline-block; color: #117a8b;
+    font-weight: 700; text-decoration: underline;
+    cursor: pointer; font-size: 1rem;
+  }
+  a.enlace-puntaje:hover { color: #0b5360; }
+
+  /* ---- TABLA ---- */
+  #tablaPuntajes { margin-top: 10px; display: none; }
+  .tabs-tabla { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 9px 18px; border-radius: 20px;
+    border: 2px solid #cfdcf2; background: #eef3fb;
+    color: #1e3c72; font-weight: 700; cursor: pointer;
+    font-size: .9rem;
+  }
+  .tab-btn.activo.facil { background: #28a745; border-color: #28a745; color: #fff; }
+  .tab-btn.activo.dificil { background: #dc3545; border-color: #dc3545; color: #fff; }
+
+  table { width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.12); }
+  th { background: #1e3c72; color: #fff; padding: 11px 8px; font-size: .85rem; text-transform: uppercase; letter-spacing: .4px; }
+  td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #e6ecf5; font-size: .95rem; }
+  tr:nth-child(even) td { background: #f7fafd; }
+  tr:hover td { background: #eaf2fc; }
+
+  /* ---- MODAL ---- */
+  #modal { display: none; position: fixed; inset: 0; background: rgba(10,25,50,.65); z-index: 50; justify-content: center; align-items: center; padding: 15px; }
+  #modal.visible { display: flex; }
+  #modal .caja-modal {
+    background: #fff; border-radius: 18px;
+    max-width: 520px; width: 100%;
+    padding: 26px; max-height: 90vh; overflow-y: auto;
+    text-align: center; animation: aparecer .3s ease;
+  }
+  @keyframes aparecer { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  #modal h2 { color: #1e3c72; margin-bottom: 14px; }
+  #modal .resumen-final { font-size: 1.05rem; color: #444; line-height: 1.7; margin-bottom: 18px; }
+  #modal .resumen-final strong { color: #2a5298; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<div class="contenedor">
+
+  <h1>🕐 Aprende la Hora</h1>
+  <p class="subtitulo">80 preguntas · 2 puntos por acierto · 8 minutos · Dos niveles de dificultad</p>
+
+  <!-- ============ REGISTRO / MENÚ DE MODOS ============ -->
+  <div id="pantallaRegistro">
+    <p>👋 Escribe tu nombre y elige el nivel:</p>
+    <input type="text" id="nombreInput" placeholder="Tu nombre aquí..." maxlength="30" autocomplete="off">
+
+    <div class="tarjetas-modo">
+      <!-- MODO FÁCIL -->
+      <div class="tarjeta-modo facil">
+        <span class="emoji">🟢</span>
+        <h3>Nivel Fácil</h3>
+        <p>Horas en punto, y media y cuartos.<br>Ideal para empezar a leer el reloj.</p>
+        <button class="btn-verde" onclick="iniciarJuego('facil')">▶ Jugar Fácil</button>
+      </div>
+
+      <!-- MODO DIFÍCIL -->
+      <div class="tarjeta-modo dificil">
+        <span class="emoji">🔴</span>
+        <h3>Nivel Difícil</h3>
+        <p>Cualquier minuto (1 a 59).<br>Pon a prueba tu precisión total.</p>
+        <button class="btn-rojo" onclick="iniciarJuego('dificil')">▶ Jugar Difícil</button>
+      </div>
+    </div>
+
+    <div class="enlaces" style="margin-top:24px;">
+      <a class="enlace-puntaje" onclick="abrirTabla('facil')">🏆 Puntajes Fácil</a>
+      <a class="enlace-puntaje" onclick="abrirTabla('dificil')">🏆 Puntajes Difícil</a>
+    </div>
+  </div>
+
+  <!-- ============ JUEGO ============ -->
+  <div id="zonaJuego">
+    <div id="barraInfo">
+      <div class="tarjeta-info"><div class="etiqueta">Jugador</div><div class="valor" id="lblJugador">-</div></div>
+      <div class="tarjeta-info"><div class="etiqueta">Nivel</div><div class="valor" id="lblModo">-</div></div>
+      <div class="tarjeta-info"><div class="etiqueta">Pregunta</div><div class="valor" id="lblPregunta">1/80</div></div>
+      <div class="tarjeta-info"><div class="etiqueta">Puntaje</div><div class="valor" id="lblPuntaje">0</div></div>
+      <div class="tarjeta-info"><div class="etiqueta">Tiempo</div><div class="valor" id="tiempoRestante">08:00</div></div>
+    </div>
+
+    <div id="preguntaTexto">¿Qué hora marca el reloj?</div>
+    <div class="area-reloj">
+      <svg id="reloj" width="230" height="230" viewBox="0 0 230 230" aria-label="Reloj analógico"></svg>
+    </div>
+
+    <div id="opciones"></div>
+    <div id="feedback"></div>
+
+    <div class="enlaces">
+      <a class="enlace-puntaje" onclick="abrirTabla(modoActual)">🏆 Ver puntajes de este nivel</a>
+    </div>
+  </div>
+
+  <!-- ============ TABLA ============ -->
+  <div id="tablaPuntajes">
+    <h2 style="text-align:center;color:#1e3c72;margin-bottom:14px;font-size:1.2rem;">🏆 Tabla de Puntajes</h2>
+
+    <div class="tabs-tabla">
+      <button class="tab-btn facil" id="tabFacil" onclick="abrirTabla('facil')">🟢 Fácil</button>
+      <button class="tab-btn dificil" id="tabDificil" onclick="abrirTabla('dificil')">🔴 Difícil</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>#</th><th>Jugador</th><th>Puntaje</th><th>Aciertos</th><th>Fecha</th></tr>
+      </thead>
+      <tbody id="cuerpoTabla"></tbody>
+    </table>
+    <div class="enlaces" style="margin-top:18px;">
+      <button class="btn-gris" onclick="cerrarTabla()">← Volver</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ MODAL FIN DE TIEMPO ============ -->
+<div id="modal">
+  <div class="caja-modal">
+    <h2>⏰ ¡Tiempo terminado!</h2>
+    <div class="resumen-final" id="resumenFinal"></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-verde" onclick="cerrarModalYReiniciar()">🔄 Jugar de nuevo</button>
+      <button class="btn-azul" onclick="cerrarModalYVerTabla()">🏆 Ver tabla</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   ========================================================= */
+const TOTAL_PREGUNTAS = 80;
+const PUNTOS_POR_ACIERTO = 2;
+const TIEMPO_JUEGO = 8 * 60;
+const CLAVE_STORAGE = 'puntajesRelojesPorNivel';
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+let jugador = '';
+let modoActual = 'facil';
+let indicePregunta = 0;
+let puntaje = 0;
+let aciertos = 0;
+let preguntas = [];
+let tiempoRestante = TIEMPO_JUEGO;
+let intervalo = null;
+let bloqueado = false;
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+function dosDigitos(n) { return n < 10 ? '0' + n : '' + n; }
+
+function formatearHora(hora, minuto) {
+  const h12 = hora === 0 ? 12 : (hora > 12 ? hora - 12 : hora);
+  const sufijo = hora < 12 ? 'AM' : 'PM';
+  return `${h12}:${dosDigitos(minuto)} ${sufijo}`;
+}
+
+/* =========================================================
+   GENERACIÓN DE PREGUNTAS SEGÚN EL NIVEL
+   FÁCIL: minutos en {0, 15, 30, 45}
+   DIFÍCIL: minutos 0-59 (precisión total)
+   ========================================================= */
+function generarPreguntas(nivel) {
+  const lista = [];
+  const MIN_FACIL = [0, 15, 30, 45];
+  const MAX_INTENTOS = 5000;
+  let intentos = 0;
+
+  while (lista.length < TOTAL_PREGUNTAS && intentos < MAX_INTENTOS) {
+    intentos++;
+
+    const hora = Math.floor(Math.random() * 12); // 0 a 11
+    let minuto;
+
+    if (nivel === 'facil') {
+      minuto = MIN_FACIL[Math.floor(Math.random() * MIN_FACIL.length)];
+    } else {
+      minuto = Math.floor(Math.random() * 60); // 0 a 59
+    }
+
+    const clave = hora + ':' + minuto;
+
+    // Evitar pregunta idéntica a la anterior
+    if (lista.length > 0 && lista[lista.length - 1].clave === clave) continue;
+
+    // Correcta + 3 distractores distintos
+    const correcta = formatearHora(hora, minuto);
+    const opcionesSet = new Set([correcta]);
+    let intentosOpc = 0;
+
+    while (opcionesSet.size < 4 && intentosOpc < 300) {
+      intentosOpc++;
+      let hOtra = hora, mOtra = minuto;
+
+      const tipo = Math.floor(Math.random() * 3);
+      if (tipo === 0) {
+        hOtra = (hora + (Math.random() < 0.5 ? 1 : -1) + 12) % 12;
+      } else if (tipo === 1) {
+        mOtra = nivel === 'facil'
+          ? MIN_FACIL[Math.floor(Math.random() * MIN_FACIL.length)]
+          : Math.floor(Math.random() * 60);
+      } else {
+        hOtra = (hora + (Math.random() < 0.5 ? 1 : -1) + 12) % 12;
+        mOtra = nivel === 'facil'
+          ? MIN_FACIL[Math.floor(Math.random() * MIN_FACIL.length)]
+          : Math.floor(Math.random() * 60);
+      }
+      opcionesSet.add(formatearHora(hOtra, mOtra));
+    }
+
+    // Relleno de seguridad
+    while (opcionesSet.size < 4) {
+      const mR = nivel === 'facil' ? MIN_FACIL[0] : 0;
+      opcionesSet.add(formatearHora(Math.floor(Math.random() * 12), mR));
+    }
+
+    const opciones = Array.from(opcionesSet).sort(() => Math.random() - 0.5);
+
+    lista.push({ clave, hora, minuto, correcta, opciones });
+  }
+
+  return lista;
+}
+
+/* =========================================================
+   DIBUJO DEL RELOJ ANALÓGICO
+   ========================================================= */
+function dibujarReloj(hora, minuto) {
+  const svg = document.getElementById('reloj');
+  const cx = 115, cy = 115, r = 105;
+
+  let contenido = '';
+  contenido += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" stroke="#1e3c72" stroke-width="6"/>`;
+  contenido += `<circle cx="${cx}" cy="${cy}" r="${r - 6}" fill="none" stroke="#cfdcf2" stroke-width="2"/>`;
+
+  for (let i = 0; i < 60; i++) {
+    const ang = (i * 6) * Math.PI / 180;
+    const esHora = i % 5 === 0;
+    const rIni = esHora ? r - 16 : r - 9;
+    const rFin = r - 4;
+    const x1 = cx + rIni * Math.sin(ang);
+    const y1 = cy - rIni * Math.cos(ang);
+    const x2 = cx + rFin * Math.sin(ang);
+    const y2 = cy - rFin * Math.cos(ang);
+    contenido += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${esHora ? '#1e3c72' : '#9db4d6'}" stroke-width="${esHora ? 3.5 : 1.4}" stroke-linecap="round"/>`;
+  }
+
+  const numeros = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  numeros.forEach((num, idx) => {
+    const ang = (idx * 30) * Math.PI / 180;
+    const rNum = r - 30;
+    const x = cx + rNum * Math.sin(ang);
+    const y = cy - rNum * Math.cos(ang);
+    contenido += `<text x="${x}" y="${y + 6}" text-anchor="middle" font-size="19" font-weight="700" fill="#1e3c72" font-family="Arial">${num}</text>`;
+  });
+
+  contenido += `<circle cx="${cx}" cy="${cy}" r="7" fill="#1e3c72"/>`;
+
+  // Manecilla de hora (avanza con los minutos)
+  const angHora = ((hora % 12) * 30 + minuto * 0.5) * Math.PI / 180;
+  const rHora = r - 48;
+  const xH = cx + rHora * Math.sin(angHora);
+  const yH = cy - rHora * Math.cos(angHora);
+  contenido += `<line x1="${cx}" y1="${cy}" x2="${xH}" y2="${yH}" stroke="#1e3c72" stroke-width="9" stroke-linecap="round"/>`;
+
+  // Manecilla de minutos
+  const angMin = (minuto * 6) * Math.PI / 180;
+  const rMin = r - 26;
+  const xM = cx + rMin * Math.sin(angMin);
+  const yM = cy - rMin * Math.cos(angMin);
+  contenido += `<line x1="${cx}" y1="${cy}" x2="${xM}" y2="${yM}" stroke="#2a5298" stroke-width="6" stroke-linecap="round"/>`;
+
+  contenido += `<circle cx="${cx}" cy="${cy}" r="4" fill="#fff"/>`;
+  svg.innerHTML = contenido;
+}
+
+/* =========================================================
+   FLUJO DEL JUEGO
+   ========================================================= */
+function iniciarJuego(nivel) {
+  const input = document.getElementById('nombreInput');
+  const nombre = input.value.trim();
+
+  if (nombre === '') {
+    alert('⚠️ Por favor, escribe tu nombre antes de comenzar.');
+    input.focus();
+    return;
+  }
+
+  jugador = nombre;
+  modoActual = nivel;
+
+  preguntas = generarPreguntas(nivel);
+  indicePregunta = 0;
+  puntaje = 0;
+  aciertos = 0;
+  tiempoRestante = TIEMPO_JUEGO;
+  bloqueado = false;
+
+  document.getElementById('pantallaRegistro').style.display = 'none';
+  document.getElementById('tablaPuntajes').style.display = 'none';
+  document.getElementById('zonaJuego').style.display = 'block';
+
+  document.getElementById('lblJugador').textContent = jugador;
+
+  const lblModo = document.getElementById('lblModo');
+  lblModo.textContent = nivel === 'facil' ? 'Fácil' : 'Difícil';
+  lblModo.className = 'valor ' + nivel;
+
+  clearInterval(intervalo);
+  intervalo = setInterval(actualizarTiempo, 1000);
+  actualizarTiempoVisual();
+
+  mostrarPregunta();
+}
+
+function actualizarTiempo() {
+  tiempoRestante--;
+  actualizarTiempoVisual();
+  if (tiempoRestante <= 0) {
+    clearInterval(intervalo);
+    finalizarJuego();
+  }
+}
+
+function actualizarTiempoVisual() {
+  const el = document.getElementById('tiempoRestante');
+  const m = Math.floor(tiempoRestante / 60);
+  const s = tiempoRestante % 60;
+  el.textContent = `${dosDigitos(m)}:${dosDigitos(s)}`;
+  if (tiempoRestante <= 60) el.classList.add('aviso');
+  else el.classList.remove('aviso');
+}
+
+function mostrarPregunta() {
+  if (indicePregunta >= TOTAL_PREGUNTAS) {
+    clearInterval(intervalo);
+    finalizarJuego();
+    return;
+  }
+
+  bloqueado = false;
+  const p = preguntas[indicePregunta];
+
+  document.getElementById('lblPregunta').textContent = `${indicePregunta + 1}/${TOTAL_PREGUNTAS}`;
+  document.getElementById('lblPuntaje').textContent = puntaje;
+  document.getElementById('preguntaTexto').innerHTML = '¿Qué hora marca el reloj?';
+  document.getElementById('feedback').textContent = '';
+
+  dibujarReloj(p.hora, p.minuto);
+
+  const cont = document.getElementById('opciones');
+  cont.innerHTML = '';
+
+  p.opciones.forEach(op => {
+    const div = document.createElement('div');
+    div.className = 'opcion';
+    div.textContent = op;
+    div.addEventListener('click', () => responder(div, op, p.correcta));
+    cont.appendChild(div);
+  });
+}
+
+function responder(elemento, elegida, correcta) {
+  if (bloqueado) return;
+  bloqueado = true;
+
+  const feedback = document.getElementById('feedback');
+  const todasOpciones = document.querySelectorAll('.opcion');
+  todasOpciones.forEach(o => o.classList.add('bloqueada'));
+
+  if (elegida === correcta) {
+    puntaje += PUNTOS_POR_ACIERTO;
+    aciertos++;
+    elemento.classList.add('correcta');
+    feedback.textContent = `✅ ¡Correcto! +${PUNTOS_POR_ACIERTO} puntos`;
+    feedback.className = 'ok';
+  } else {
+    elemento.classList.add('incorrecta');
+    feedback.textContent = `❌ Incorrecto. La respuesta era: ${correcta}`;
+    feedback.className = 'no';
+    todasOpciones.forEach(o => {
+      if (o.textContent === correcta) o.classList.add('correcta');
+    });
+  }
+
+  document.getElementById('lblPuntaje').textContent = puntaje;
+
+  indicePregunta++;
+  setTimeout(() => {
+    if (tiempoRestante > 0) mostrarPregunta();
+  }, 900);
+}
+
+/* =========================================================
+   FIN DEL JUEGO
+   ========================================================= */
+function finalizarJuego() {
+  clearInterval(intervalo);
+  document.getElementById('zonaJuego').style.display = 'none';
+
+  guardarPuntaje();
+
+  const contestadas = Math.min(indicePregunta, TOTAL_PREGUNTAS);
+  const modal = document.getElementById('modal');
+  document.getElementById('resumenFinal').innerHTML = `
+    Jugador: <strong>${jugador}</strong><br>
+    Nivel: <strong>${modoActual === 'facil' ? '🟢 Fácil' : '🔴 Difícil'}</strong><br>
+    Puntaje obtenido: <strong>${puntaje} puntos</strong><br>
+    Aciertos: <strong>${aciertos}</strong> de ${contestadas} preguntas respondidas<br>
+    <small>(${PUNTOS_POR_ACIERTO} puntos por respuesta correcta)</small>
+  `;
+  modal.classList.add('visible');
+}
+
+function cerrarModalYReiniciar() {
+  document.getElementById('modal').classList.remove('visible');
+  document.getElementById('pantallaRegistro').style.display = 'block';
+  document.getElementById('zonaJuego').style.display = 'none';
+  document.getElementById('nombreInput').value = jugador;
+  document.getElementById('nombreInput').focus();
+}
+
+function cerrarModalYVerTabla() {
+  document.getElementById('modal').classList.remove('visible');
+  abrirTabla(modoActual);
+}
+
+/* =========================================================
+   HISTORIAL / TABLA (separado por nivel)
+   ========================================================= */
+function obtenerPuntajes() {
+  try {
+    const datos = localStorage.getItem(CLAVE_STORAGE);
+    return datos ? JSON.parse(datos) : { facil: [], dificil: [] };
+  } catch (e) {
+    return { facil: [], dificil: [] };
+  }
+}
+
+function guardarPuntaje() {
+  const datos = obtenerPuntajes();
+  if (!datos[modoActual]) datos[modoActual] = [];
+
+  const ahora = new Date();
+  datos[modoActual].push({
+    nombre: jugador,
+    puntaje: puntaje,
+    aciertos: aciertos,
+    fecha: `${dosDigitos(ahora.getDate())}/${dosDigitos(ahora.getMonth() + 1)}/${ahora.getFullYear()} ${dosDigitos(ahora.getHours())}:${dosDigitos(ahora.getMinutes())}`
+  });
+
+  try {
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(datos));
+  } catch (e) {
+    console.warn('No se pudo guardar el puntaje', e);
+  }
+}
+
+function abrirTabla(nivel) {
+  document.getElementById('pantallaRegistro').style.display = 'none';
+  document.getElementById('zonaJuego').style.display = 'none';
+  document.getElementById('tablaPuntajes').style.display = 'block';
+
+  document.getElementById('tabFacil').classList.toggle('activo', nivel === 'facil');
+  document.getElementById('tabDificil').classList.toggle('activo', nivel === 'dificil');
+
+  renderizarTabla(nivel);
+}
+
+function cerrarTabla() {
+  document.getElementById('tablaPuntajes').style.display = 'none';
+
+  if (intervalo && tiempoRestante > 0 && preguntas.length > 0 && indicePregunta > 0) {
+    document.getElementById('zonaJuego').style.display = 'block';
+  } else {
+    document.getElementById('pantallaRegistro').style.display = 'block';
+  }
+}
+
+function renderizarTabla(nivel) {
+  const datos = obtenerPuntajes();
+  const lista = datos[nivel] || [];
+  const cuerpo = document.getElementById('cuerpoTabla');
+
+  if (lista.length === 0) {
+    cuerpo.innerHTML = `<tr><td colspan="5" style="padding:22px;color:#888;">Aún no hay puntajes en el nivel ${nivel === 'facil' ? 'Fácil 🟢' : 'Difícil 🔴'}. ¡Juega y aparece aquí! 🎮</td></tr>`;
+    return;
+  }
+
+  const ordenada = [...lista].sort((a, b) => b.puntaje - a.puntaje);
+
+  cuerpo.innerHTML = ordenada.map((item, idx) => {
+    let medalla = '';
+    if (idx === 0) medalla = '🥇 ';
+    else if (idx === 1) medalla = '🥈 ';
+    else if (idx === 2) medalla = '🥉 ';
+
+    return `<tr>
+      <td>${idx + 1}</td>
+      <td>${medalla}${escaparHTML(item.nombre)}</td>
+      <td><strong>${item.puntaje}</strong></td>
+      <td>${item.aciertos}</td>
+      <td style="font-size:.85rem;color:#666;">${item.fecha}</td>
+    </tr>`;
+  }).join('');
+}
+
+function escaparHTML(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
+/* =========================================================
+   EVENTO ENTER
+   ========================================================= */
+document.getElementById('nombreInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') iniciarJuego('facil');
+});
+</script>
+</body>
+</html>
